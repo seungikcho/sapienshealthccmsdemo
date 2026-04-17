@@ -4,4 +4,9 @@
 - [x] Simplify the navigation tabs to match the new structure.
 - [x] Update supporting copy using the clinical trial screening and operational support context from the conversation.
 - [x] Validate the revised site visually and technically.
+- [x] Remove the Rice spinout concept / MedMIX foundation banner line from the hero.
+- [x] Generate a custom Sapiens Labs logo with a black background and an S-based delta-inspired mark using the provided image as stylistic reference.
+- [x] Add more company-like branded visual structure and stronger fusion graphics showing different clinical data streams converging.
+- [x] Redesign the hero and key sections to feel more like a polished startup company website.
+- [x] Validate the refreshed site visually and technically.
 - [ ] Save a new checkpoint and deliver the updated version.
