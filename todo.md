@@ -1,0 +1,7 @@
+- [x] Rename the company from Sapiens Health to Sapiens Labs across the site.
+- [x] Reduce homepage copy and simplify section structure.
+- [x] Replace current framing with two primary pillars: hospital operation support and clinical trial support.
+- [x] Simplify the navigation tabs to match the new structure.
+- [x] Update supporting copy using the clinical trial screening and operational support context from the conversation.
+- [x] Validate the revised site visually and technically.
+- [ ] Save a new checkpoint and deliver the updated version.
