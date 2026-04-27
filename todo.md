@@ -57,3 +57,6 @@
 - [x] Simplify the hero card labels so they use the regular site text style instead of all-caps styling.
 - [x] Add clearer modality coverage in the hero graphic, including CT, X-ray, pathology, EHR, and notes, using simple visuals where needed.
 - [x] Review the updated hero layout in the live preview and save a new checkpoint if the composition is cleaner.
+- [x] Remove the current right-side hero graphic panel from the opening section.
+- [x] Rebalance the hero layout after removing the graphic so the opening feels cleaner and less busy.
+- [x] Review the simplified hero in the live preview and save a checkpoint if the cleaner direction works.

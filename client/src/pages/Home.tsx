@@ -143,15 +143,13 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="grid gap-8 px-5 py-10 sm:px-8 sm:py-14 lg:grid-cols-[1.05fr_0.95fr] lg:px-10 lg:py-16 xl:gap-14">
-            <div className="flex max-w-[48rem] flex-col justify-between">
-              <div>
-                <h1 className="font-display max-w-[12ch] text-[3rem] font-semibold leading-[0.94] tracking-[-0.075em] text-white sm:text-[4rem] lg:text-[4.8rem] xl:text-[5.45rem]">
-                  Intelligence layer for incomplete clinical data.
-                </h1>
-              </div>
+          <div className="px-5 py-10 sm:px-8 sm:py-14 lg:px-10 lg:py-18">
+            <div className="max-w-[58rem]">
+              <h1 className="font-display max-w-[12ch] text-[3rem] font-semibold leading-[0.95] tracking-[-0.075em] text-white sm:text-[4rem] lg:text-[4.7rem] xl:text-[5.3rem]">
+                Intelligence layer for incomplete clinical data.
+              </h1>
 
-              <div className="mt-8 max-w-[34rem]">
+              <div className="mt-8 max-w-[36rem]">
                 <p className="text-lg leading-8 text-white/72 sm:text-xl">
                   Sapiens Health builds the AI engine that fuses imaging, EHR, and clinical data —
                   even when some are missing.
@@ -171,82 +169,6 @@ export default function Home() {
                     Get In Touch
                     <ArrowRight className="h-4 w-4" />
                   </a>
-                </div>
-              </div>
-            </div>
-
-            <div className="relative min-h-[28rem] lg:min-h-[34rem]">
-              <div className="hero-stage absolute inset-0 rounded-[2rem] border border-white/8 bg-[radial-gradient(circle_at_50%_18%,rgba(136,108,255,0.14),transparent_28%),linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.015))]" />
-              <div className="absolute inset-[7%_4%_6%_4%] rounded-[1.85rem] border border-white/10 bg-[radial-gradient(circle_at_50%_48%,rgba(122,103,255,0.16),transparent_26%),linear-gradient(180deg,rgba(12,11,22,0.98),rgba(8,7,18,0.98))] p-4 shadow-[0_50px_90px_rgba(0,0,0,0.35)] sm:p-5">
-                <div className="grid h-full grid-cols-3 gap-3 sm:gap-4">
-                  {heroSignalCards.slice(0, 3).map((card, index) => {
-                    const Icon = card.icon;
-                    return (
-                      <div
-                        key={card.title}
-                        className={`floating-card ${index === 0 ? "floating-card-a" : index === 1 ? "floating-card-b" : "floating-card-c"} flex aspect-square flex-col rounded-[1.55rem] border border-white/12 bg-[#12111e]/94 p-2.5 shadow-[0_28px_50px_rgba(0,0,0,0.28)] backdrop-blur-xl`}
-                      >
-                        <div className="flex-1 overflow-hidden rounded-[1.1rem] border border-white/8 bg-[radial-gradient(circle_at_50%_30%,rgba(83,221,255,0.12),transparent_32%),linear-gradient(180deg,#10101b,#090911)]">
-                          {card.image ? (
-                            <img src={card.image} alt={card.title} className="h-full w-full object-cover" />
-                          ) : (
-                            <div className="flex h-full w-full items-center justify-center">
-                              <div className="flex h-[4.5rem] w-[4.5rem] items-center justify-center rounded-[1.35rem] border border-white/10 bg-white/[0.03] shadow-[0_0_40px_rgba(100,88,255,0.14)] sm:h-[5rem] sm:w-[5rem]">
-                                <Icon className="h-8 w-8 text-white/82 sm:h-9 sm:w-9" />
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                        <div className="mt-2.5 flex items-center gap-2 text-sm font-medium text-white/72">
-                          <Icon className="h-3.5 w-3.5 text-[#bfa4ff]" />
-                          <span>{card.title}</span>
-                        </div>
-                      </div>
-                    );
-                  })}
-
-                  <div className="floating-card floating-card-a flex aspect-square flex-col rounded-[1.55rem] border border-white/12 bg-[#12111e]/94 p-2.5 shadow-[0_28px_50px_rgba(0,0,0,0.28)] backdrop-blur-xl">
-                    <div className="flex-1 overflow-hidden rounded-[1.1rem] border border-white/8 bg-[radial-gradient(circle,rgba(153,134,255,0.3),rgba(10,10,18,0.06)_58%,rgba(10,10,18,0)_78%)]">
-                      <div className="relative flex h-full w-full items-center justify-center">
-                        <div className="absolute inset-[16%] rounded-full border border-white/10" />
-                        <div className="absolute inset-[26%] rounded-full border border-[#9f92ff]/24" />
-                        <div className="absolute inset-[32%] rounded-full bg-[radial-gradient(circle,rgba(196,183,255,0.34),rgba(104,87,255,0.18)_48%,rgba(8,8,18,0)_76%)] blur-[2px]" />
-                        <div className="relative flex h-[4.5rem] w-[4.5rem] items-center justify-center overflow-hidden rounded-[1.35rem] border border-white/12 bg-black/80 shadow-[0_0_40px_rgba(111,93,255,0.24)] sm:h-[5rem] sm:w-[5rem]">
-                          <img src={logoUrl} alt="Sapiens Health engine mark" className="h-full w-full object-cover" />
-                        </div>
-                      </div>
-                    </div>
-                    <div className="mt-2.5 flex items-center gap-2 text-sm font-medium text-white/72">
-                      <Database className="h-3.5 w-3.5 text-[#bfa4ff]" />
-                      <span>Fusion engine</span>
-                    </div>
-                  </div>
-
-                  {heroSignalCards.slice(3).map((card, index) => {
-                    const Icon = card.icon;
-                    return (
-                      <div
-                        key={card.title}
-                        className={`floating-card ${index === 0 ? "floating-card-b" : "floating-card-c"} flex aspect-square flex-col rounded-[1.55rem] border border-white/12 bg-[#12111e]/94 p-2.5 shadow-[0_28px_50px_rgba(0,0,0,0.28)] backdrop-blur-xl`}
-                      >
-                        <div className="flex-1 overflow-hidden rounded-[1.1rem] border border-white/8 bg-[radial-gradient(circle_at_50%_30%,rgba(83,221,255,0.12),transparent_32%),linear-gradient(180deg,#10101b,#090911)]">
-                          {card.image ? (
-                            <img src={card.image} alt={card.title} className="h-full w-full object-cover" />
-                          ) : (
-                            <div className="flex h-full w-full items-center justify-center">
-                              <div className="flex h-[4.5rem] w-[4.5rem] items-center justify-center rounded-[1.35rem] border border-white/10 bg-white/[0.03] shadow-[0_0_40px_rgba(100,88,255,0.14)] sm:h-[5rem] sm:w-[5rem]">
-                                <Icon className="h-8 w-8 text-white/82 sm:h-9 sm:w-9" />
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                        <div className="mt-2.5 flex items-center gap-2 text-sm font-medium text-white/72">
-                          <Icon className="h-3.5 w-3.5 text-[#bfa4ff]" />
-                          <span>{card.title}</span>
-                        </div>
-                      </div>
-                    );
-                  })}
                 </div>
               </div>
             </div>
