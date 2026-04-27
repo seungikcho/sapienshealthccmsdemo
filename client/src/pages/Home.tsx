@@ -107,8 +107,7 @@ export default function Home() {
               <img src={logoUrl} alt="Sapiens Health logo" className="h-full w-full object-cover" />
             </div>
             <div className="min-w-0">
-              <div className="font-wordmark truncate text-sm text-white/96">SAPIENS HEALTH</div>
-              <div className="truncate text-xs text-white/48">Multimodal clinical intelligence</div>
+              <div className="font-wordmark truncate text-white/96">Sapiens Health</div>
             </div>
           </a>
 

@@ -48,3 +48,6 @@
 - [x] Unify the top hero animation imagery so imaging, pathology, and clinical data feel stylistically consistent.
 - [x] Replace the large headline font with a straighter, more neutral grotesk-style typeface closer to the provided reference.
 - [x] Review the updated heading typography in the live preview and save a new checkpoint if it reads more cleanly.
+- [x] Restyle the top Sapiens Health wordmark to look simpler and straighter like the latest reference.
+- [x] Remove the 'Multimodal clinical intelligence' subtitle from the header.
+- [x] Review the cleaned header in the live preview and save a checkpoint if approved visually.
