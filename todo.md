@@ -31,11 +31,18 @@
 - [x] Add more dynamic animation so users can visually follow data flowing through the platform.
 - [x] Research additional realistic hospital decision-support tasks to include in the pipeline.
 - [x] Validate the revised About section visually and technically.
-- [ ] Rebuild the homepage to scale correctly on full-width desktop screens without broken proportions.
-- [ ] Study converge-bio.com for layout, spacing, and section composition cues.
-- [ ] Introduce stronger visual graphics and real medical imagery across the homepage.
-- [ ] Generate or collect image assets for CT, imaging, and healthcare data visuals.
-- [ ] Redesign the opening hero to follow a converge-style composition using Sapiens Health branding.
-- [ ] Simplify the framework presentation into cleaner, more visual product sections.
-- [ ] Add tasteful animation to images and graphic modules so the page feels more alive.
-- [ ] Validate the redesigned site visually and technically.
+- [x] Rebuild the homepage to scale correctly on full-width desktop screens without broken proportions.
+- [x] Study converge-bio.com for layout, spacing, and section composition cues.
+- [x] Introduce stronger visual graphics and real medical imagery across the homepage.
+- [x] Generate or collect image assets for CT, imaging, and healthcare data visuals.
+- [x] Redesign the opening hero to follow a converge-style composition using Sapiens Health branding.
+- [x] Simplify the framework presentation into cleaner, more visual product sections.
+- [x] Add tasteful animation to images and graphic modules so the page feels more alive.
+- [x] Validate the redesigned site visually and technically.
+- [x] Change section subheading fonts so labels such as Contact and Hospital operations read more clearly and prominently.
+- [x] Update the top SAPIENS HEALTH wordmark typography to feel cleaner and more distinctive.
+- [x] Remove the Healthcare AI deep tech eyebrow text from the hero.
+- [x] Simplify the CT, pathology, and EHR graphics by removing surrounding visual clutter and keeping only the clean core visuals.
+- [x] Add cleaner visual inputs inside the MEDMIX engine section so imagery is used more consistently.
+- [x] Shorten output card descriptions so each block is faster to scan.
+- [x] Unify the top hero animation imagery so imaging, pathology, and clinical data feel stylistically consistent.

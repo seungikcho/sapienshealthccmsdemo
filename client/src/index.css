@@ -1,8 +1,7 @@
 /*
-Design philosophy for this stylesheet: Wide cinematic healthcare AI interface.
-Keep the background dark and premium, let large modules breathe across desktop width,
-and support subtle floating image motion, engine pulse, and framework flow animations.
-The visual system should feel crisp, polished, and product-oriented rather than diagram-heavy.
+Design philosophy for this stylesheet: Premium dark healthcare AI interface with a cleaner,
+editorial type system. Use Manrope for body copy, a sharper display face for the wordmark and
+section headings, and restrained motion so the page feels polished, spacious, and product-led.
 */
 @import "tailwindcss";
 @import "tw-animate-css";
@@ -183,6 +182,28 @@ The visual system should feel crisp, polished, and product-oriented rather than 
     min-width: 0;
   }
 
+  .font-display {
+    font-family: "Syne", sans-serif;
+    font-feature-settings: "ss01" 1;
+  }
+
+  .font-wordmark {
+    font-family: "Syne", sans-serif;
+    font-size: 0.92rem;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    line-height: 1;
+  }
+
+  .section-kicker {
+    font-family: "Syne", sans-serif;
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.56);
+  }
+
   .hero-stage {
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 50px 120px rgba(0, 0, 0, 0.22);
   }
@@ -241,6 +262,14 @@ The visual system should feel crisp, polished, and product-oriented rather than 
     letter-spacing: 0.24em;
     text-transform: uppercase;
     color: rgba(255, 255, 255, 0.62);
+  }
+
+  .input-visual-card {
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 1.1rem;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.02));
+    padding: 0.65rem;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.025), 0 20px 40px rgba(0, 0, 0, 0.18);
   }
 
   .framework-rail {

@@ -1,8 +1,8 @@
 /*
-Design philosophy for this page: Full-screen healthcare AI deep-tech launch page.
-Use a wide cinematic desktop layout, strong headline hierarchy, restrained violet-cyan glow,
-real medical-image panels, and simpler product storytelling inspired by premium biotech sites.
-The page should feel spacious and graphic-led rather than boxed or diagram-heavy.
+Design philosophy for this page: Converge-inspired healthcare AI launch page with a cleaner,
+more premium product language. Keep the desktop composition wide and cinematic, use a sharper
+editorial display face for the wordmark and section titles, and let the medical visuals feel
+minimal, unified, and investment-grade rather than schematic or cluttered.
 */
 import {
   Activity,
@@ -16,7 +16,6 @@ import {
   HeartPulse,
   Microscope,
   ScanLine,
-  Sparkles,
   Stethoscope,
   TestTube2,
 } from "lucide-react";
@@ -24,33 +23,36 @@ import {
 const logoUrl =
   "https://d36hbw14aib5lz.cloudfront.net/310519663318202729/TdsfYCSbV9xhvU4DsPP84j/sapienslabs-logo-delta-s-ZjHQetHDXzKos43yZtYjhG.webp?Expires=1807943486&Signature=bfdsDHdM6VbnOCGdixbHpPYBMIrYD2Iaoli5PD2tmAlSbGwChYR7nNxUJIRSQ2Pliwgd7Vz3RvRDPXKLq87uJM5lNGBrieObDqPDN~gGsfmBUgMg-mB-7KN3h~BkL14M12o3i9aw89YHbu2KvJHqdAQPvU~X3MIYpnWR2DSTuKXoNitY490GJbM5LmyBIL2FezT~o04fHDRaALkBcifH7eKRlLab7boYuNTC3G4WEPXTyIyBDoPUZrPps1lyVnu~71IYflncNFZkMiadkvu7DAO5Vs1LfO7qBrII9lx8MzsA4lyPZmJugxjgK8DJ2Dtf1YNTCctpMCNZBxrDmNg8Lw__&Key-Pair-Id=K1MP89RTKNH4J";
 
-const heroPanelUrl =
-  "https://d2xsxph8kpxj0f.cloudfront.net/310519663318202729/TdsfYCSbV9xhvU4DsPP84j/sapienshealth-converge-hero-panel-NgEPFyQkisPkeSfYwpRwff.webp";
+const unifiedHeroUrl =
+  "https://d2xsxph8kpxj0f.cloudfront.net/310519663318202729/TdsfYCSbV9xhvU4DsPP84j/sapienshealth-unified-fusion-hero-ArkM7e2b8jFtYQ6SoGAZYd.webp";
 const ctCardUrl =
-  "https://d2xsxph8kpxj0f.cloudfront.net/310519663318202729/TdsfYCSbV9xhvU4DsPP84j/sapienshealth-ct-card-ipxNLKoHDU7tS9ahsYy2Ed.webp";
+  "https://d2xsxph8kpxj0f.cloudfront.net/310519663318202729/TdsfYCSbV9xhvU4DsPP84j/sapienshealth-clean-imaging-card-MQjtJ8DP6g4pJhhxq2McRa.webp";
 const pathologyCardUrl =
-  "https://d2xsxph8kpxj0f.cloudfront.net/310519663318202729/TdsfYCSbV9xhvU4DsPP84j/sapienshealth-pathology-card-NgbQ3LcpAsKsJrL4zoVT5f.webp";
+  "https://d2xsxph8kpxj0f.cloudfront.net/310519663318202729/TdsfYCSbV9xhvU4DsPP84j/sapienshealth-clean-pathology-card-7n3TYJKUaWSHohhNFGEmy8.webp";
 const ehrCardUrl =
-  "https://d2xsxph8kpxj0f.cloudfront.net/310519663318202729/TdsfYCSbV9xhvU4DsPP84j/sapienshealth-ehr-monitor-card-i46Nek6t93bDx8BZ8RZRW7.webp";
+  "https://d2xsxph8kpxj0f.cloudfront.net/310519663318202729/TdsfYCSbV9xhvU4DsPP84j/sapienshealth-clean-ehr-card-8kJzNndpH8o7RtF5edHh3t.webp";
 
 const modalityCards = [
   {
     title: "CT and imaging",
-    description: "CT, X-ray, MRI, ultrasound, and image-derived findings enter the same decision layer.",
+    description: "Imaging enters the same operational decision layer.",
     image: ctCardUrl,
     icon: ScanLine,
+    label: "Imaging",
   },
   {
     title: "Pathology and tissue",
-    description: "Digital pathology, histology regions, biomarkers, and morphology cues remain connected to the case context.",
+    description: "Tissue context stays connected to the full case.",
     image: pathologyCardUrl,
     icon: Microscope,
+    label: "Pathology",
   },
   {
     title: "EHR and live monitoring",
-    description: "Labs, vitals, notes, medications, orders, and longitudinal trends are fused with imaging signals.",
+    description: "Clinical records and physiologic signals stay in sync.",
     image: ehrCardUrl,
     icon: Database,
+    label: "Clinical data",
   },
 ];
 
@@ -66,12 +68,12 @@ const inputChips = [
 ];
 
 const outputTasks = [
-  { title: "OR time estimation", detail: "Case duration, turnover, and downstream schedule impact.", icon: Clock3 },
-  { title: "Discharge readiness", detail: "Bed planning and patient-flow prioritization from incomplete signals.", icon: Building2 },
-  { title: "ICU escalation", detail: "Faster recognition of patients who need transfer or closer monitoring.", icon: Stethoscope },
-  { title: "Trial eligibility", detail: "Pre-screen likely candidates against protocol criteria and site logic.", icon: FileSearch },
-  { title: "Patient matching", detail: "Match multimodal profiles to relevant studies, arms, or sponsor programs.", icon: BrainCircuit },
-  { title: "Deterioration watch", detail: "Surface risk patterns across imaging, monitoring, and documentation together.", icon: Activity },
+  { title: "OR time estimation", detail: "Predict case timing and turnover.", icon: Clock3 },
+  { title: "Discharge readiness", detail: "Flag patients nearing discharge.", icon: Building2 },
+  { title: "ICU escalation", detail: "Surface cases that need closer monitoring.", icon: Stethoscope },
+  { title: "Trial eligibility", detail: "Pre-screen likely protocol matches.", icon: FileSearch },
+  { title: "Patient matching", detail: "Route patients toward relevant studies.", icon: BrainCircuit },
+  { title: "Deterioration watch", detail: "Detect multimodal risk earlier.", icon: Activity },
 ];
 
 const solutionCards = [
@@ -105,7 +107,7 @@ export default function Home() {
               <img src={logoUrl} alt="Sapiens Health logo" className="h-full w-full object-cover" />
             </div>
             <div className="min-w-0">
-              <div className="truncate text-sm font-semibold tracking-[0.24em] text-white/94">SAPIENS HEALTH</div>
+              <div className="font-wordmark truncate text-sm text-white/96">SAPIENS HEALTH</div>
               <div className="truncate text-xs text-white/48">Multimodal clinical intelligence</div>
             </div>
           </a>
@@ -138,11 +140,7 @@ export default function Home() {
           <div className="grid gap-8 px-5 py-10 sm:px-8 sm:py-14 lg:grid-cols-[1.05fr_0.95fr] lg:px-10 lg:py-16 xl:gap-14">
             <div className="flex max-w-[48rem] flex-col justify-between">
               <div>
-                <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-xs uppercase tracking-[0.28em] text-white/56">
-                  <Sparkles className="h-3.5 w-3.5 text-[#cab7ff]" />
-                  Healthcare AI deep tech
-                </div>
-                <h1 className="max-w-[11ch] font-[Space_Grotesk] text-[3.35rem] font-bold leading-[0.93] tracking-[-0.08em] text-white sm:text-[4.5rem] lg:text-[5.4rem] xl:text-[6.25rem]">
+                <h1 className="font-display max-w-[11ch] text-[3.35rem] font-semibold leading-[0.93] tracking-[-0.08em] text-white sm:text-[4.5rem] lg:text-[5.4rem] xl:text-[6.25rem]">
                   Intelligence layer for incomplete clinical data.
                 </h1>
               </div>
@@ -174,32 +172,32 @@ export default function Home() {
             <div className="relative min-h-[28rem] lg:min-h-[34rem]">
               <div className="hero-stage absolute inset-0 rounded-[2rem] border border-white/8 bg-[radial-gradient(circle_at_50%_18%,rgba(136,108,255,0.14),transparent_28%),linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.015))]" />
               <div className="absolute inset-[8%_4%_6%_4%] overflow-hidden rounded-[1.8rem] border border-white/10 bg-[#0c0b16] shadow-[0_50px_90px_rgba(0,0,0,0.35)]">
-                <img src={heroPanelUrl} alt="Sapiens Health multimodal fusion visual" className="h-full w-full object-cover opacity-90" />
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_15%,rgba(181,159,255,0.18),transparent_20%),linear-gradient(180deg,rgba(5,5,12,0.06),rgba(5,5,12,0.24))]" />
+                <img src={unifiedHeroUrl} alt="Sapiens Health multimodal fusion visual" className="h-full w-full object-cover opacity-92" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_15%,rgba(181,159,255,0.12),transparent_20%),linear-gradient(180deg,rgba(5,5,12,0.04),rgba(5,5,12,0.18))]" />
               </div>
 
-              <div className="floating-card floating-card-a absolute left-[4%] top-[6%] w-[11rem] rounded-[1.6rem] border border-white/12 bg-[#11101c]/90 p-3 shadow-[0_30px_60px_rgba(0,0,0,0.35)] backdrop-blur-xl sm:w-[13rem]">
-                <div className="mb-2 flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] text-white/46">
+              <div className="floating-card floating-card-a absolute left-[3%] top-[7%] w-[9.6rem] rounded-[1.45rem] border border-white/12 bg-[#11101c]/92 p-2.5 shadow-[0_30px_60px_rgba(0,0,0,0.35)] backdrop-blur-xl sm:w-[11rem]">
+                <img src={ctCardUrl} alt="CT imaging input" className="h-28 w-full rounded-[1rem] object-cover sm:h-32" />
+                <div className="mt-2.5 inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.24em] text-white/56">
                   <ScanLine className="h-3.5 w-3.5 text-[#bfa4ff]" />
                   Imaging
                 </div>
-                <img src={ctCardUrl} alt="CT imaging input" className="h-32 w-full rounded-[1.2rem] object-cover sm:h-36" />
               </div>
 
-              <div className="floating-card floating-card-b absolute right-[2%] top-[10%] w-[11rem] rounded-[1.6rem] border border-white/12 bg-[#11101c]/90 p-3 shadow-[0_30px_60px_rgba(0,0,0,0.35)] backdrop-blur-xl sm:w-[13rem]">
-                <div className="mb-2 flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] text-white/46">
+              <div className="floating-card floating-card-b absolute right-[1%] top-[10%] w-[9.6rem] rounded-[1.45rem] border border-white/12 bg-[#11101c]/92 p-2.5 shadow-[0_30px_60px_rgba(0,0,0,0.35)] backdrop-blur-xl sm:w-[11rem]">
+                <img src={pathologyCardUrl} alt="Pathology input" className="h-28 w-full rounded-[1rem] object-cover sm:h-32" />
+                <div className="mt-2.5 inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.24em] text-white/56">
                   <Microscope className="h-3.5 w-3.5 text-cyan-300" />
                   Pathology
                 </div>
-                <img src={pathologyCardUrl} alt="Pathology input" className="h-32 w-full rounded-[1.2rem] object-cover sm:h-36" />
               </div>
 
-              <div className="floating-card floating-card-c absolute bottom-[5%] right-[10%] w-[12rem] rounded-[1.6rem] border border-white/12 bg-[#11101c]/92 p-3 shadow-[0_30px_60px_rgba(0,0,0,0.35)] backdrop-blur-xl sm:w-[14rem]">
-                <div className="mb-2 flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] text-white/46">
+              <div className="floating-card floating-card-c absolute bottom-[4%] right-[8%] w-[10.5rem] rounded-[1.45rem] border border-white/12 bg-[#11101c]/92 p-2.5 shadow-[0_30px_60px_rgba(0,0,0,0.35)] backdrop-blur-xl sm:w-[12rem]">
+                <img src={ehrCardUrl} alt="EHR and monitoring input" className="h-30 w-full rounded-[1rem] object-cover sm:h-34" />
+                <div className="mt-2.5 inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.24em] text-white/56">
                   <Database className="h-3.5 w-3.5 text-[#bfa4ff]" />
                   Clinical data
                 </div>
-                <img src={ehrCardUrl} alt="EHR and monitoring input" className="h-36 w-full rounded-[1.2rem] object-cover sm:h-40" />
               </div>
             </div>
           </div>
@@ -207,8 +205,8 @@ export default function Home() {
 
         <section id="about" className="mx-auto mt-8 grid w-full max-w-[1520px] gap-6 lg:grid-cols-[0.9fr_1.1fr]">
           <article className="rounded-[2rem] border border-white/10 bg-white/[0.035] p-6 shadow-[0_30px_80px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:p-8">
-            <div className="text-xs font-semibold uppercase tracking-[0.28em] text-white/42">About</div>
-            <h2 className="mt-5 max-w-[16ch] font-[Space_Grotesk] text-3xl font-bold tracking-[-0.06em] text-white sm:text-4xl lg:text-[2.8rem]">
+            <div className="section-kicker">About</div>
+            <h2 className="font-display mt-5 max-w-[16ch] text-3xl font-semibold tracking-[-0.06em] text-white sm:text-4xl lg:text-[2.8rem]">
               Built like a platform, not a paper diagram.
             </h2>
             <p className="mt-5 max-w-[34rem] text-base leading-8 text-white/66">
@@ -228,9 +226,9 @@ export default function Home() {
                     <div>
                       <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[11px] uppercase tracking-[0.22em] text-white/52">
                         <Icon className="h-3.5 w-3.5 text-[#cab7ff]" />
-                        Input modality
+                        {card.label}
                       </div>
-                      <h3 className="mt-4 font-[Space_Grotesk] text-2xl font-bold tracking-[-0.05em] text-white">{card.title}</h3>
+                      <h3 className="font-display mt-4 text-2xl font-semibold tracking-[-0.05em] text-white">{card.title}</h3>
                       <p className="mt-3 text-sm leading-7 text-white/62">{card.description}</p>
                     </div>
                   </div>
@@ -242,8 +240,8 @@ export default function Home() {
           <article className="overflow-hidden rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(15,12,29,0.92),rgba(8,7,18,0.98))] p-6 shadow-[0_30px_90px_rgba(0,0,0,0.34)] sm:p-8">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
               <div>
-                <div className="text-xs font-semibold uppercase tracking-[0.28em] text-white/42">Framework</div>
-                <h2 className="mt-4 max-w-[17ch] font-[Space_Grotesk] text-3xl font-bold tracking-[-0.06em] text-white sm:text-4xl">
+                <div className="section-kicker">Framework</div>
+                <h2 className="font-display mt-4 max-w-[17ch] text-3xl font-semibold tracking-[-0.06em] text-white sm:text-4xl">
                   Diverse inputs enter. MEDMIX routes. Predictions ship.
                 </h2>
               </div>
@@ -255,7 +253,21 @@ export default function Home() {
             <div className="mt-8 grid gap-5 xl:grid-cols-[0.78fr_0.64fr_0.98fr] xl:items-center">
               <div className="stage-card">
                 <div className="stage-label">Inputs</div>
-                <div className="mt-4 flex flex-wrap gap-2.5">
+                <div className="mt-4 grid grid-cols-3 gap-3">
+                  {modalityCards.map((card) => {
+                    const Icon = card.icon;
+                    return (
+                      <div key={card.title} className="input-visual-card">
+                        <img src={card.image} alt={card.title} className="h-24 w-full rounded-[0.95rem] object-cover" />
+                        <div className="mt-2 inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.2em] text-white/55">
+                          <Icon className="h-3 w-3 text-[#cab7ff]" />
+                          {card.label}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="mt-5 flex flex-wrap gap-2.5">
                   {inputChips.map((chip) => {
                     const Icon = chip.icon;
                     return (
@@ -268,8 +280,7 @@ export default function Home() {
                 </div>
                 <div className="framework-rail mt-5" />
                 <p className="mt-4 text-sm leading-7 text-white/58">
-                  Clinical images, pathology, structured records, notes, vitals, operations signals,
-                  and trial context can be fused in one production layer.
+                  Images, pathology, records, notes, vitals, and workflow context feed one production layer.
                 </p>
               </div>
 
@@ -283,9 +294,9 @@ export default function Home() {
                 <div className="relative z-10 mt-5 flex h-20 w-20 items-center justify-center overflow-hidden rounded-[1.65rem] border border-white/12 bg-black/80 shadow-[0_0_40px_rgba(111,93,255,0.22)]">
                   <img src={logoUrl} alt="Sapiens Health engine mark" className="h-full w-full object-cover" />
                 </div>
-                <div className="relative z-10 mt-5 font-[Space_Grotesk] text-2xl font-bold tracking-[-0.05em] text-white">Sapiens Health</div>
+                <div className="font-display relative z-10 mt-5 text-2xl font-semibold tracking-[-0.05em] text-white">Sapiens Health</div>
                 <p className="relative z-10 mt-3 max-w-[14rem] text-sm leading-6 text-white/62">
-                  Fuses multimodal evidence, scores incomplete inputs, and routes prediction tasks for real workflows.
+                  Fuses multimodal evidence and routes predictions into live workflows.
                 </p>
               </div>
 
@@ -321,9 +332,9 @@ export default function Home() {
                   <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.05] text-[#cab7ff]">
                     <Icon className="h-5 w-5" />
                   </div>
-                  <div className="text-xs font-semibold uppercase tracking-[0.28em] text-white/42">{card.eyebrow}</div>
+                  <div className="section-kicker">{card.eyebrow}</div>
                 </div>
-                <h2 className="mt-6 max-w-[15ch] font-[Space_Grotesk] text-3xl font-bold tracking-[-0.06em] text-white sm:text-4xl">
+                <h2 className="font-display mt-6 max-w-[15ch] text-3xl font-semibold tracking-[-0.06em] text-white sm:text-4xl">
                   {card.title}
                 </h2>
                 <p className="mt-5 max-w-[34rem] text-base leading-8 text-white/64">{card.text}</p>
@@ -335,8 +346,8 @@ export default function Home() {
         <section id="contact" className="mx-auto mt-8 w-full max-w-[1520px] rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.025))] p-6 shadow-[0_30px_80px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:p-8">
           <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end">
             <div>
-              <div className="text-xs font-semibold uppercase tracking-[0.28em] text-white/42">Contact</div>
-              <h2 className="mt-4 max-w-[14ch] font-[Space_Grotesk] text-3xl font-bold tracking-[-0.06em] text-white sm:text-4xl lg:text-[2.85rem]">
+              <div className="section-kicker">Contact</div>
+              <h2 className="font-display mt-4 max-w-[14ch] text-3xl font-semibold tracking-[-0.06em] text-white sm:text-4xl lg:text-[2.85rem]">
                 Built for real hospitals, study teams, and multimodal workflows.
               </h2>
               <p className="mt-5 max-w-[42rem] text-base leading-8 text-white/64">
