@@ -24,3 +24,10 @@
 - [x] Restyle the homepage into a darker healthcare AI deep-tech design while preserving the Sapiens Health logo.
 - [x] Update the primary hero actions to About Technology and Get In Touch.
 - [x] Validate the redesigned page visually and technically.
+- [x] Replace the current About-section fusion panel with a business-facing end-to-end platform pipeline.
+- [x] Expand the input side to show a broader set of real clinical and operational data types.
+- [x] Emphasize the central MEDMIX engine with stronger branding and animated processing states.
+- [x] Expand the output side to show understandable hospital and trial prediction tasks.
+- [x] Add more dynamic animation so users can visually follow data flowing through the platform.
+- [x] Research additional realistic hospital decision-support tasks to include in the pipeline.
+- [x] Validate the revised About section visually and technically.

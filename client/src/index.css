@@ -178,6 +178,138 @@ than soft editorial cards.
     min-width: 0;
   }
 
+  .pipeline-shell {
+    position: relative;
+  }
+
+  .pipeline-shell::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 1.5rem;
+    background:
+      linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    background-size: 46px 46px;
+    opacity: 0.35;
+    pointer-events: none;
+  }
+
+  .pipeline-input-card,
+  .pipeline-output-card {
+    position: relative;
+    animation: panelFloat 6s ease-in-out infinite;
+  }
+
+  .pipeline-drop {
+    position: absolute;
+    right: -0.35rem;
+    top: 50%;
+    width: 0.55rem;
+    height: 0.55rem;
+    margin-top: -0.275rem;
+    border-radius: 9999px;
+    background: linear-gradient(135deg, rgba(214, 188, 255, 0.95), rgba(116, 220, 255, 0.95));
+    box-shadow: 0 0 16px rgba(139, 121, 255, 0.6);
+    animation: dataDrop 2.4s ease-in-out infinite;
+  }
+
+  .pipeline-engine::before {
+    content: "";
+    position: absolute;
+    inset: 1rem;
+    border-radius: 1.7rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    pointer-events: none;
+  }
+
+  .pipeline-engine-badge {
+    position: relative;
+    z-index: 10;
+    margin-bottom: 0.75rem;
+    border-radius: 9999px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.4rem 0.75rem;
+    font-size: 0.65rem;
+    letter-spacing: 0.24em;
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .pipeline-core-glow {
+    position: absolute;
+    inset: 22% 20%;
+    border-radius: 9999px;
+    background: radial-gradient(circle, rgba(115, 96, 255, 0.3), rgba(115, 96, 255, 0));
+    filter: blur(18px);
+    animation: corePulse 4.8s ease-in-out infinite;
+  }
+
+  .pipeline-orbit {
+    position: absolute;
+    inset: 1rem;
+    border-radius: 2rem;
+    border: 1px solid rgba(146, 125, 255, 0.16);
+    pointer-events: none;
+  }
+
+  .pipeline-orbit::after {
+    content: "";
+    position: absolute;
+    top: -0.32rem;
+    left: 50%;
+    width: 0.65rem;
+    height: 0.65rem;
+    margin-left: -0.325rem;
+    border-radius: 9999px;
+    background: linear-gradient(135deg, rgba(214, 188, 255, 1), rgba(116, 220, 255, 1));
+    box-shadow: 0 0 18px rgba(122, 206, 255, 0.45);
+  }
+
+  .pipeline-orbit-a {
+    animation: orbitSpin 14s linear infinite;
+  }
+
+  .pipeline-orbit-b {
+    inset: 2rem;
+    animation: orbitSpinReverse 18s linear infinite;
+  }
+
+  .pipeline-output-card {
+    overflow: hidden;
+    border-radius: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.04);
+    padding: 1rem;
+  }
+
+  .pipeline-output-card::before {
+    content: "";
+    position: absolute;
+    inset: auto -20% 0 -20%;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(154, 134, 255, 0.75), rgba(120, 218, 255, 0.75), rgba(255, 255, 255, 0));
+    animation: outputSweep 3.8s linear infinite;
+  }
+
+  .pipeline-output-violet {
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02), 0 0 0 1px rgba(160, 134, 255, 0.05);
+  }
+
+  .pipeline-output-cyan {
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02), 0 0 0 1px rgba(120, 218, 255, 0.05);
+  }
+
+  .pipeline-score {
+    flex-shrink: 0;
+    border-radius: 9999px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.06);
+    padding: 0.35rem 0.5rem;
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.72);
+  }
+
   @media (min-width: 640px) {
     .container {
       padding-left: 1.5rem;
@@ -191,5 +323,80 @@ than soft editorial cards.
       padding-right: 2rem;
       max-width: 1280px;
     }
+  }
+}
+
+@keyframes panelFloat {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes dataDrop {
+  0% {
+    transform: translateX(-8px) scale(0.85);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  55% {
+    transform: translateX(18px) scale(1);
+    opacity: 0.95;
+  }
+  100% {
+    transform: translateX(34px) scale(0.75);
+    opacity: 0;
+  }
+}
+
+@keyframes orbitSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes orbitSpinReverse {
+  from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes corePulse {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(0.92);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+}
+
+@keyframes outputSweep {
+  0% {
+    transform: translateX(-32%);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateX(32%);
+    opacity: 0;
   }
 }
