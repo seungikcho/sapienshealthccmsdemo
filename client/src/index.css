@@ -183,23 +183,23 @@ section headings, and restrained motion so the page feels polished, spacious, an
   }
 
   .font-display {
-    font-family: "Syne", sans-serif;
-    font-feature-settings: "ss01" 1;
+    font-family: "Instrument Sans", "Manrope", sans-serif;
+    font-feature-settings: normal;
   }
 
   .font-wordmark {
-    font-family: "Syne", sans-serif;
+    font-family: "Instrument Sans", "Manrope", sans-serif;
     font-size: 0.92rem;
     font-weight: 700;
-    letter-spacing: 0.22em;
+    letter-spacing: 0.18em;
     line-height: 1;
   }
 
   .section-kicker {
-    font-family: "Syne", sans-serif;
+    font-family: "Instrument Sans", "Manrope", sans-serif;
     font-size: 0.74rem;
     font-weight: 700;
-    letter-spacing: 0.2em;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
     color: rgba(255, 255, 255, 0.56);
   }

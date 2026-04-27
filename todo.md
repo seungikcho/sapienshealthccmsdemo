@@ -46,3 +46,5 @@
 - [x] Add cleaner visual inputs inside the MEDMIX engine section so imagery is used more consistently.
 - [x] Shorten output card descriptions so each block is faster to scan.
 - [x] Unify the top hero animation imagery so imaging, pathology, and clinical data feel stylistically consistent.
+- [x] Replace the large headline font with a straighter, more neutral grotesk-style typeface closer to the provided reference.
+- [x] Review the updated heading typography in the live preview and save a new checkpoint if it reads more cleanly.
