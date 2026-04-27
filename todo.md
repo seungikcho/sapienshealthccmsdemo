@@ -51,3 +51,9 @@
 - [x] Restyle the top Sapiens Health wordmark to look simpler and straighter like the latest reference.
 - [x] Remove the 'Multimodal clinical intelligence' subtitle from the header.
 - [x] Review the cleaned header in the live preview and save a checkpoint if approved visually.
+- [x] Increase the size of the top Sapiens Health wordmark so it feels more intentional in the header.
+- [x] Reduce the hero headline scale so the opening composition breathes more comfortably.
+- [x] Rebuild the right-side hero graphic into a converge-like set of simple, equal-sized modality cards with consistent framing.
+- [x] Simplify the hero card labels so they use the regular site text style instead of all-caps styling.
+- [x] Add clearer modality coverage in the hero graphic, including CT, X-ray, pathology, EHR, and notes, using simple visuals where needed.
+- [x] Review the updated hero layout in the live preview and save a new checkpoint if the composition is cleaner.
