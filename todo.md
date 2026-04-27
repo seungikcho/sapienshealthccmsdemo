@@ -31,3 +31,11 @@
 - [x] Add more dynamic animation so users can visually follow data flowing through the platform.
 - [x] Research additional realistic hospital decision-support tasks to include in the pipeline.
 - [x] Validate the revised About section visually and technically.
+- [ ] Rebuild the homepage to scale correctly on full-width desktop screens without broken proportions.
+- [ ] Study converge-bio.com for layout, spacing, and section composition cues.
+- [ ] Introduce stronger visual graphics and real medical imagery across the homepage.
+- [ ] Generate or collect image assets for CT, imaging, and healthcare data visuals.
+- [ ] Redesign the opening hero to follow a converge-style composition using Sapiens Health branding.
+- [ ] Simplify the framework presentation into cleaner, more visual product sections.
+- [ ] Add tasteful animation to images and graphic modules so the page feels more alive.
+- [ ] Validate the redesigned site visually and technically.

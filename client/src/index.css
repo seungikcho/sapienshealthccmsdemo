@@ -1,8 +1,8 @@
 /*
-Design philosophy for this stylesheet: Dark healthcare AI interface with sharp contrast,
-minimal geometry, cool violet-cyan glow, and restrained futuristic depth. Typography should
-feel crisp, modern, and highly legible. Surfaces must read as premium product panels rather
-than soft editorial cards.
+Design philosophy for this stylesheet: Wide cinematic healthcare AI interface.
+Keep the background dark and premium, let large modules breathe across desktop width,
+and support subtle floating image motion, engine pulse, and framework flow animations.
+The visual system should feel crisp, polished, and product-oriented rather than diagram-heavy.
 */
 @import "tailwindcss";
 @import "tw-animate-css";
@@ -51,11 +51,11 @@ than soft editorial cards.
 :root {
   --radius: 1rem;
   --background: oklch(0.13 0.03 286);
-  --foreground: oklch(0.96 0.01 286);
+  --foreground: oklch(0.965 0.01 286);
   --card: oklch(0.17 0.025 286);
-  --card-foreground: oklch(0.96 0.01 286);
+  --card-foreground: oklch(0.965 0.01 286);
   --popover: oklch(0.16 0.025 286);
-  --popover-foreground: oklch(0.96 0.01 286);
+  --popover-foreground: oklch(0.965 0.01 286);
   --primary: oklch(0.83 0.13 308);
   --primary-foreground: oklch(0.14 0.03 286);
   --secondary: oklch(0.23 0.02 286);
@@ -86,11 +86,11 @@ than soft editorial cards.
 
 .dark {
   --background: oklch(0.13 0.03 286);
-  --foreground: oklch(0.96 0.01 286);
+  --foreground: oklch(0.965 0.01 286);
   --card: oklch(0.17 0.025 286);
-  --card-foreground: oklch(0.96 0.01 286);
+  --card-foreground: oklch(0.965 0.01 286);
   --popover: oklch(0.16 0.025 286);
-  --popover-foreground: oklch(0.96 0.01 286);
+  --popover-foreground: oklch(0.965 0.01 286);
   --primary: oklch(0.83 0.13 308);
   --primary-foreground: oklch(0.14 0.03 286);
   --secondary: oklch(0.23 0.02 286);
@@ -132,18 +132,23 @@ than soft editorial cards.
     min-height: 100vh;
     font-family: "Manrope", sans-serif;
     background:
-      radial-gradient(circle at top, rgba(142, 101, 255, 0.12), transparent 26%),
-      radial-gradient(circle at 80% 18%, rgba(102, 210, 255, 0.07), transparent 18%),
-      linear-gradient(180deg, #070612 0%, #090816 45%, #06050f 100%);
+      radial-gradient(circle at 14% 10%, rgba(126, 92, 255, 0.15), transparent 18%),
+      radial-gradient(circle at 84% 16%, rgba(80, 209, 255, 0.08), transparent 16%),
+      linear-gradient(180deg, #06050d 0%, #0a0915 48%, #07060e 100%);
     color: var(--foreground);
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
   }
 
   a {
     color: inherit;
     text-decoration: none;
+  }
+
+  img {
+    display: block;
   }
 
   button:not(:disabled),
@@ -178,43 +183,77 @@ than soft editorial cards.
     min-width: 0;
   }
 
-  .pipeline-shell {
-    position: relative;
+  .hero-stage {
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 50px 120px rgba(0, 0, 0, 0.22);
   }
 
-  .pipeline-shell::before {
+  .hero-stage::before {
     content: "";
     position: absolute;
     inset: 0;
-    border-radius: 1.5rem;
+    border-radius: 2rem;
     background:
-      linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
-    background-size: 46px 46px;
-    opacity: 0.35;
+      linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+    background-size: 108px 108px;
+    opacity: 0.16;
     pointer-events: none;
   }
 
-  .pipeline-input-card,
-  .pipeline-output-card {
+  .floating-card {
+    animation: floatCard 8s ease-in-out infinite;
+  }
+
+  .floating-card-a {
+    animation-delay: 0s;
+  }
+
+  .floating-card-b {
+    animation-delay: 1.4s;
+  }
+
+  .floating-card-c {
+    animation-delay: 2.6s;
+  }
+
+  .modality-card {
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03), 0 24px 60px rgba(0, 0, 0, 0.2);
+  }
+
+  .stage-card {
     position: relative;
-    animation: panelFloat 6s ease-in-out infinite;
+    overflow: hidden;
+    border-radius: 1.7rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.025));
+    padding: 1.35rem;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03), 0 24px 60px rgba(0, 0, 0, 0.22);
   }
 
-  .pipeline-drop {
-    position: absolute;
-    right: -0.35rem;
-    top: 50%;
-    width: 0.55rem;
-    height: 0.55rem;
-    margin-top: -0.275rem;
+  .stage-label {
+    display: inline-flex;
+    align-items: center;
     border-radius: 9999px;
-    background: linear-gradient(135deg, rgba(214, 188, 255, 0.95), rgba(116, 220, 255, 0.95));
-    box-shadow: 0 0 16px rgba(139, 121, 255, 0.6);
-    animation: dataDrop 2.4s ease-in-out infinite;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.04);
+    padding: 0.45rem 0.8rem;
+    font-size: 0.7rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.62);
   }
 
-  .pipeline-engine::before {
+  .framework-rail {
+    height: 1px;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(147, 123, 255, 0.82), rgba(111, 219, 255, 0.82), rgba(255, 255, 255, 0));
+    animation: railSweep 3.8s linear infinite;
+  }
+
+  .chip-pulse {
+    animation: chipPulse 4.8s ease-in-out infinite;
+  }
+
+  .engine-shell::before {
     content: "";
     position: absolute;
     inset: 1rem;
@@ -223,91 +262,58 @@ than soft editorial cards.
     pointer-events: none;
   }
 
-  .pipeline-engine-badge {
-    position: relative;
-    z-index: 10;
-    margin-bottom: 0.75rem;
-    border-radius: 9999px;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    background: rgba(255, 255, 255, 0.05);
-    padding: 0.4rem 0.75rem;
-    font-size: 0.65rem;
-    letter-spacing: 0.24em;
-    color: rgba(255, 255, 255, 0.7);
-  }
-
-  .pipeline-core-glow {
+  .engine-core-glow {
     position: absolute;
-    inset: 22% 20%;
+    inset: 23% 19%;
     border-radius: 9999px;
-    background: radial-gradient(circle, rgba(115, 96, 255, 0.3), rgba(115, 96, 255, 0));
+    background: radial-gradient(circle, rgba(120, 101, 255, 0.32), rgba(120, 101, 255, 0));
     filter: blur(18px);
-    animation: corePulse 4.8s ease-in-out infinite;
+    animation: corePulse 5s ease-in-out infinite;
   }
 
-  .pipeline-orbit {
+  .engine-ring {
     position: absolute;
     inset: 1rem;
     border-radius: 2rem;
-    border: 1px solid rgba(146, 125, 255, 0.16);
+    border: 1px solid rgba(146, 125, 255, 0.18);
     pointer-events: none;
   }
 
-  .pipeline-orbit::after {
+  .engine-ring::after {
     content: "";
     position: absolute;
-    top: -0.32rem;
+    top: -0.34rem;
     left: 50%;
-    width: 0.65rem;
-    height: 0.65rem;
-    margin-left: -0.325rem;
+    width: 0.68rem;
+    height: 0.68rem;
+    margin-left: -0.34rem;
     border-radius: 9999px;
     background: linear-gradient(135deg, rgba(214, 188, 255, 1), rgba(116, 220, 255, 1));
-    box-shadow: 0 0 18px rgba(122, 206, 255, 0.45);
+    box-shadow: 0 0 18px rgba(122, 206, 255, 0.4);
   }
 
-  .pipeline-orbit-a {
+  .engine-ring-a {
     animation: orbitSpin 14s linear infinite;
   }
 
-  .pipeline-orbit-b {
+  .engine-ring-b {
     inset: 2rem;
     animation: orbitSpinReverse 18s linear infinite;
   }
 
-  .pipeline-output-card {
+  .output-task-card {
+    position: relative;
     overflow: hidden;
-    border-radius: 1rem;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(255, 255, 255, 0.04);
-    padding: 1rem;
+    animation: outputFloat 7s ease-in-out infinite;
   }
 
-  .pipeline-output-card::before {
+  .output-task-card::before {
     content: "";
     position: absolute;
-    inset: auto -20% 0 -20%;
+    inset: auto -18% 0 -18%;
     height: 1px;
     background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(154, 134, 255, 0.75), rgba(120, 218, 255, 0.75), rgba(255, 255, 255, 0));
-    animation: outputSweep 3.8s linear infinite;
-  }
-
-  .pipeline-output-violet {
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02), 0 0 0 1px rgba(160, 134, 255, 0.05);
-  }
-
-  .pipeline-output-cyan {
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02), 0 0 0 1px rgba(120, 218, 255, 0.05);
-  }
-
-  .pipeline-score {
-    flex-shrink: 0;
-    border-radius: 9999px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(255, 255, 255, 0.06);
-    padding: 0.35rem 0.5rem;
-    font-size: 0.7rem;
-    color: rgba(255, 255, 255, 0.72);
+    animation: railSweep 4.2s linear infinite;
   }
 
   @media (min-width: 640px) {
@@ -321,36 +327,30 @@ than soft editorial cards.
     .container {
       padding-left: 2rem;
       padding-right: 2rem;
-      max-width: 1280px;
+      max-width: 1520px;
     }
   }
 }
 
-@keyframes panelFloat {
+@keyframes floatCard {
   0%,
   100% {
     transform: translateY(0px);
   }
   50% {
-    transform: translateY(-4px);
+    transform: translateY(-10px);
   }
 }
 
-@keyframes dataDrop {
-  0% {
-    transform: translateX(-8px) scale(0.85);
-    opacity: 0;
-  }
-  20% {
-    opacity: 1;
-  }
-  55% {
-    transform: translateX(18px) scale(1);
-    opacity: 0.95;
-  }
+@keyframes chipPulse {
+  0%,
   100% {
-    transform: translateX(34px) scale(0.75);
-    opacity: 0;
+    opacity: 0.9;
+    transform: translateY(0px);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-3px);
   }
 }
 
@@ -384,19 +384,29 @@ than soft editorial cards.
   }
 }
 
-@keyframes outputSweep {
+@keyframes railSweep {
   0% {
-    transform: translateX(-32%);
+    transform: translateX(-30%);
     opacity: 0;
   }
-  20% {
+  18% {
     opacity: 1;
   }
-  70% {
-    opacity: 0.9;
+  72% {
+    opacity: 0.95;
   }
   100% {
-    transform: translateX(32%);
+    transform: translateX(30%);
     opacity: 0;
+  }
+}
+
+@keyframes outputFloat {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-4px);
   }
 }
