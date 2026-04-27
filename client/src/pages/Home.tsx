@@ -60,11 +60,11 @@ export default function Home() {
         <div className="container flex items-center justify-between py-5">
           <a href="#top" className="flex items-center gap-4">
             <div className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-2xl bg-[#111111] shadow-[0_18px_34px_rgba(15,23,42,0.18)] ring-1 ring-black/8">
-              <img src={logoUrl} alt="Sapiens Labs logo" className="h-full w-full object-cover" />
+              <img src={logoUrl} alt="Sapiens Health logo" className="h-full w-full object-cover" />
             </div>
             <div>
               <div className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-slate-500">
-                Sapiens Labs
+                Sapiens Health
               </div>
               <div className="text-sm text-slate-700">Multimodal clinical intelligence</div>
             </div>
@@ -114,7 +114,7 @@ export default function Home() {
               </h1>
 
               <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600 sm:text-xl">
-                Sapiens Labs turns incomplete multimodal clinical data into decision-ready
+                Sapiens Health turns incomplete multimodal clinical data into decision-ready
                 signal. We fuse notes, imaging, waveform, and structured records into one
                 operating layer for real healthcare workflows.
               </p>
@@ -322,7 +322,7 @@ export default function Home() {
                   Contact
                 </div>
                 <h2 className="font-[Instrument_Serif] text-4xl leading-none tracking-[-0.04em] text-slate-950 md:text-5xl">
-                  Sapiens Labs
+                  Sapiens Health
                 </h2>
                 <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600">
                   We are building a multimodal intelligence layer for healthcare organizations that
@@ -334,7 +334,7 @@ export default function Home() {
                 href="mailto:hello@sapienslabs.ai"
                 className="inline-flex items-center justify-center gap-2 rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white shadow-[0_18px_40px_rgba(15,23,42,0.16)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-slate-800"
               >
-                hello@sapienslabs.ai
+                Contact Sapiens Health
                 <ArrowRight className="h-4 w-4" />
               </a>
             </div>

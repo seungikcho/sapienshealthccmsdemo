@@ -10,3 +10,10 @@
 - [x] Redesign the hero and key sections to feel more like a polished startup company website.
 - [x] Validate the refreshed site visually and technically.
 - [ ] Save a new checkpoint and deliver the updated version.
+- [ ] Confirm whether the user wants direct guidance, screenshot-based help, or browser-based assistance for connecting sapienshealth.co.
+- [ ] Add sapienshealth.co in the site domain settings and capture the required DNS values.
+- [ ] Update GoDaddy DNS records for the root domain and www.
+- [ ] Verify the custom domain connection status and note any propagation delay.
+- [x] Replace all visible Sapiens Labs branding with Sapiens Health across the website.
+- [x] Update page metadata and brand copy to use Sapiens Health.
+- [x] Review the renamed site and deliver the updated version.
