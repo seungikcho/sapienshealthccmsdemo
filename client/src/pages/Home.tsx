@@ -125,9 +125,9 @@ export default function Home() {
 
           <div className="grid gap-10 px-5 py-12 sm:px-8 sm:py-16 lg:grid-cols-[1.22fr_0.78fr] lg:px-10 lg:py-18">
             <div className="max-w-[40rem]">
-              <h1 className="font-display max-w-[17ch] text-[2.7rem] font-semibold leading-[0.98] tracking-[-0.06em] text-white sm:text-[3.25rem] lg:text-[3.45rem] xl:text-[3.9rem]">
-                <span className="block whitespace-nowrap">The intelligence layer</span>
-                <span className="block whitespace-nowrap">for incomplete patient data.</span>
+              <h1 className="font-display max-w-[18ch] text-[2.45rem] font-semibold leading-[0.99] tracking-[-0.055em] text-white sm:text-[2.95rem] lg:text-[3.1rem] xl:text-[3.45rem]">
+                <span className="block whitespace-nowrap">Intelligence layer for</span>
+                <span className="block whitespace-nowrap">Incomplete patient data.</span>
               </h1>
 
               <p className="mt-8 max-w-[34rem] text-[1.02rem] leading-7 text-white/72 sm:text-[1.12rem] sm:leading-8">

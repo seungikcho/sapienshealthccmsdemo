@@ -98,3 +98,7 @@
 - [x] Reduce the hero display size so the heading reads as two clear lines at full desktop width.
 - [x] Update the supporting copy to `Sapiens Health delivers clinical predictions from multimodal patient data — even when modalities are missing`.
 - [x] Review the revised hero readability in the live preview and save a checkpoint if the typography feels cleaner.
+- [x] Remove `The` from the hero headline.
+- [x] Set the hero title as two lines reading `Intelligence layer for` and `Incomplete patient data.`
+- [x] Reduce the hero display size slightly from the current version for cleaner full-screen readability.
+- [x] Review the adjusted headline in the live preview and save a checkpoint if the typography feels better.
