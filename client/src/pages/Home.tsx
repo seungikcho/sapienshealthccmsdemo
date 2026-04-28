@@ -23,9 +23,6 @@ import {
 const logoUrl =
   "https://d36hbw14aib5lz.cloudfront.net/310519663318202729/TdsfYCSbV9xhvU4DsPP84j/sapienslabs-logo-delta-s-ZjHQetHDXzKos43yZtYjhG.webp?Expires=1807943486&Signature=bfdsDHdM6VbnOCGdixbHpPYBMIrYD2Iaoli5PD2tmAlSbGwChYR7nNxUJIRSQ2Pliwgd7Vz3RvRDPXKLq87uJM5lNGBrieObDqPDN~gGsfmBUgMg-mB-7KN3h~BkL14M12o3i9aw89YHbu2KvJHqdAQPvU~X3MIYpnWR2DSTuKXoNitY490GJbM5LmyBIL2FezT~o04fHDRaALkBcifH7eKRlLab7boYuNTC3G4WEPXTyIyBDoPUZrPps1lyVnu~71IYflncNFZkMiadkvu7DAO5Vs1LfO7qBrII9lx8MzsA4lyPZmJugxjgK8DJ2Dtf1YNTCctpMCNZBxrDmNg8Lw__&Key-Pair-Id=K1MP89RTKNH4J";
 
-const clinicalImageUrl =
-  "https://d2xsxph8kpxj0f.cloudfront.net/310519663318202729/TdsfYCSbV9xhvU4DsPP84j/clinical-intelligence_7a32d9bc.jpg";
-
 const modalityTiles = [
   {
     label: "CT",
@@ -121,15 +118,16 @@ export default function Home() {
         <section className="mx-auto w-full max-w-[1520px] overflow-hidden rounded-[2.2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(13,11,23,0.92),rgba(9,8,18,0.98))] shadow-[0_0_0_1px_rgba(255,255,255,0.02),0_60px_160px_rgba(0,0,0,0.52)]">
           <div className="border-b border-white/8 px-5 py-6 sm:px-8 lg:px-10">
             <div className="inline-flex items-center gap-2 rounded-full border border-[#8f7dff]/25 bg-[linear-gradient(180deg,rgba(126,92,255,0.18),rgba(80,48,160,0.10))] px-5 py-2 text-sm text-[#e9deff] shadow-[0_8px_30px_rgba(120,80,255,0.18)]">
-              <span className="font-medium">Intelligence layer for incomplete multimodal clinical data</span>
+              <span className="font-medium">Launching MedMIX I: Best multimodal engine for medical outcome prediction</span>
               <Chevron />
             </div>
           </div>
 
-          <div className="grid gap-10 px-5 py-12 sm:px-8 sm:py-16 lg:grid-cols-[0.92fr_1.08fr] lg:px-10 lg:py-18">
+          <div className="grid gap-10 px-5 py-12 sm:px-8 sm:py-16 lg:grid-cols-[1.22fr_0.78fr] lg:px-10 lg:py-18">
             <div className="max-w-[40rem]">
-              <h1 className="font-display max-w-[10ch] text-[3rem] font-semibold leading-[0.95] tracking-[-0.075em] text-white sm:text-[4.15rem] lg:text-[5rem] xl:text-[5.6rem]">
-                The intelligence layer for incomplete clinical data.
+              <h1 className="font-display max-w-[16ch] text-[3rem] font-semibold leading-[0.95] tracking-[-0.075em] text-white sm:text-[3.8rem] lg:text-[3.9rem] xl:text-[4.45rem]">
+                <span className="block whitespace-nowrap">intelligence layer for</span>
+                <span className="block whitespace-nowrap">incomplete clinical data</span>
               </h1>
 
               <p className="mt-8 max-w-[33rem] text-lg leading-8 text-white/72 sm:text-xl">
@@ -141,27 +139,82 @@ export default function Home() {
                   href="#insights"
                   className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[linear-gradient(135deg,#d8b1ff_0%,#9c8cff_56%,#81ddff_100%)] px-6 py-4 text-base font-semibold text-[#080612] shadow-[0_22px_50px_rgba(145,118,255,0.34)] transition duration-300 hover:-translate-y-0.5"
                 >
-                  See insight flow
+                  Try Out MedMIX
                   <ArrowRight className="h-4 w-4" />
                 </a>
                 <a
                   href="#contact"
                   className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/14 bg-white/[0.04] px-6 py-4 text-base font-semibold text-white transition duration-300 hover:-translate-y-0.5 hover:bg-white/[0.07]"
                 >
-                  Request evaluation
+                  Get In Touch
                   <ArrowRight className="h-4 w-4" />
                 </a>
               </div>
             </div>
 
             <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-3 shadow-[0_30px_80px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:p-4">
-              <div className="relative overflow-hidden rounded-[1.6rem] border border-white/10 bg-black/30">
-                <img src={clinicalImageUrl} alt="Clinical workflow environment" className="h-[23rem] w-full object-cover sm:h-[27rem] lg:h-[31rem]" />
-                <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(7,7,13,0.08),rgba(7,7,13,0.26))]" />
-                <div className="absolute inset-x-4 bottom-4 rounded-[1.4rem] border border-white/10 bg-[linear-gradient(180deg,rgba(10,11,20,0.78),rgba(10,11,20,0.58))] p-4 backdrop-blur-xl sm:inset-x-6 sm:bottom-6 sm:p-5">
-                  <div className="text-sm text-white/58">Clinical workflow reality</div>
+              <div className="relative overflow-hidden rounded-[1.6rem] border border-white/10 bg-[radial-gradient(circle_at_50%_45%,rgba(146,117,255,0.18),transparent_28%),linear-gradient(180deg,rgba(12,12,24,0.96),rgba(8,8,18,0.98))] px-5 py-5 sm:px-6 sm:py-6">
+                <div className="pointer-events-none absolute inset-0 opacity-70">
+                  <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:72px_72px]" />
+                  <div className="absolute left-1/2 top-1/2 h-44 w-44 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#9c8cff]/18 blur-3xl" />
+                  <div className="absolute left-[18%] top-[20%] h-28 w-28 rounded-full bg-cyan-300/8 blur-3xl" />
+                  <div className="absolute bottom-[16%] right-[12%] h-32 w-32 rounded-full bg-fuchsia-300/10 blur-3xl" />
+                </div>
+
+                <div className="relative grid grid-cols-3 gap-3 sm:gap-4">
+                  {[
+                    "ct",
+                    "ehr",
+                    "pathology",
+                    "notes",
+                    "vitals",
+                    "medmix",
+                    "fusion",
+                    "signal",
+                    "insight",
+                  ].map((cell, index) => (
+                    <div
+                      key={cell}
+                      className={`group relative aspect-square overflow-hidden rounded-[1.35rem] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02))] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_18px_40px_rgba(0,0,0,0.28)] ${index === 4 ? "sm:scale-[1.03]" : ""}`}
+                    >
+                      <div
+                        className="absolute inset-0 opacity-80"
+                        style={{
+                          background:
+                            index === 4
+                              ? "radial-gradient(circle at 50% 50%, rgba(214,185,255,0.34), rgba(148,117,255,0.14) 38%, rgba(10,10,18,0) 68%)"
+                              : index % 3 === 0
+                                ? "linear-gradient(135deg, rgba(74,226,255,0.18), rgba(120,83,255,0.06))"
+                                : index % 3 === 1
+                                  ? "linear-gradient(135deg, rgba(221,176,255,0.14), rgba(70,212,255,0.06))"
+                                  : "linear-gradient(135deg, rgba(130,108,255,0.16), rgba(255,255,255,0.03))",
+                        }}
+                      />
+                      <div className="absolute inset-[14%] rounded-[1.1rem] border border-white/10 bg-black/20 backdrop-blur-sm" />
+                      <div className="absolute inset-x-[24%] top-[22%] h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
+                      <div className="absolute inset-y-[24%] left-[50%] w-px -translate-x-1/2 bg-gradient-to-b from-transparent via-white/25 to-transparent" />
+                      {index === 4 ? (
+                        <>
+                          <div className="absolute left-1/2 top-1/2 h-20 w-20 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/15 bg-[radial-gradient(circle,rgba(255,255,255,0.32),rgba(140,112,255,0.14)_45%,rgba(255,255,255,0)_70%)] shadow-[0_0_30px_rgba(161,134,255,0.35)]" />
+                          <div className="absolute left-1/2 top-1/2 h-28 w-28 -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#cdb7ff]/25" />
+                          <div className="absolute left-1/2 top-1/2 h-36 w-36 -translate-x-1/2 -translate-y-1/2 rounded-full border border-cyan-300/10" />
+                        </>
+                      ) : (
+                        <>
+                          <div className="absolute left-[18%] top-[22%] h-2.5 w-2.5 rounded-full bg-white/55 shadow-[0_0_14px_rgba(255,255,255,0.45)]" />
+                          <div className="absolute bottom-[24%] left-[22%] right-[22%] h-px bg-gradient-to-r from-transparent via-white/35 to-transparent" />
+                          <div className="absolute bottom-[22%] left-[22%] h-12 w-12 rounded-full border border-white/10 bg-white/5" />
+                          <div className="absolute right-[20%] top-[20%] h-10 w-10 rounded-xl border border-white/10 bg-white/5" />
+                        </>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                <div className="relative mt-5 rounded-[1.35rem] border border-white/10 bg-[linear-gradient(180deg,rgba(10,11,20,0.78),rgba(10,11,20,0.58))] p-4 backdrop-blur-xl sm:p-5">
+                  <div className="text-sm text-white/58">MedMIX intelligence field</div>
                   <div className="mt-2 font-display text-2xl font-semibold tracking-[-0.05em] text-white">
-                    Missing signals are common. Insight still has to ship.
+                    A cleaner visual layer for multimodal clinical signal fusion.
                   </div>
                 </div>
               </div>

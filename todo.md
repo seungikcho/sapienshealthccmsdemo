@@ -83,3 +83,9 @@
 - [x] Study converge-bio.com and align the homepage typography scale, spacing rhythm, and overall layout tone more closely with that reference.
 - [x] Rework the modality tile visuals so they feel simple, consistent, and image-led rather than icon-led.
 - [x] Review the Converge-inspired redesign in the live preview and save a new checkpoint if the direction is stronger.
+- [x] Replace the top hero badge text with `Launching MedMIX I: Best multimodal engine for medical outcome prediction`.
+- [x] Restyle the main hero heading to read `intelligence layer for incomplete clinical data` across two lines.
+- [x] Remove the right-side clinical photo from the hero.
+- [x] Add a more decorative grid-based animated intelligence visual in place of the photo.
+- [x] Rename the hero buttons to `Try Out MedMIX` and `Get In Touch`.
+- [x] Review the updated hero launch framing in the live preview and save a checkpoint if the composition feels stronger.
