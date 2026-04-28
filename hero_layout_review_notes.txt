@@ -1,0 +1,5 @@
+2026-04-28 hero review
+- Supported by / Nucleate lockup is no longer visible in the header.
+- The right-side intelligence visual now renders as a 3 columns by 2 rows block.
+- The block has been moved upward and now starts near the headline height instead of below the CTA.
+- The overall first-screen composition reads balanced, with the visual block occupying the white-marked target area more closely.

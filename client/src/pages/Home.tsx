@@ -22,9 +22,6 @@ import {
 
 const logoUrl =
   "https://d36hbw14aib5lz.cloudfront.net/310519663318202729/TdsfYCSbV9xhvU4DsPP84j/sapienslabs-logo-delta-s-ZjHQetHDXzKos43yZtYjhG.webp?Expires=1807943486&Signature=bfdsDHdM6VbnOCGdixbHpPYBMIrYD2Iaoli5PD2tmAlSbGwChYR7nNxUJIRSQ2Pliwgd7Vz3RvRDPXKLq87uJM5lNGBrieObDqPDN~gGsfmBUgMg-mB-7KN3h~BkL14M12o3i9aw89YHbu2KvJHqdAQPvU~X3MIYpnWR2DSTuKXoNitY490GJbM5LmyBIL2FezT~o04fHDRaALkBcifH7eKRlLab7boYuNTC3G4WEPXTyIyBDoPUZrPps1lyVnu~71IYflncNFZkMiadkvu7DAO5Vs1LfO7qBrII9lx8MzsA4lyPZmJugxjgK8DJ2Dtf1YNTCctpMCNZBxrDmNg8Lw__&Key-Pair-Id=K1MP89RTKNH4J";
-const nucleateLogoUrl =
-  "https://d2xsxph8kpxj0f.cloudfront.net/310519663318202729/TdsfYCSbV9xhvU4DsPP84j/nucleate-logo_c57deeb9.webp";
-
 const modalityTiles = [
   {
     label: "CT",
@@ -96,14 +93,6 @@ export default function Home() {
             </div>
             <div className="min-w-0">
               <div className="font-wordmark truncate text-white/96">Sapiens Health</div>
-              <div className="mt-1.5 flex flex-col gap-1.5">
-                <span className="text-[0.58rem] font-medium tracking-[0.18em] text-white/48 uppercase">Supported by</span>
-                <img
-                  src={nucleateLogoUrl}
-                  alt="Nucleate"
-                  className="h-5 w-auto opacity-100 mix-blend-screen brightness-125 contrast-125"
-                />
-              </div>
             </div>
           </a>
 
@@ -133,7 +122,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="grid gap-10 px-5 py-12 sm:px-8 sm:py-16 lg:grid-cols-[1.34fr_0.66fr] lg:px-10 lg:py-18">
+          <div className="grid items-start gap-10 px-5 py-12 sm:px-8 sm:py-16 lg:grid-cols-[1.08fr_0.92fr] lg:px-10 lg:py-18">
             <div className="max-w-[40rem]">
               <h1 className="font-display max-w-[18ch] text-[2.45rem] font-semibold leading-[0.99] tracking-[-0.055em] text-white sm:text-[2.95rem] lg:text-[3.1rem] xl:text-[3.45rem]">
                 <span className="block whitespace-nowrap">Intelligence layer for</span>
@@ -155,8 +144,8 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="self-start rounded-[1.85rem] border border-white/10 bg-white/[0.03] p-3 shadow-[0_30px_80px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:max-w-[20rem] sm:p-4 lg:-ml-[4.5rem] lg:mt-[12.25rem] lg:max-w-[17.5rem]">
-              <div className="relative overflow-hidden rounded-[1.45rem] border border-white/10 bg-[radial-gradient(circle_at_50%_45%,rgba(146,117,255,0.18),transparent_28%),linear-gradient(180deg,rgba(12,12,24,0.96),rgba(8,8,18,0.98))] px-4 py-4 sm:px-5 sm:py-5">
+            <div className="rounded-[1.85rem] border border-white/10 bg-white/[0.03] p-3 shadow-[0_30px_80px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:mx-auto sm:w-full sm:max-w-[26rem] sm:p-4 lg:-mt-2 lg:mx-0 lg:max-w-[27.5rem] lg:justify-self-end lg:self-stretch lg:p-4">
+              <div className="relative h-full overflow-hidden rounded-[1.45rem] border border-white/10 bg-[radial-gradient(circle_at_50%_45%,rgba(146,117,255,0.18),transparent_28%),linear-gradient(180deg,rgba(12,12,24,0.96),rgba(8,8,18,0.98))] px-4 py-4 sm:px-5 sm:py-5 lg:min-h-[28.75rem]">
                 <div className="pointer-events-none absolute inset-0 opacity-75">
                   <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:64px_64px]" />
                   <div className="absolute inset-y-0 left-[-28%] w-[52%] rotate-[18deg] bg-gradient-to-r from-transparent via-cyan-300/10 to-transparent blur-2xl animate-[pulse_5s_ease-in-out_infinite]" />
@@ -166,10 +155,11 @@ export default function Home() {
                   <div className="absolute bottom-[14%] right-[10%] h-28 w-28 rounded-full bg-fuchsia-300/12 blur-3xl animate-[pulse_6s_ease-in-out_infinite]" />
                 </div>
 
-                <div className="pointer-events-none absolute inset-x-[12%] top-1/2 h-px -translate-y-1/2 bg-gradient-to-r from-transparent via-white/18 to-transparent opacity-80" />
-                <div className="pointer-events-none absolute inset-y-[10%] left-1/2 w-px -translate-x-1/2 bg-gradient-to-b from-transparent via-white/16 to-transparent opacity-75" />
+                <div className="pointer-events-none absolute inset-x-[10%] top-1/2 h-px -translate-y-1/2 bg-gradient-to-r from-transparent via-white/18 to-transparent opacity-80" />
+                <div className="pointer-events-none absolute inset-y-[10%] left-1/3 w-px -translate-x-1/2 bg-gradient-to-b from-transparent via-white/14 to-transparent opacity-70" />
+                <div className="pointer-events-none absolute inset-y-[10%] left-2/3 w-px -translate-x-1/2 bg-gradient-to-b from-transparent via-white/14 to-transparent opacity-70" />
 
-                <div className="relative grid grid-cols-2 gap-3">
+                <div className="relative grid h-full grid-cols-3 gap-3">
                   {[
                     "ct",
                     "pathology",
@@ -180,13 +170,13 @@ export default function Home() {
                   ].map((cell, index) => (
                     <div
                       key={cell}
-                      className={`group relative aspect-square overflow-hidden rounded-[1.2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02))] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_18px_40px_rgba(0,0,0,0.28)] ${index === 3 ? "chip-pulse sm:scale-[1.03]" : index % 2 === 0 ? "floating-card floating-card-a" : "floating-card floating-card-b"}`}
+                      className={`group relative aspect-[0.9] overflow-hidden rounded-[1.2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02))] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_18px_40px_rgba(0,0,0,0.28)] ${index === 4 ? "chip-pulse sm:scale-[1.03]" : index % 2 === 0 ? "floating-card floating-card-a" : "floating-card floating-card-b"}`}
                     >
                       <div
                         className="absolute inset-0 opacity-80"
                         style={{
                           background:
-                            index === 3
+                            index === 4
                               ? "radial-gradient(circle at 50% 50%, rgba(214,185,255,0.36), rgba(148,117,255,0.16) 38%, rgba(10,10,18,0) 68%)"
                               : index % 2 === 0
                                 ? "linear-gradient(135deg, rgba(74,226,255,0.18), rgba(120,83,255,0.06))"
@@ -196,7 +186,7 @@ export default function Home() {
                       <div className="absolute inset-[14%] rounded-[1rem] border border-white/10 bg-black/20 backdrop-blur-sm" />
                       <div className="absolute inset-x-[24%] top-[22%] h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
                       <div className="absolute inset-y-[24%] left-[50%] w-px -translate-x-1/2 bg-gradient-to-b from-transparent via-white/25 to-transparent" />
-                      {index === 3 ? (
+                      {index === 4 ? (
                         <>
                           <div className="absolute left-1/2 top-1/2 h-14 w-14 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/15 bg-[radial-gradient(circle,rgba(255,255,255,0.34),rgba(140,112,255,0.16)_45%,rgba(255,255,255,0)_70%)] shadow-[0_0_34px_rgba(161,134,255,0.42)] animate-pulse" />
                           <div className="absolute left-1/2 top-1/2 h-20 w-20 -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#cdb7ff]/25 animate-[spin_22s_linear_infinite]" />

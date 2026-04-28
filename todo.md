@@ -110,3 +110,7 @@
 - [x] Rebuild the intelligence visual into a tighter 2x3 or similarly balanced grid that fits the hero height better.
 - [x] Add a transparent-background `Supported by` lockup with the Nucleate logo beneath the main Sapiens Health logo.
 - [x] Review the adjusted hero block and supporter branding in the live preview and save a checkpoint if the balance is improved.
+- [x] Remove the Supported by / Nucleate lockup from the header completely.
+- [x] Rebuild the right-side intelligence visual into a 3 columns × 2 rows block.
+- [x] Raise the right-side intelligence block so its top aligns with the hero headline area marked by the user.
+- [x] Match the overall visual height of the intelligence block to the left hero text column more precisely.
