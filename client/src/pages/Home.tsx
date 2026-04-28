@@ -122,18 +122,18 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="grid items-start gap-8 px-5 py-10 sm:px-8 sm:py-12 lg:grid-cols-[1.12fr_0.88fr] lg:px-10 lg:py-12">
+          <div className="grid items-start gap-5 px-5 py-7 sm:px-8 sm:py-8 lg:grid-cols-[1.18fr_0.82fr] lg:px-10 lg:py-7">
             <div className="max-w-[40rem]">
               <h1 className="font-display max-w-[18ch] text-[2.45rem] font-semibold leading-[0.99] tracking-[-0.055em] text-white sm:text-[2.95rem] lg:text-[3.1rem] xl:text-[3.45rem]">
                 <span className="block whitespace-nowrap">Intelligence layer for</span>
                 <span className="block whitespace-nowrap">incomplete patient data.</span>
               </h1>
 
-              <p className="mt-7 max-w-[34rem] text-[1.02rem] leading-7 text-white/72 sm:text-[1.12rem] sm:leading-8">
+              <p className="mt-5 max-w-[34rem] text-[1.02rem] leading-7 text-white/72 sm:text-[1.12rem] sm:leading-8">
                 Sapiens Health delivers clinical predictions from multimodal patient data — even when modalities are missing.
               </p>
 
-              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                 <a
                   href="#contact"
                   className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/14 bg-white/[0.04] px-6 py-4 text-base font-semibold text-white transition duration-300 hover:-translate-y-0.5 hover:bg-white/[0.07]"
@@ -144,8 +144,8 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="rounded-[1.7rem] border border-white/10 bg-white/[0.03] p-3 shadow-[0_30px_80px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:mx-auto sm:w-full sm:max-w-[23rem] sm:p-3.5 lg:-mt-1 lg:mx-0 lg:max-w-[24rem] lg:justify-self-end lg:self-start lg:p-3.5">
-              <div className="relative h-full overflow-hidden rounded-[1.35rem] border border-white/10 bg-[radial-gradient(circle_at_50%_45%,rgba(146,117,255,0.18),transparent_28%),linear-gradient(180deg,rgba(12,12,24,0.96),rgba(8,8,18,0.98))] px-3.5 py-3.5 sm:px-4 sm:py-4 lg:min-h-[21.75rem]">
+            <div className="rounded-[1.55rem] border border-white/10 bg-white/[0.03] p-2 shadow-[0_30px_80px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:mx-auto sm:w-full sm:max-w-[21rem] sm:p-2.5 lg:-mt-1 lg:mx-0 lg:max-w-[21.5rem] lg:justify-self-end lg:self-start lg:p-2.5">
+              <div className="relative overflow-hidden rounded-[1.2rem] border border-white/10 bg-[radial-gradient(circle_at_50%_45%,rgba(146,117,255,0.18),transparent_28%),linear-gradient(180deg,rgba(12,12,24,0.96),rgba(8,8,18,0.98))] px-2.5 py-2.5 sm:px-3 sm:py-3">
                 <div className="pointer-events-none absolute inset-0 opacity-75">
                   <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:64px_64px]" />
                   <div className="absolute inset-y-0 left-[-28%] w-[52%] rotate-[18deg] bg-gradient-to-r from-transparent via-cyan-300/10 to-transparent blur-2xl animate-[pulse_5s_ease-in-out_infinite]" />
@@ -159,7 +159,7 @@ export default function Home() {
                 <div className="pointer-events-none absolute inset-y-[10%] left-1/3 w-px -translate-x-1/2 bg-gradient-to-b from-transparent via-white/14 to-transparent opacity-70" />
                 <div className="pointer-events-none absolute inset-y-[10%] left-2/3 w-px -translate-x-1/2 bg-gradient-to-b from-transparent via-white/14 to-transparent opacity-70" />
 
-                <div className="relative grid h-full grid-cols-3 gap-2.5">
+                <div className="relative grid grid-cols-3 gap-2">
                   {[
                     "ct",
                     "pathology",
@@ -170,7 +170,7 @@ export default function Home() {
                   ].map((cell, index) => (
                     <div
                       key={cell}
-                      className={`group relative aspect-[0.88] overflow-hidden rounded-[1rem] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02))] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_18px_40px_rgba(0,0,0,0.28)] ${index === 4 ? "chip-pulse sm:scale-[1.03]" : index % 2 === 0 ? "floating-card floating-card-a" : "floating-card floating-card-b"}`}
+                      className={`group relative aspect-[0.9] overflow-hidden rounded-[1rem] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02))] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_18px_40px_rgba(0,0,0,0.28)] ${index === 4 ? "chip-pulse sm:scale-[1.03]" : index % 2 === 0 ? "floating-card floating-card-a" : "floating-card floating-card-b"}`}
                     >
                       <div
                         className="absolute inset-0 opacity-80"

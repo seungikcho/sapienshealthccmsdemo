@@ -117,3 +117,6 @@
 - [x] Crop the overall hero panel height to match the user's newly marked composition.
 - [x] Refit the right-side 3x2 intelligence block so it sits cleanly within the shortened hero panel.
 - [x] Rebalance spacing between the hero text column and the 3x2 intelligence block after the crop.
+- [x] Crop the hero panel even tighter to match the user's latest reference more closely.
+- [x] Remove the visible bottom empty space beneath the 3x2 intelligence block.
+- [x] Refit the right-side visual height again after eliminating the lower gap.
