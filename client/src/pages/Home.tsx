@@ -125,13 +125,13 @@ export default function Home() {
 
           <div className="grid gap-10 px-5 py-12 sm:px-8 sm:py-16 lg:grid-cols-[1.22fr_0.78fr] lg:px-10 lg:py-18">
             <div className="max-w-[40rem]">
-              <h1 className="font-display max-w-[15ch] text-[3rem] font-semibold leading-[0.95] tracking-[-0.075em] text-white sm:text-[3.8rem] lg:text-[3.9rem] xl:text-[4.45rem]">
-                <span className="block">Intelligence Layer for</span>
-                <span className="block">Multimodal Patient Data</span>
+              <h1 className="font-display max-w-[17ch] text-[2.7rem] font-semibold leading-[0.98] tracking-[-0.06em] text-white sm:text-[3.25rem] lg:text-[3.45rem] xl:text-[3.9rem]">
+                <span className="block whitespace-nowrap">The intelligence layer</span>
+                <span className="block whitespace-nowrap">for incomplete patient data.</span>
               </h1>
 
-              <p className="mt-8 max-w-[31rem] text-lg leading-8 text-white/72 sm:text-xl">
-                Sapiens Health predicts hospital operation tasks with missing modalities from the data you already have.
+              <p className="mt-8 max-w-[34rem] text-[1.02rem] leading-7 text-white/72 sm:text-[1.12rem] sm:leading-8">
+                Sapiens Health delivers clinical predictions from multimodal patient data — even when modalities are missing.
               </p>
 
               <div className="mt-9 flex flex-col gap-3 sm:flex-row">

@@ -94,3 +94,7 @@
 - [x] Remove the extra hero CTA so only `Get In Touch` remains.
 - [x] Remove the text caption under the right-side intelligence visual.
 - [x] Review the simplified hero in the live preview and save a checkpoint if the direction is cleaner.
+- [x] Change the hero headline to `The intelligence layer for incomplete patient data.`
+- [x] Reduce the hero display size so the heading reads as two clear lines at full desktop width.
+- [x] Update the supporting copy to `Sapiens Health delivers clinical predictions from multimodal patient data — even when modalities are missing`.
+- [x] Review the revised hero readability in the live preview and save a checkpoint if the typography feels cleaner.
