@@ -106,3 +106,7 @@
 - [x] Move the right-side intelligence visual further left and make it smaller so it begins below the `Get In Touch` button.
 - [x] Add more dynamic animation to the intelligence visual while keeping the current design language.
 - [x] Review the updated hero motion and layout in the live preview and save a checkpoint if the composition feels stronger.
+- [x] Resize the right-side intelligence block so its height matches the first-screen hero composition more closely instead of forcing a tall 3x3 panel.
+- [x] Rebuild the intelligence visual into a tighter 2x3 or similarly balanced grid that fits the hero height better.
+- [x] Add a transparent-background `Supported by` lockup with the Nucleate logo beneath the main Sapiens Health logo.
+- [x] Review the adjusted hero block and supporter branding in the live preview and save a checkpoint if the balance is improved.
