@@ -125,23 +125,16 @@ export default function Home() {
 
           <div className="grid gap-10 px-5 py-12 sm:px-8 sm:py-16 lg:grid-cols-[1.22fr_0.78fr] lg:px-10 lg:py-18">
             <div className="max-w-[40rem]">
-              <h1 className="font-display max-w-[16ch] text-[3rem] font-semibold leading-[0.95] tracking-[-0.075em] text-white sm:text-[3.8rem] lg:text-[3.9rem] xl:text-[4.45rem]">
-                <span className="block whitespace-nowrap">intelligence layer for</span>
-                <span className="block whitespace-nowrap">incomplete clinical data</span>
+              <h1 className="font-display max-w-[15ch] text-[3rem] font-semibold leading-[0.95] tracking-[-0.075em] text-white sm:text-[3.8rem] lg:text-[3.9rem] xl:text-[4.45rem]">
+                <span className="block">Intelligence Layer for</span>
+                <span className="block">Multimodal Patient Data</span>
               </h1>
 
-              <p className="mt-8 max-w-[33rem] text-lg leading-8 text-white/72 sm:text-xl">
-                Sapiens Health turns fragmented multimodal patient data into workflow-ready insights for hospitals and care teams.
+              <p className="mt-8 max-w-[31rem] text-lg leading-8 text-white/72 sm:text-xl">
+                Sapiens Health predicts hospital operation tasks with missing modalities from the data you already have.
               </p>
 
               <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-                <a
-                  href="#insights"
-                  className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[linear-gradient(135deg,#d8b1ff_0%,#9c8cff_56%,#81ddff_100%)] px-6 py-4 text-base font-semibold text-[#080612] shadow-[0_22px_50px_rgba(145,118,255,0.34)] transition duration-300 hover:-translate-y-0.5"
-                >
-                  Try Out MedMIX
-                  <ArrowRight className="h-4 w-4" />
-                </a>
                 <a
                   href="#contact"
                   className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/14 bg-white/[0.04] px-6 py-4 text-base font-semibold text-white transition duration-300 hover:-translate-y-0.5 hover:bg-white/[0.07]"
@@ -211,12 +204,6 @@ export default function Home() {
                   ))}
                 </div>
 
-                <div className="relative mt-5 rounded-[1.35rem] border border-white/10 bg-[linear-gradient(180deg,rgba(10,11,20,0.78),rgba(10,11,20,0.58))] p-4 backdrop-blur-xl sm:p-5">
-                  <div className="text-sm text-white/58">MedMIX intelligence field</div>
-                  <div className="mt-2 font-display text-2xl font-semibold tracking-[-0.05em] text-white">
-                    A cleaner visual layer for multimodal clinical signal fusion.
-                  </div>
-                </div>
               </div>
             </div>
           </div>

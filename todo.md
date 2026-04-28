@@ -89,3 +89,8 @@
 - [x] Add a more decorative grid-based animated intelligence visual in place of the photo.
 - [x] Rename the hero buttons to `Try Out MedMIX` and `Get In Touch`.
 - [x] Review the updated hero launch framing in the live preview and save a checkpoint if the composition feels stronger.
+- [x] Change the hero headline to `Intelligence Layer for Multimodal Patient Data`.
+- [x] Shorten the hero description to emphasize hospital operation tasks with missing modalities from existing data.
+- [x] Remove the extra hero CTA so only `Get In Touch` remains.
+- [x] Remove the text caption under the right-side intelligence visual.
+- [x] Review the simplified hero in the live preview and save a checkpoint if the direction is cleaner.
