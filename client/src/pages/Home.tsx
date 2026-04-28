@@ -123,11 +123,11 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="grid gap-10 px-5 py-12 sm:px-8 sm:py-16 lg:grid-cols-[1.22fr_0.78fr] lg:px-10 lg:py-18">
+          <div className="grid gap-10 px-5 py-12 sm:px-8 sm:py-16 lg:grid-cols-[1.34fr_0.66fr] lg:px-10 lg:py-18">
             <div className="max-w-[40rem]">
               <h1 className="font-display max-w-[18ch] text-[2.45rem] font-semibold leading-[0.99] tracking-[-0.055em] text-white sm:text-[2.95rem] lg:text-[3.1rem] xl:text-[3.45rem]">
                 <span className="block whitespace-nowrap">Intelligence layer for</span>
-                <span className="block whitespace-nowrap">Incomplete patient data.</span>
+                <span className="block whitespace-nowrap">incomplete patient data.</span>
               </h1>
 
               <p className="mt-8 max-w-[34rem] text-[1.02rem] leading-7 text-white/72 sm:text-[1.12rem] sm:leading-8">
@@ -145,16 +145,21 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-3 shadow-[0_30px_80px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:p-4">
-              <div className="relative overflow-hidden rounded-[1.6rem] border border-white/10 bg-[radial-gradient(circle_at_50%_45%,rgba(146,117,255,0.18),transparent_28%),linear-gradient(180deg,rgba(12,12,24,0.96),rgba(8,8,18,0.98))] px-5 py-5 sm:px-6 sm:py-6">
-                <div className="pointer-events-none absolute inset-0 opacity-70">
-                  <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:72px_72px]" />
-                  <div className="absolute left-1/2 top-1/2 h-44 w-44 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#9c8cff]/18 blur-3xl" />
-                  <div className="absolute left-[18%] top-[20%] h-28 w-28 rounded-full bg-cyan-300/8 blur-3xl" />
-                  <div className="absolute bottom-[16%] right-[12%] h-32 w-32 rounded-full bg-fuchsia-300/10 blur-3xl" />
+            <div className="self-start rounded-[1.85rem] border border-white/10 bg-white/[0.03] p-3 shadow-[0_30px_80px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:max-w-[24rem] sm:p-4 lg:-ml-[3.5rem] lg:mt-[8.5rem] lg:max-w-[20.75rem]">
+              <div className="relative overflow-hidden rounded-[1.45rem] border border-white/10 bg-[radial-gradient(circle_at_50%_45%,rgba(146,117,255,0.18),transparent_28%),linear-gradient(180deg,rgba(12,12,24,0.96),rgba(8,8,18,0.98))] px-4 py-4 sm:px-5 sm:py-5">
+                <div className="pointer-events-none absolute inset-0 opacity-75">
+                  <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:64px_64px]" />
+                  <div className="absolute inset-y-0 left-[-28%] w-[52%] rotate-[18deg] bg-gradient-to-r from-transparent via-cyan-300/10 to-transparent blur-2xl animate-[pulse_5s_ease-in-out_infinite]" />
+                  <div className="absolute inset-y-0 right-[-24%] w-[48%] -rotate-[16deg] bg-gradient-to-r from-transparent via-fuchsia-300/10 to-transparent blur-2xl animate-[pulse_6.4s_ease-in-out_infinite]" />
+                  <div className="absolute left-1/2 top-1/2 h-36 w-36 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#9c8cff]/20 blur-3xl animate-pulse" />
+                  <div className="absolute left-[16%] top-[18%] h-24 w-24 rounded-full bg-cyan-300/10 blur-3xl animate-[pulse_7s_ease-in-out_infinite]" />
+                  <div className="absolute bottom-[14%] right-[10%] h-28 w-28 rounded-full bg-fuchsia-300/12 blur-3xl animate-[pulse_6s_ease-in-out_infinite]" />
                 </div>
 
-                <div className="relative grid grid-cols-3 gap-3 sm:gap-4">
+                <div className="pointer-events-none absolute inset-x-[12%] top-1/2 h-px -translate-y-1/2 bg-gradient-to-r from-transparent via-white/18 to-transparent opacity-80" />
+                <div className="pointer-events-none absolute inset-y-[12%] left-1/2 w-px -translate-x-1/2 bg-gradient-to-b from-transparent via-white/16 to-transparent opacity-75" />
+
+                <div className="relative grid grid-cols-3 gap-2.5 sm:gap-3">
                   {[
                     "ct",
                     "ehr",
@@ -168,42 +173,41 @@ export default function Home() {
                   ].map((cell, index) => (
                     <div
                       key={cell}
-                      className={`group relative aspect-square overflow-hidden rounded-[1.35rem] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02))] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_18px_40px_rgba(0,0,0,0.28)] ${index === 4 ? "sm:scale-[1.03]" : ""}`}
+                      className={`group relative aspect-square overflow-hidden rounded-[1.2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02))] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_18px_40px_rgba(0,0,0,0.28)] ${index === 4 ? "chip-pulse sm:scale-[1.04]" : index % 3 === 0 ? "floating-card floating-card-a" : index % 3 === 1 ? "floating-card floating-card-b" : "floating-card floating-card-c"}`}
                     >
                       <div
                         className="absolute inset-0 opacity-80"
                         style={{
                           background:
                             index === 4
-                              ? "radial-gradient(circle at 50% 50%, rgba(214,185,255,0.34), rgba(148,117,255,0.14) 38%, rgba(10,10,18,0) 68%)"
+                              ? "radial-gradient(circle at 50% 50%, rgba(214,185,255,0.36), rgba(148,117,255,0.16) 38%, rgba(10,10,18,0) 68%)"
                               : index % 3 === 0
                                 ? "linear-gradient(135deg, rgba(74,226,255,0.18), rgba(120,83,255,0.06))"
                                 : index % 3 === 1
-                                  ? "linear-gradient(135deg, rgba(221,176,255,0.14), rgba(70,212,255,0.06))"
-                                  : "linear-gradient(135deg, rgba(130,108,255,0.16), rgba(255,255,255,0.03))",
+                                  ? "linear-gradient(135deg, rgba(221,176,255,0.15), rgba(70,212,255,0.06))"
+                                  : "linear-gradient(135deg, rgba(130,108,255,0.17), rgba(255,255,255,0.03))",
                         }}
                       />
-                      <div className="absolute inset-[14%] rounded-[1.1rem] border border-white/10 bg-black/20 backdrop-blur-sm" />
+                      <div className="absolute inset-[14%] rounded-[1rem] border border-white/10 bg-black/20 backdrop-blur-sm" />
                       <div className="absolute inset-x-[24%] top-[22%] h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
                       <div className="absolute inset-y-[24%] left-[50%] w-px -translate-x-1/2 bg-gradient-to-b from-transparent via-white/25 to-transparent" />
                       {index === 4 ? (
                         <>
-                          <div className="absolute left-1/2 top-1/2 h-20 w-20 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/15 bg-[radial-gradient(circle,rgba(255,255,255,0.32),rgba(140,112,255,0.14)_45%,rgba(255,255,255,0)_70%)] shadow-[0_0_30px_rgba(161,134,255,0.35)]" />
-                          <div className="absolute left-1/2 top-1/2 h-28 w-28 -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#cdb7ff]/25" />
-                          <div className="absolute left-1/2 top-1/2 h-36 w-36 -translate-x-1/2 -translate-y-1/2 rounded-full border border-cyan-300/10" />
+                          <div className="absolute left-1/2 top-1/2 h-16 w-16 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/15 bg-[radial-gradient(circle,rgba(255,255,255,0.34),rgba(140,112,255,0.16)_45%,rgba(255,255,255,0)_70%)] shadow-[0_0_34px_rgba(161,134,255,0.42)] animate-pulse" />
+                          <div className="absolute left-1/2 top-1/2 h-24 w-24 -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#cdb7ff]/25 animate-[spin_22s_linear_infinite]" />
+                          <div className="absolute left-1/2 top-1/2 h-[7.5rem] w-[7.5rem] -translate-x-1/2 -translate-y-1/2 rounded-full border border-cyan-300/10 animate-[spin_28s_linear_infinite_reverse]" />
                         </>
                       ) : (
                         <>
-                          <div className="absolute left-[18%] top-[22%] h-2.5 w-2.5 rounded-full bg-white/55 shadow-[0_0_14px_rgba(255,255,255,0.45)]" />
+                          <div className="absolute left-[18%] top-[22%] h-2.5 w-2.5 rounded-full bg-white/55 shadow-[0_0_14px_rgba(255,255,255,0.45)] animate-[pulse_4.8s_ease-in-out_infinite]" />
                           <div className="absolute bottom-[24%] left-[22%] right-[22%] h-px bg-gradient-to-r from-transparent via-white/35 to-transparent" />
-                          <div className="absolute bottom-[22%] left-[22%] h-12 w-12 rounded-full border border-white/10 bg-white/5" />
-                          <div className="absolute right-[20%] top-[20%] h-10 w-10 rounded-xl border border-white/10 bg-white/5" />
+                          <div className="absolute bottom-[22%] left-[22%] h-10 w-10 rounded-full border border-white/10 bg-white/5" />
+                          <div className="absolute right-[20%] top-[20%] h-8.5 w-8.5 rounded-xl border border-white/10 bg-white/5" />
                         </>
                       )}
                     </div>
                   ))}
                 </div>
-
               </div>
             </div>
           </div>

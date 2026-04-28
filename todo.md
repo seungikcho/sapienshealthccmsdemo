@@ -102,3 +102,7 @@
 - [x] Set the hero title as two lines reading `Intelligence layer for` and `Incomplete patient data.`
 - [x] Reduce the hero display size slightly from the current version for cleaner full-screen readability.
 - [x] Review the adjusted headline in the live preview and save a checkpoint if the typography feels better.
+- [x] Change `Incomplete` to lowercase in the hero headline.
+- [x] Move the right-side intelligence visual further left and make it smaller so it begins below the `Get In Touch` button.
+- [x] Add more dynamic animation to the intelligence visual while keeping the current design language.
+- [x] Review the updated hero motion and layout in the live preview and save a checkpoint if the composition feels stronger.
