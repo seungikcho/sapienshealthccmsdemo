@@ -1,102 +1,29 @@
 /*
-Design philosophy for this page: Converge-inspired healthcare AI launch page with a cleaner,
-more premium product language. Keep the desktop composition wide and cinematic, use a sharper
-editorial display face for the wordmark and section titles, and let the medical visuals feel
-minimal, unified, and investment-grade rather than schematic or cluttered.
+Design philosophy for this page: A minimal, investment-grade healthcare AI homepage with
+five clear sections only. The composition should feel calm, premium, and precise, with one
+clinical image and one manufacturing image used consistently to anchor the two verticals.
 */
 import {
-  Activity,
   ArrowRight,
-  BrainCircuit,
   Building2,
-  Clock3,
+  CircleGauge,
   Database,
-  FileSearch,
+  Factory,
   FileText,
-  HeartPulse,
-  ImageIcon,
+  Layers3,
   Microscope,
-  ScanLine,
-  Stethoscope,
-  TestTube2,
 } from "lucide-react";
 
 const logoUrl =
   "https://d36hbw14aib5lz.cloudfront.net/310519663318202729/TdsfYCSbV9xhvU4DsPP84j/sapienslabs-logo-delta-s-ZjHQetHDXzKos43yZtYjhG.webp?Expires=1807943486&Signature=bfdsDHdM6VbnOCGdixbHpPYBMIrYD2Iaoli5PD2tmAlSbGwChYR7nNxUJIRSQ2Pliwgd7Vz3RvRDPXKLq87uJM5lNGBrieObDqPDN~gGsfmBUgMg-mB-7KN3h~BkL14M12o3i9aw89YHbu2KvJHqdAQPvU~X3MIYpnWR2DSTuKXoNitY490GJbM5LmyBIL2FezT~o04fHDRaALkBcifH7eKRlLab7boYuNTC3G4WEPXTyIyBDoPUZrPps1lyVnu~71IYflncNFZkMiadkvu7DAO5Vs1LfO7qBrII9lx8MzsA4lyPZmJugxjgK8DJ2Dtf1YNTCctpMCNZBxrDmNg8Lw__&Key-Pair-Id=K1MP89RTKNH4J";
 
-const ctCardUrl =
-  "https://d2xsxph8kpxj0f.cloudfront.net/310519663318202729/TdsfYCSbV9xhvU4DsPP84j/sapienshealth-clean-imaging-card-MQjtJ8DP6g4pJhhxq2McRa.webp";
-const pathologyCardUrl =
-  "https://d2xsxph8kpxj0f.cloudfront.net/310519663318202729/TdsfYCSbV9xhvU4DsPP84j/sapienshealth-clean-pathology-card-7n3TYJKUaWSHohhNFGEmy8.webp";
-const ehrCardUrl =
-  "https://d2xsxph8kpxj0f.cloudfront.net/310519663318202729/TdsfYCSbV9xhvU4DsPP84j/sapienshealth-clean-ehr-card-8kJzNndpH8o7RtF5edHh3t.webp";
+const clinicalImageUrl =
+  "https://d2xsxph8kpxj0f.cloudfront.net/310519663318202729/TdsfYCSbV9xhvU4DsPP84j/clinical-intelligence_7a32d9bc.jpg";
+const bioprocessImageUrl =
+  "https://d2xsxph8kpxj0f.cloudfront.net/310519663318202729/TdsfYCSbV9xhvU4DsPP84j/bioprocess-intelligence_be2b8c9b.jpg";
 
-const modalityCards = [
-  {
-    title: "CT and imaging",
-    description: "Imaging enters the same operational decision layer.",
-    image: ctCardUrl,
-    icon: ScanLine,
-    label: "Imaging",
-  },
-  {
-    title: "Pathology and tissue",
-    description: "Tissue context stays connected to the full case.",
-    image: pathologyCardUrl,
-    icon: Microscope,
-    label: "Pathology",
-  },
-  {
-    title: "EHR and live monitoring",
-    description: "Clinical records and physiologic signals stay in sync.",
-    image: ehrCardUrl,
-    icon: Database,
-    label: "Clinical data",
-  },
-];
-
-const inputChips = [
-  { label: "CT", icon: ScanLine },
-  { label: "Pathology", icon: Microscope },
-  { label: "Labs", icon: TestTube2 },
-  { label: "Vitals", icon: HeartPulse },
-  { label: "Notes", icon: FileText },
-  { label: "EHR", icon: Database },
-  { label: "Trials", icon: FileSearch },
-  { label: "Ops", icon: Building2 },
-];
-
-const outputTasks = [
-  { title: "OR time estimation", detail: "Predict case timing and turnover.", icon: Clock3 },
-  { title: "Discharge readiness", detail: "Flag patients nearing discharge.", icon: Building2 },
-  { title: "ICU escalation", detail: "Surface cases that need closer monitoring.", icon: Stethoscope },
-  { title: "Trial eligibility", detail: "Pre-screen likely protocol matches.", icon: FileSearch },
-  { title: "Patient matching", detail: "Route patients toward relevant studies.", icon: BrainCircuit },
-  { title: "Deterioration watch", detail: "Detect multimodal risk earlier.", icon: Activity },
-];
-
-const heroSignalCards = [
-  { title: "CT", image: ctCardUrl, icon: ScanLine },
-  { title: "X-ray", icon: ImageIcon },
-  { title: "Pathology", image: pathologyCardUrl, icon: Microscope },
-  { title: "EHR", image: ehrCardUrl, icon: Database },
-  { title: "Notes", icon: FileText },
-];
-
-const solutionCards = [
-  {
-    eyebrow: "Hospital operations",
-    title: "Operational intelligence for busy care environments",
-    text: "Use multimodal signals to support OR timing, discharge readiness, escalation workflows, and throughput planning in real hospital settings.",
-    icon: Building2,
-  },
-  {
-    eyebrow: "Clinical trial support",
-    title: "A cleaner way to screen and match patients",
-    text: "Fuse imaging, EHR, pathology, and protocol context to streamline eligibility screening, patient matching, and coordinator review.",
-    icon: FileSearch,
-  },
-];
+const frameworkInputs = ["Imaging", "EHR", "Pathology", "Notes", "Process data"];
+const frameworkOutputs = ["Clinical predictions", "Bioprocess outcomes"];
 
 export default function Home() {
   return (
@@ -120,15 +47,16 @@ export default function Home() {
 
           <div className="hidden items-center gap-8 md:flex">
             <nav className="flex items-center gap-8 text-sm text-white/74">
-              <a href="#about" className="transition hover:text-white">About</a>
-              <a href="#research" className="transition hover:text-white">Research</a>
+              <a href="#clinical" className="transition hover:text-white">Clinical</a>
+              <a href="#bioprocess" className="transition hover:text-white">Bioprocess</a>
+              <a href="#framework" className="transition hover:text-white">How it works</a>
               <a href="#contact" className="transition hover:text-white">Contact</a>
             </nav>
             <a
               href="#contact"
               className="inline-flex items-center justify-center rounded-full border border-white/18 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/6"
             >
-              Get in touch
+              Request evaluation
             </a>
           </div>
         </div>
@@ -138,202 +66,154 @@ export default function Home() {
         <section className="mx-auto w-full max-w-[1520px] overflow-hidden rounded-[2.2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(13,11,23,0.92),rgba(9,8,18,0.98))] shadow-[0_0_0_1px_rgba(255,255,255,0.02),0_60px_160px_rgba(0,0,0,0.52)]">
           <div className="border-b border-white/8 px-5 py-6 sm:px-8 lg:px-10">
             <div className="inline-flex items-center gap-2 rounded-full border border-[#8f7dff]/25 bg-[linear-gradient(180deg,rgba(126,92,255,0.18),rgba(80,48,160,0.10))] px-5 py-2 text-sm text-[#e9deff] shadow-[0_8px_30px_rgba(120,80,255,0.18)]">
-              <span className="font-medium">Launching MEDMIX I: Best multimodal AI engine in digital health</span>
+              <span className="font-medium">MedMIX for incomplete multimodal data</span>
               <Chevron />
             </div>
           </div>
 
-          <div className="px-5 py-10 sm:px-8 sm:py-14 lg:px-10 lg:py-18">
-            <div className="max-w-[58rem]">
-              <h1 className="font-display max-w-[12ch] text-[3rem] font-semibold leading-[0.95] tracking-[-0.075em] text-white sm:text-[4rem] lg:text-[4.7rem] xl:text-[5.3rem]">
-                Intelligence layer for incomplete clinical data.
+          <div className="px-5 py-12 sm:px-8 sm:py-16 lg:px-10 lg:py-20">
+            <div className="max-w-[60rem]">
+              <h1 className="font-display max-w-[9ch] text-[3rem] font-semibold leading-[0.95] tracking-[-0.075em] text-white sm:text-[4.15rem] lg:text-[5rem] xl:text-[5.8rem]">
+                Predict outcomes from incomplete data.
               </h1>
 
-              <div className="mt-8 max-w-[36rem]">
-                <p className="text-lg leading-8 text-white/72 sm:text-xl">
-                  Sapiens Health builds the AI engine that fuses imaging, EHR, and clinical data —
-                  even when some are missing.
-                </p>
-                <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                  <a
-                    href="#about"
-                    className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[linear-gradient(135deg,#d8b1ff_0%,#9c8cff_56%,#81ddff_100%)] px-6 py-4 text-base font-semibold text-[#080612] shadow-[0_22px_50px_rgba(145,118,255,0.34)] transition duration-300 hover:-translate-y-0.5"
-                  >
-                    About Technology
-                    <ArrowRight className="h-4 w-4" />
-                  </a>
-                  <a
-                    href="#contact"
-                    className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/14 bg-white/[0.04] px-6 py-4 text-base font-semibold text-white transition duration-300 hover:-translate-y-0.5 hover:bg-white/[0.07]"
-                  >
-                    Get In Touch
-                    <ArrowRight className="h-4 w-4" />
-                  </a>
-                </div>
+              <p className="mt-8 max-w-[34rem] text-lg leading-8 text-white/72 sm:text-xl">
+                Sapiens Health builds the multimodal AI engine that works with what you have.
+              </p>
+
+              <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+                <a
+                  href="#framework"
+                  className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[linear-gradient(135deg,#d8b1ff_0%,#9c8cff_56%,#81ddff_100%)] px-6 py-4 text-base font-semibold text-[#080612] shadow-[0_22px_50px_rgba(145,118,255,0.34)] transition duration-300 hover:-translate-y-0.5"
+                >
+                  How MedMIX works
+                  <ArrowRight className="h-4 w-4" />
+                </a>
+                <a
+                  href="#contact"
+                  className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/14 bg-white/[0.04] px-6 py-4 text-base font-semibold text-white transition duration-300 hover:-translate-y-0.5 hover:bg-white/[0.07]"
+                >
+                  Request evaluation
+                  <ArrowRight className="h-4 w-4" />
+                </a>
               </div>
             </div>
           </div>
         </section>
 
-        <section id="about" className="mx-auto mt-8 grid w-full max-w-[1520px] gap-6 lg:grid-cols-[0.9fr_1.1fr]">
-          <article className="rounded-[2rem] border border-white/10 bg-white/[0.035] p-6 shadow-[0_30px_80px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:p-8">
-            <div className="section-kicker">About</div>
-            <h2 className="font-display mt-5 max-w-[16ch] text-3xl font-semibold tracking-[-0.06em] text-white sm:text-4xl lg:text-[2.8rem]">
-              Built like a platform, not a paper diagram.
+        <section id="clinical" className="mx-auto mt-8 grid w-full max-w-[1520px] gap-6 lg:grid-cols-[0.88fr_1.12fr]">
+          <article className="rounded-[2rem] border border-white/10 bg-white/[0.035] p-6 shadow-[0_30px_80px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:p-8 lg:p-10">
+            <div className="section-kicker">Clinical Intelligence</div>
+            <div className="mt-5 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-sm text-white/66">
+              <Building2 className="h-4 w-4 text-[#cab7ff]" />
+              <span>For Healthcare Institutions</span>
+            </div>
+            <h2 className="font-display mt-5 max-w-[14ch] text-3xl font-semibold tracking-[-0.06em] text-white sm:text-4xl lg:text-[2.9rem]">
+              Predictions that survive missing clinical signals.
             </h2>
-            <p className="mt-5 max-w-[34rem] text-base leading-8 text-white/66">
-              Sapiens Health accepts the clinical reality hospitals and study teams already have —
-              incomplete imaging, fragmented notes, sparse vitals, operational signals, and protocol
-              context — then turns that mixture into usable prediction tasks.
+            <p className="mt-5 max-w-[34rem] text-base leading-8 text-white/68 sm:text-lg">
+              Hospitals rarely have complete data. ECG, imaging, EHR, clinical notes — some are always missing. MedMIX fuses what exists and delivers accurate predictions anyway.
             </p>
-
-            <div className="mt-8 grid gap-4">
-              {modalityCards.map((card) => {
-                const Icon = card.icon;
-                return (
-                  <div key={card.title} className="modality-card grid gap-4 rounded-[1.6rem] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.025))] p-4 sm:grid-cols-[10.5rem_1fr] sm:items-center">
-                    <div className="overflow-hidden rounded-[1.3rem] border border-white/10 bg-[#0d0c17]">
-                      <img src={card.image} alt={card.title} className="h-40 w-full object-cover sm:h-36" />
-                    </div>
-                    <div>
-                      <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[11px] uppercase tracking-[0.22em] text-white/52">
-                        <Icon className="h-3.5 w-3.5 text-[#cab7ff]" />
-                        {card.label}
-                      </div>
-                      <h3 className="font-display mt-4 text-2xl font-semibold tracking-[-0.05em] text-white">{card.title}</h3>
-                      <p className="mt-3 text-sm leading-7 text-white/62">{card.description}</p>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
           </article>
 
-          <article className="overflow-hidden rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(15,12,29,0.92),rgba(8,7,18,0.98))] p-6 shadow-[0_30px_90px_rgba(0,0,0,0.34)] sm:p-8">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-              <div>
-                <div className="section-kicker">Framework</div>
-                <h2 className="font-display mt-4 max-w-[17ch] text-3xl font-semibold tracking-[-0.06em] text-white sm:text-4xl">
-                  Diverse inputs enter. MEDMIX routes. Predictions ship.
-                </h2>
-              </div>
-              <div className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-xs text-white/58">
-                missing-modality robust
-              </div>
-            </div>
-
-            <div className="mt-8 grid gap-5 xl:grid-cols-[0.78fr_0.64fr_0.98fr] xl:items-center">
-              <div className="stage-card">
-                <div className="stage-label">Inputs</div>
-                <div className="mt-4 grid grid-cols-3 gap-3">
-                  {modalityCards.map((card) => {
-                    const Icon = card.icon;
-                    return (
-                      <div key={card.title} className="input-visual-card">
-                        <img src={card.image} alt={card.title} className="h-24 w-full rounded-[0.95rem] object-cover" />
-                        <div className="mt-2 inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.2em] text-white/55">
-                          <Icon className="h-3 w-3 text-[#cab7ff]" />
-                          {card.label}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-                <div className="mt-5 flex flex-wrap gap-2.5">
-                  {inputChips.map((chip) => {
-                    const Icon = chip.icon;
-                    return (
-                      <div key={chip.label} className="chip-pulse inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.05] px-3 py-2 text-sm text-white/72">
-                        <Icon className="h-4 w-4 text-[#c8b6ff]" />
-                        {chip.label}
-                      </div>
-                    );
-                  })}
-                </div>
-                <div className="framework-rail mt-5" />
-                <p className="mt-4 text-sm leading-7 text-white/58">
-                  Images, pathology, records, notes, vitals, and workflow context feed one production layer.
-                </p>
-              </div>
-
-              <div className="engine-shell relative mx-auto flex h-[21rem] w-full max-w-[19rem] flex-col items-center justify-center rounded-[2rem] border border-white/10 bg-[radial-gradient(circle_at_50%_28%,rgba(214,197,255,0.24),rgba(103,84,255,0.18)_36%,rgba(8,8,18,0.98)_84%)] px-5 text-center shadow-[0_0_90px_rgba(112,96,255,0.18)]">
-                <span className="engine-ring engine-ring-a" />
-                <span className="engine-ring engine-ring-b" />
-                <span className="engine-core-glow" />
-                <div className="relative z-10 rounded-full border border-white/12 bg-white/[0.04] px-3 py-1 text-[11px] uppercase tracking-[0.24em] text-white/66">
-                  MEDMIX engine
-                </div>
-                <div className="relative z-10 mt-5 flex h-20 w-20 items-center justify-center overflow-hidden rounded-[1.65rem] border border-white/12 bg-black/80 shadow-[0_0_40px_rgba(111,93,255,0.22)]">
-                  <img src={logoUrl} alt="Sapiens Health engine mark" className="h-full w-full object-cover" />
-                </div>
-                <div className="font-display relative z-10 mt-5 text-2xl font-semibold tracking-[-0.05em] text-white">Sapiens Health</div>
-                <p className="relative z-10 mt-3 max-w-[14rem] text-sm leading-6 text-white/62">
-                  Fuses multimodal evidence and routes predictions into live workflows.
-                </p>
-              </div>
-
-              <div className="stage-card">
-                <div className="stage-label">Outputs</div>
-                <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
-                  {outputTasks.map((task) => {
-                    const Icon = task.icon;
-                    return (
-                      <div key={task.title} className="output-task-card flex items-start gap-3 rounded-[1.2rem] border border-white/10 bg-white/[0.04] p-3.5">
-                        <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.05] text-[#cbb8ff]">
-                          <Icon className="h-4.5 w-4.5" />
-                        </div>
-                        <div>
-                          <div className="text-sm font-semibold text-white">{task.title}</div>
-                          <div className="mt-1 text-sm leading-6 text-white/58">{task.detail}</div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
+          <article className="overflow-hidden rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(15,12,29,0.92),rgba(8,7,18,0.98))] p-3 shadow-[0_30px_90px_rgba(0,0,0,0.34)] sm:p-4">
+            <div className="relative overflow-hidden rounded-[1.6rem] border border-white/10 bg-black/30">
+              <img src={clinicalImageUrl} alt="Clinical intelligence environment" className="h-[24rem] w-full object-cover sm:h-[29rem] lg:h-[32rem]" />
+              <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(7,7,13,0.06),rgba(7,7,13,0.24))]" />
             </div>
           </article>
         </section>
 
-        <section id="research" className="mx-auto mt-8 grid w-full max-w-[1520px] gap-6 lg:grid-cols-[1fr_1fr]">
-          {solutionCards.map((card) => {
-            const Icon = card.icon;
-            return (
-              <article key={card.title} className="rounded-[2rem] border border-white/10 bg-white/[0.035] p-6 shadow-[0_30px_80px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:p-8">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.05] text-[#cab7ff]">
-                    <Icon className="h-5 w-5" />
-                  </div>
-                  <div className="section-kicker">{card.eyebrow}</div>
-                </div>
-                <h2 className="font-display mt-6 max-w-[15ch] text-3xl font-semibold tracking-[-0.06em] text-white sm:text-4xl">
-                  {card.title}
-                </h2>
-                <p className="mt-5 max-w-[34rem] text-base leading-8 text-white/64">{card.text}</p>
-              </article>
-            );
-          })}
+        <section id="bioprocess" className="mx-auto mt-8 grid w-full max-w-[1520px] gap-6 lg:grid-cols-[1.12fr_0.88fr]">
+          <article className="order-2 overflow-hidden rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(15,12,29,0.92),rgba(8,7,18,0.98))] p-3 shadow-[0_30px_90px_rgba(0,0,0,0.34)] sm:p-4 lg:order-1">
+            <div className="relative overflow-hidden rounded-[1.6rem] border border-white/10 bg-black/30">
+              <img src={bioprocessImageUrl} alt="Bioprocess intelligence manufacturing environment" className="h-[24rem] w-full object-cover sm:h-[29rem] lg:h-[32rem]" />
+              <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(7,7,13,0.08),rgba(7,7,13,0.22))]" />
+            </div>
+          </article>
+
+          <article className="order-1 rounded-[2rem] border border-white/10 bg-white/[0.035] p-6 shadow-[0_30px_80px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:p-8 lg:order-2 lg:p-10">
+            <div className="section-kicker">Bioprocess Intelligence</div>
+            <div className="mt-5 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-sm text-white/66">
+              <Factory className="h-4 w-4 text-[#cab7ff]" />
+              <span>For Biomanufacturing and CDMOs</span>
+            </div>
+            <h2 className="font-display mt-5 max-w-[15ch] text-3xl font-semibold tracking-[-0.06em] text-white sm:text-4xl lg:text-[2.9rem]">
+              Outcome prediction across variable batch reality.
+            </h2>
+            <p className="mt-5 max-w-[34rem] text-base leading-8 text-white/68 sm:text-lg">
+              Every batch looks different. Apheresis results, flow cytometry, process parameters — coverage varies by client and stage. MedMIX predicts outcomes from whatever is available.
+            </p>
+          </article>
         </section>
 
-        <section id="contact" className="mx-auto mt-8 w-full max-w-[1520px] rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.025))] p-6 shadow-[0_30px_80px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:p-8">
-          <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end">
-            <div>
-              <div className="section-kicker">Contact</div>
-              <h2 className="font-display mt-4 max-w-[14ch] text-3xl font-semibold tracking-[-0.06em] text-white sm:text-4xl lg:text-[2.85rem]">
-                Built for real hospitals, study teams, and multimodal workflows.
-              </h2>
-              <p className="mt-5 max-w-[42rem] text-base leading-8 text-white/64">
-                If you are exploring hospital decision support or clinical trial screening on incomplete
-                clinical data, we can show how MEDMIX fits into your environment.
-              </p>
+        <section id="framework" className="mx-auto mt-8 w-full max-w-[1520px] rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(15,12,29,0.92),rgba(8,7,18,0.98))] p-6 shadow-[0_30px_90px_rgba(0,0,0,0.34)] sm:p-8 lg:p-10">
+          <div className="max-w-[44rem]">
+            <div className="section-kicker">How MedMIX works</div>
+            <h2 className="font-display mt-5 max-w-[14ch] text-3xl font-semibold tracking-[-0.06em] text-white sm:text-4xl lg:text-[2.9rem]">
+              Diverse inputs enter. Missing ones are masked, not fabricated. Predictions ship.
+            </h2>
+          </div>
+
+          <div className="mt-8 grid gap-4 lg:grid-cols-3">
+            <article className="rounded-[1.6rem] border border-white/10 bg-white/[0.035] p-5">
+              <div className="flex items-center gap-2 text-sm font-medium text-white/68">
+                <Layers3 className="h-4 w-4 text-[#cab7ff]" />
+                <span>Inputs</span>
+              </div>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {frameworkInputs.map((item) => (
+                  <span key={item} className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-sm text-white/72">
+                    {item}
+                  </span>
+                ))}
+              </div>
+            </article>
+
+            <article className="rounded-[1.6rem] border border-white/10 bg-white/[0.035] p-5">
+              <div className="flex items-center gap-2 text-sm font-medium text-white/68">
+                <CircleGauge className="h-4 w-4 text-[#cab7ff]" />
+                <span>Engine</span>
+              </div>
+              <div className="mt-4 rounded-[1.3rem] border border-white/10 bg-[linear-gradient(180deg,rgba(138,116,255,0.12),rgba(255,255,255,0.02))] p-4">
+                <div className="font-display text-2xl font-semibold tracking-[-0.05em] text-white">MedMIX</div>
+                <p className="mt-2 text-sm leading-7 text-white/66">
+                  Entropy-guided multimodal fusion.
+                </p>
+              </div>
+            </article>
+
+            <article className="rounded-[1.6rem] border border-white/10 bg-white/[0.035] p-5">
+              <div className="flex items-center gap-2 text-sm font-medium text-white/68">
+                <Database className="h-4 w-4 text-[#cab7ff]" />
+                <span>Outputs</span>
+              </div>
+              <div className="mt-4 grid gap-2">
+                {frameworkOutputs.map((item) => (
+                  <div key={item} className="rounded-[1rem] border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white/72">
+                    {item}
+                  </div>
+                ))}
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section id="contact" className="mx-auto mt-8 w-full max-w-[1520px] rounded-[2rem] border border-white/10 bg-white/[0.035] p-6 shadow-[0_30px_80px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:p-8 lg:p-10">
+          <div className="max-w-[50rem]">
+            <div className="section-kicker">Contact</div>
+            <h2 className="font-display mt-5 max-w-[16ch] text-3xl font-semibold tracking-[-0.06em] text-white sm:text-4xl lg:text-[2.9rem]">
+              Working with incomplete clinical or bioprocess data?
+            </h2>
+            <div className="mt-8">
+              <a
+                href="mailto:team@sapienshealth.co"
+                className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[linear-gradient(135deg,#d8b1ff_0%,#9c8cff_56%,#81ddff_100%)] px-6 py-4 text-base font-semibold text-[#080612] shadow-[0_22px_50px_rgba(145,118,255,0.34)] transition duration-300 hover:-translate-y-0.5"
+              >
+                Request Evaluation
+                <ArrowRight className="h-4 w-4" />
+              </a>
             </div>
-            <a
-              href="mailto:hello@sapienshealth.co"
-              className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/14 bg-white/[0.05] px-7 py-4 text-base font-semibold text-white transition duration-300 hover:-translate-y-0.5 hover:bg-white/[0.08]"
-            >
-              Contact team
-              <ArrowRight className="h-4 w-4" />
-            </a>
           </div>
         </section>
       </main>
@@ -343,18 +223,8 @@ export default function Home() {
 
 function Chevron() {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="h-4 w-4"
-      aria-hidden="true"
-    >
-      <path d="M9 18l6-6-6-6" />
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" className="opacity-80">
+      <path d="M3 2.5L7.2 6L3 9.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }

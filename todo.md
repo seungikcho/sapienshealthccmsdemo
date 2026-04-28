@@ -60,3 +60,10 @@
 - [x] Remove the current right-side hero graphic panel from the opening section.
 - [x] Rebalance the hero layout after removing the graphic so the opening feels cleaner and less busy.
 - [x] Review the simplified hero in the live preview and save a checkpoint if the cleaner direction works.
+- [x] Replace the current homepage structure with five sections only: Hero, Clinical Intelligence, Bioprocess Intelligence, How it works, and Contact.
+- [x] Update the hero copy to use the new headline and supporting sentence provided by the user.
+- [x] Replace the current solution sections with separate Clinical Intelligence and Bioprocess Intelligence sections using the new copy.
+- [x] Rewrite the framework section into a concise How MedMIX works section with Inputs, Engine, and Outputs.
+- [x] Simplify the contact section to the new incomplete-data evaluation prompt and CTA.
+- [x] Unify the visuals so the page uses one clinical image and one manufacturing image only, aligned to the two vertical sections.
+- [x] Review the rebuilt five-section homepage in the live preview and save a checkpoint if the new version is coherent.
