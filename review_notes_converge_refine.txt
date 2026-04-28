@@ -1,0 +1,7 @@
+Converge-inspired refinement review notes:
+
+The hero no longer leads with explicit Digital Health wording and now reads more like a product platform with the phrase "Intelligence layer for incomplete multimodal clinical data." This is directionally closer to the requested submission tone.
+
+The modality area is substantially improved relative to the previous icon-like cards. It now uses equal-sized image-led tiles for CT, EHR, Pathology, Clinical notes, and Vitals, which makes the section read more like a product input gallery and less like an explanatory checklist. The shared sizing and darker framing are closer to the Converge reference.
+
+A likely next micro-refinement would be to make the modality labels even calmer and slightly smaller, or to increase tile size on desktop so the imagery has more presence. But the current version already resolves the major issue: the tiles now look like actual modality images rather than abstract futuristic badges.

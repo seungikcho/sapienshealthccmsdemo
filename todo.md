@@ -74,3 +74,12 @@
 - [x] Replace the intelligence-split storytelling with a prediction-to-insight workflow concept.
 - [x] Rewrite section titles, body copy, and calls to action to emphasize AI-powered clinical workflows and real-world data intelligence.
 - [x] Review the Digital Health rewrite in the live preview and save a new checkpoint if the positioning is coherent.
+- [x] Remove explicit 'Digital Health' wording from the homepage hero and section framing.
+- [x] Restore an 'intelligence layer for ...' style hero direction that feels more fitting for the submission.
+- [x] Replace the current text-based modality list with equal-sized visual tiles for Imaging, EHR, Pathology, Clinical notes, and Vitals.
+- [x] Use unified generated imagery so each modality tile reads as a clean, matching block rather than a text card.
+- [x] Review the revised hero wording and modality tile system in the live preview and save a new checkpoint if the composition is stronger.
+- [x] Replace the current futuristic modality tiles with realistic, modality-appropriate image blocks that clearly read as CT, EHR, Pathology, Clinical notes, and Vitals.
+- [x] Study converge-bio.com and align the homepage typography scale, spacing rhythm, and overall layout tone more closely with that reference.
+- [x] Rework the modality tile visuals so they feel simple, consistent, and image-led rather than icon-led.
+- [x] Review the Converge-inspired redesign in the live preview and save a new checkpoint if the direction is stronger.

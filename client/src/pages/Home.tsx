@@ -1,7 +1,8 @@
 /*
-Design philosophy for this page: A minimal, investment-grade Digital Health homepage built for
-award submission. The composition should feel calm, premium, and precise, with incomplete
-multimodal clinical data and workflow-ready insights as the core message.
+Design philosophy for this page: A dark editorial product homepage inspired by Converge Bio.
+The typography should feel straight, large, and calm. The layout should use generous spacing,
+minimal clutter, and image-led product blocks. MedMIX should read as an intelligence layer for
+incomplete multimodal clinical data rather than a broad category statement.
 */
 import {
   AlertTriangle,
@@ -11,7 +12,6 @@ import {
   Database,
   FileText,
   HeartPulse,
-  ImageIcon,
   Layers3,
   Microscope,
   MoveRight,
@@ -26,12 +26,32 @@ const logoUrl =
 const clinicalImageUrl =
   "https://d2xsxph8kpxj0f.cloudfront.net/310519663318202729/TdsfYCSbV9xhvU4DsPP84j/clinical-intelligence_7a32d9bc.jpg";
 
-const incompleteInputs = [
-  { label: "Imaging", icon: ScanLine },
-  { label: "EHR", icon: Database },
-  { label: "Pathology", icon: Microscope },
-  { label: "Clinical notes", icon: FileText },
-  { label: "Vitals", icon: HeartPulse },
+const modalityTiles = [
+  {
+    label: "CT",
+    image:
+      "https://d2xsxph8kpxj0f.cloudfront.net/310519663318202729/TdsfYCSbV9xhvU4DsPP84j/sapiens-imaging-tile-oBWATGFLeZuQR9syf4mkyW.webp",
+  },
+  {
+    label: "EHR",
+    image:
+      "https://d2xsxph8kpxj0f.cloudfront.net/310519663318202729/TdsfYCSbV9xhvU4DsPP84j/sapiens-ehr-tile-L4Mxc73s5P7RBVBdrsGSpd.webp",
+  },
+  {
+    label: "Pathology",
+    image:
+      "https://d2xsxph8kpxj0f.cloudfront.net/310519663318202729/TdsfYCSbV9xhvU4DsPP84j/sapiens-pathology-tile-G4z9pvJ6Mi4kSWMjgowmn7.webp",
+  },
+  {
+    label: "Clinical notes",
+    image:
+      "https://d2xsxph8kpxj0f.cloudfront.net/310519663318202729/TdsfYCSbV9xhvU4DsPP84j/sapiens-notes-tile-C83VT9ULuSmsJZYG6srnZA.webp",
+  },
+  {
+    label: "Vitals",
+    image:
+      "https://d2xsxph8kpxj0f.cloudfront.net/310519663318202729/TdsfYCSbV9xhvU4DsPP84j/sapiens-vitals-tile-a4nFJTE6ASqXHRaHm54mEF.webp",
+  },
 ];
 
 const insightFlows = [
@@ -57,14 +77,14 @@ const insightFlows = [
   },
 ];
 
-const frameworkInputs = ["Imaging", "EHR", "Pathology", "Notes", "Vitals"];
+const frameworkInputs = ["CT", "EHR", "Pathology", "Notes", "Vitals"];
 const frameworkOutputs = ["Workflow insight", "Prioritization signal", "Clinical prediction"];
 
 export default function Home() {
   return (
     <div className="min-h-screen overflow-x-hidden bg-background text-foreground">
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_12%_12%,rgba(133,102,255,0.18),transparent_20%),radial-gradient(circle_at_88%_14%,rgba(64,212,255,0.1),transparent_18%),linear-gradient(180deg,#06050d_0%,#0a0915_45%,#07060e_100%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_12%_12%,rgba(133,102,255,0.14),transparent_20%),radial-gradient(circle_at_88%_14%,rgba(64,212,255,0.08),transparent_18%),linear-gradient(180deg,#06050d_0%,#0a0915_45%,#07060e_100%)]" />
         <div className="absolute left-[-10rem] top-[14rem] h-[28rem] w-[28rem] rounded-full bg-[#6f57ff]/10 blur-3xl" />
         <div className="absolute bottom-[8rem] right-[-6rem] h-[24rem] w-[24rem] rounded-full bg-cyan-400/8 blur-3xl" />
       </div>
@@ -82,7 +102,7 @@ export default function Home() {
 
           <div className="hidden items-center gap-8 md:flex">
             <nav className="flex items-center gap-8 text-sm text-white/74">
-              <a href="#digital-health" className="transition hover:text-white">Digital Health</a>
+              <a href="#platform" className="transition hover:text-white">Platform</a>
               <a href="#insights" className="transition hover:text-white">Insights</a>
               <a href="#framework" className="transition hover:text-white">How it works</a>
               <a href="#contact" className="transition hover:text-white">Contact</a>
@@ -101,19 +121,19 @@ export default function Home() {
         <section className="mx-auto w-full max-w-[1520px] overflow-hidden rounded-[2.2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(13,11,23,0.92),rgba(9,8,18,0.98))] shadow-[0_0_0_1px_rgba(255,255,255,0.02),0_60px_160px_rgba(0,0,0,0.52)]">
           <div className="border-b border-white/8 px-5 py-6 sm:px-8 lg:px-10">
             <div className="inline-flex items-center gap-2 rounded-full border border-[#8f7dff]/25 bg-[linear-gradient(180deg,rgba(126,92,255,0.18),rgba(80,48,160,0.10))] px-5 py-2 text-sm text-[#e9deff] shadow-[0_8px_30px_rgba(120,80,255,0.18)]">
-              <span className="font-medium">Digital Health AI for incomplete multimodal data</span>
+              <span className="font-medium">Intelligence layer for incomplete multimodal clinical data</span>
               <Chevron />
             </div>
           </div>
 
-          <div className="grid gap-8 px-5 py-12 sm:px-8 sm:py-16 lg:grid-cols-[0.95fr_1.05fr] lg:px-10 lg:py-18">
-            <div className="max-w-[42rem]">
-              <h1 className="font-display max-w-[10ch] text-[3rem] font-semibold leading-[0.95] tracking-[-0.075em] text-white sm:text-[4.15rem] lg:text-[5rem] xl:text-[5.8rem]">
-                Digital health for incomplete multimodal clinical data.
+          <div className="grid gap-10 px-5 py-12 sm:px-8 sm:py-16 lg:grid-cols-[0.92fr_1.08fr] lg:px-10 lg:py-18">
+            <div className="max-w-[40rem]">
+              <h1 className="font-display max-w-[10ch] text-[3rem] font-semibold leading-[0.95] tracking-[-0.075em] text-white sm:text-[4.15rem] lg:text-[5rem] xl:text-[5.6rem]">
+                The intelligence layer for incomplete clinical data.
               </h1>
 
-              <p className="mt-8 max-w-[34rem] text-lg leading-8 text-white/72 sm:text-xl">
-                Sapiens Health turns fragmented real-world clinical data into workflow-ready insights for hospitals and care teams.
+              <p className="mt-8 max-w-[33rem] text-lg leading-8 text-white/72 sm:text-xl">
+                Sapiens Health turns fragmented multimodal patient data into workflow-ready insights for hospitals and care teams.
               </p>
 
               <div className="mt-9 flex flex-col gap-3 sm:flex-row">
@@ -134,11 +154,11 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="rounded-[2rem] border border-white/10 bg-white/[0.035] p-3 shadow-[0_30px_80px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:p-4">
+            <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-3 shadow-[0_30px_80px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:p-4">
               <div className="relative overflow-hidden rounded-[1.6rem] border border-white/10 bg-black/30">
                 <img src={clinicalImageUrl} alt="Clinical workflow environment" className="h-[23rem] w-full object-cover sm:h-[27rem] lg:h-[31rem]" />
                 <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(7,7,13,0.08),rgba(7,7,13,0.26))]" />
-                <div className="absolute inset-x-4 bottom-4 rounded-[1.4rem] border border-white/10 bg-[linear-gradient(180deg,rgba(10,11,20,0.76),rgba(10,11,20,0.56))] p-4 backdrop-blur-xl sm:inset-x-6 sm:bottom-6 sm:p-5">
+                <div className="absolute inset-x-4 bottom-4 rounded-[1.4rem] border border-white/10 bg-[linear-gradient(180deg,rgba(10,11,20,0.78),rgba(10,11,20,0.58))] p-4 backdrop-blur-xl sm:inset-x-6 sm:bottom-6 sm:p-5">
                   <div className="text-sm text-white/58">Clinical workflow reality</div>
                   <div className="mt-2 font-display text-2xl font-semibold tracking-[-0.05em] text-white">
                     Missing signals are common. Insight still has to ship.
@@ -149,35 +169,31 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="digital-health" className="mx-auto mt-8 grid w-full max-w-[1520px] gap-6 lg:grid-cols-[0.82fr_1.18fr]">
+        <section id="platform" className="mx-auto mt-8 grid w-full max-w-[1520px] gap-6 lg:grid-cols-[0.78fr_1.22fr]">
           <article className="rounded-[2rem] border border-white/10 bg-white/[0.035] p-6 shadow-[0_30px_80px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:p-8 lg:p-10">
-            <div className="section-kicker">Digital Health</div>
-            <div className="mt-5 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-sm text-white/66">
-              <Building2 className="h-4 w-4 text-[#cab7ff]" />
-              <span>AI-powered clinical workflows and real-world data intelligence</span>
-            </div>
-            <h2 className="font-display mt-5 max-w-[14ch] text-3xl font-semibold tracking-[-0.06em] text-white sm:text-4xl lg:text-[2.9rem]">
-              Built for the data hospitals actually have.
+            <div className="section-kicker">Platform</div>
+            <h2 className="font-display mt-5 max-w-[12ch] text-3xl font-semibold tracking-[-0.06em] text-white sm:text-4xl lg:text-[2.95rem]">
+              Built around the data that actually exists.
             </h2>
             <p className="mt-5 max-w-[34rem] text-base leading-8 text-white/68 sm:text-lg">
-              ECG, imaging, EHR, pathology, and clinical notes rarely arrive together in complete form. MedMIX works with incomplete multimodal clinical data and turns fragmented patient context into usable insight for real care environments.
+              CT, EHR, pathology, clinical notes, and vitals do not arrive in perfect synchrony. MedMIX fuses what is available and turns incomplete multimodal context into usable clinical signal.
             </p>
           </article>
 
           <article className="rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(15,12,29,0.92),rgba(8,7,18,0.98))] p-6 shadow-[0_30px_90px_rgba(0,0,0,0.34)] sm:p-8 lg:p-10">
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
-              {incompleteInputs.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <div key={item.label} className="rounded-[1.5rem] border border-white/10 bg-white/[0.035] p-4">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-black/20">
-                      <Icon className="h-5 w-5 text-[#cab7ff]" />
-                    </div>
-                    <div className="mt-4 text-base font-medium text-white/86">{item.label}</div>
-                    <div className="mt-2 text-sm leading-6 text-white/54">Available when present. Masked when absent.</div>
+              {modalityTiles.map((tile) => (
+                <div key={tile.label} className="group">
+                  <div className="overflow-hidden rounded-[1.6rem] border border-white/10 bg-black/20 shadow-[0_20px_45px_rgba(0,0,0,0.28)]">
+                    <img
+                      src={tile.image}
+                      alt={`${tile.label} modality tile`}
+                      className="aspect-square w-full object-cover transition duration-500 group-hover:scale-[1.02]"
+                    />
                   </div>
-                );
-              })}
+                  <div className="px-1 pt-3 text-base font-medium text-white/82">{tile.label}</div>
+                </div>
+              ))}
             </div>
           </article>
         </section>
@@ -185,7 +201,7 @@ export default function Home() {
         <section id="insights" className="mx-auto mt-8 w-full max-w-[1520px] rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(15,12,29,0.92),rgba(8,7,18,0.98))] p-6 shadow-[0_30px_90px_rgba(0,0,0,0.34)] sm:p-8 lg:p-10">
           <div className="max-w-[48rem]">
             <div className="section-kicker">Prediction to insight</div>
-            <h2 className="font-display mt-5 max-w-[13ch] text-3xl font-semibold tracking-[-0.06em] text-white sm:text-4xl lg:text-[2.9rem]">
+            <h2 className="font-display mt-5 max-w-[13ch] text-3xl font-semibold tracking-[-0.06em] text-white sm:text-4xl lg:text-[2.95rem]">
               Prediction tasks become workflow-ready insight.
             </h2>
             <p className="mt-5 max-w-[38rem] text-base leading-8 text-white/66 sm:text-lg">
@@ -223,7 +239,7 @@ export default function Home() {
         <section id="framework" className="mx-auto mt-8 w-full max-w-[1520px] rounded-[2rem] border border-white/10 bg-white/[0.035] p-6 shadow-[0_30px_80px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:p-8 lg:p-10">
           <div className="max-w-[44rem]">
             <div className="section-kicker">How MedMIX works</div>
-            <h2 className="font-display mt-5 max-w-[14ch] text-3xl font-semibold tracking-[-0.06em] text-white sm:text-4xl lg:text-[2.9rem]">
+            <h2 className="font-display mt-5 max-w-[14ch] text-3xl font-semibold tracking-[-0.06em] text-white sm:text-4xl lg:text-[2.95rem]">
               Incomplete inputs enter. Missing ones are masked. Clinical insight ships.
             </h2>
           </div>
@@ -275,11 +291,11 @@ export default function Home() {
         <section id="contact" className="mx-auto mt-8 w-full max-w-[1520px] rounded-[2rem] border border-white/10 bg-[linear-gradient(135deg,rgba(255,255,255,0.04),rgba(64,212,255,0.05))] p-6 shadow-[0_30px_80px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:p-8 lg:p-10">
           <div className="max-w-[50rem]">
             <div className="section-kicker">Contact</div>
-            <h2 className="font-display mt-5 max-w-[16ch] text-3xl font-semibold tracking-[-0.06em] text-white sm:text-4xl lg:text-[2.9rem]">
-              Building digital health workflows on incomplete clinical data?
+            <h2 className="font-display mt-5 max-w-[16ch] text-3xl font-semibold tracking-[-0.06em] text-white sm:text-4xl lg:text-[2.95rem]">
+              Working with incomplete multimodal clinical data?
             </h2>
             <p className="mt-5 max-w-[34rem] text-base leading-8 text-white/66 sm:text-lg">
-              We work with care teams and digital health partners that need reliable insight from real-world multimodal data.
+              We work with care teams and digital partners that need reliable insight from real-world multimodal patient data.
             </p>
             <div className="mt-8">
               <a
