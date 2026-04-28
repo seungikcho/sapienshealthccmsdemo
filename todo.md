@@ -67,3 +67,10 @@
 - [x] Simplify the contact section to the new incomplete-data evaluation prompt and CTA.
 - [x] Unify the visuals so the page uses one clinical image and one manufacturing image only, aligned to the two vertical sections.
 - [x] Review the rebuilt five-section homepage in the live preview and save a checkpoint if the new version is coherent.
+- [x] Review the Nebius AI Discovery Award page and confirm how Sapiens Health fits the Digital Health track.
+- [x] Rewrite the homepage so it is positioned entirely for Digital Health rather than biomanufacturing.
+- [x] Remove all manufacturing and CDMO references from the homepage.
+- [x] Reframe the core product message around incomplete multimodal clinical data.
+- [x] Replace the intelligence-split storytelling with a prediction-to-insight workflow concept.
+- [x] Rewrite section titles, body copy, and calls to action to emphasize AI-powered clinical workflows and real-world data intelligence.
+- [x] Review the Digital Health rewrite in the live preview and save a new checkpoint if the positioning is coherent.

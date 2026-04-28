@@ -1,17 +1,23 @@
 /*
-Design philosophy for this page: A minimal, investment-grade healthcare AI homepage with
-five clear sections only. The composition should feel calm, premium, and precise, with one
-clinical image and one manufacturing image used consistently to anchor the two verticals.
+Design philosophy for this page: A minimal, investment-grade Digital Health homepage built for
+award submission. The composition should feel calm, premium, and precise, with incomplete
+multimodal clinical data and workflow-ready insights as the core message.
 */
 import {
+  AlertTriangle,
   ArrowRight,
   Building2,
   CircleGauge,
   Database,
-  Factory,
   FileText,
+  HeartPulse,
+  ImageIcon,
   Layers3,
   Microscope,
+  MoveRight,
+  ScanLine,
+  Sparkles,
+  Stethoscope,
 } from "lucide-react";
 
 const logoUrl =
@@ -19,11 +25,40 @@ const logoUrl =
 
 const clinicalImageUrl =
   "https://d2xsxph8kpxj0f.cloudfront.net/310519663318202729/TdsfYCSbV9xhvU4DsPP84j/clinical-intelligence_7a32d9bc.jpg";
-const bioprocessImageUrl =
-  "https://d2xsxph8kpxj0f.cloudfront.net/310519663318202729/TdsfYCSbV9xhvU4DsPP84j/bioprocess-intelligence_be2b8c9b.jpg";
 
-const frameworkInputs = ["Imaging", "EHR", "Pathology", "Notes", "Process data"];
-const frameworkOutputs = ["Clinical predictions", "Bioprocess outcomes"];
+const incompleteInputs = [
+  { label: "Imaging", icon: ScanLine },
+  { label: "EHR", icon: Database },
+  { label: "Pathology", icon: Microscope },
+  { label: "Clinical notes", icon: FileText },
+  { label: "Vitals", icon: HeartPulse },
+];
+
+const insightFlows = [
+  {
+    task: "Deterioration risk",
+    insight: "Escalation insight for clinical teams",
+    icon: AlertTriangle,
+  },
+  {
+    task: "Discharge readiness",
+    insight: "Bed planning and transition signal",
+    icon: Building2,
+  },
+  {
+    task: "Readmission risk",
+    insight: "Follow-up prioritization cue",
+    icon: Stethoscope,
+  },
+  {
+    task: "Treatment response",
+    insight: "Review signal for care pathways",
+    icon: Sparkles,
+  },
+];
+
+const frameworkInputs = ["Imaging", "EHR", "Pathology", "Notes", "Vitals"];
+const frameworkOutputs = ["Workflow insight", "Prioritization signal", "Clinical prediction"];
 
 export default function Home() {
   return (
@@ -47,8 +82,8 @@ export default function Home() {
 
           <div className="hidden items-center gap-8 md:flex">
             <nav className="flex items-center gap-8 text-sm text-white/74">
-              <a href="#clinical" className="transition hover:text-white">Clinical</a>
-              <a href="#bioprocess" className="transition hover:text-white">Bioprocess</a>
+              <a href="#digital-health" className="transition hover:text-white">Digital Health</a>
+              <a href="#insights" className="transition hover:text-white">Insights</a>
               <a href="#framework" className="transition hover:text-white">How it works</a>
               <a href="#contact" className="transition hover:text-white">Contact</a>
             </nav>
@@ -66,27 +101,27 @@ export default function Home() {
         <section className="mx-auto w-full max-w-[1520px] overflow-hidden rounded-[2.2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(13,11,23,0.92),rgba(9,8,18,0.98))] shadow-[0_0_0_1px_rgba(255,255,255,0.02),0_60px_160px_rgba(0,0,0,0.52)]">
           <div className="border-b border-white/8 px-5 py-6 sm:px-8 lg:px-10">
             <div className="inline-flex items-center gap-2 rounded-full border border-[#8f7dff]/25 bg-[linear-gradient(180deg,rgba(126,92,255,0.18),rgba(80,48,160,0.10))] px-5 py-2 text-sm text-[#e9deff] shadow-[0_8px_30px_rgba(120,80,255,0.18)]">
-              <span className="font-medium">MedMIX for incomplete multimodal data</span>
+              <span className="font-medium">Digital Health AI for incomplete multimodal data</span>
               <Chevron />
             </div>
           </div>
 
-          <div className="px-5 py-12 sm:px-8 sm:py-16 lg:px-10 lg:py-20">
-            <div className="max-w-[60rem]">
-              <h1 className="font-display max-w-[9ch] text-[3rem] font-semibold leading-[0.95] tracking-[-0.075em] text-white sm:text-[4.15rem] lg:text-[5rem] xl:text-[5.8rem]">
-                Predict outcomes from incomplete data.
+          <div className="grid gap-8 px-5 py-12 sm:px-8 sm:py-16 lg:grid-cols-[0.95fr_1.05fr] lg:px-10 lg:py-18">
+            <div className="max-w-[42rem]">
+              <h1 className="font-display max-w-[10ch] text-[3rem] font-semibold leading-[0.95] tracking-[-0.075em] text-white sm:text-[4.15rem] lg:text-[5rem] xl:text-[5.8rem]">
+                Digital health for incomplete multimodal clinical data.
               </h1>
 
               <p className="mt-8 max-w-[34rem] text-lg leading-8 text-white/72 sm:text-xl">
-                Sapiens Health builds the multimodal AI engine that works with what you have.
+                Sapiens Health turns fragmented real-world clinical data into workflow-ready insights for hospitals and care teams.
               </p>
 
               <div className="mt-9 flex flex-col gap-3 sm:flex-row">
                 <a
-                  href="#framework"
+                  href="#insights"
                   className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[linear-gradient(135deg,#d8b1ff_0%,#9c8cff_56%,#81ddff_100%)] px-6 py-4 text-base font-semibold text-[#080612] shadow-[0_22px_50px_rgba(145,118,255,0.34)] transition duration-300 hover:-translate-y-0.5"
                 >
-                  How MedMIX works
+                  See insight flow
                   <ArrowRight className="h-4 w-4" />
                 </a>
                 <a
@@ -98,60 +133,98 @@ export default function Home() {
                 </a>
               </div>
             </div>
+
+            <div className="rounded-[2rem] border border-white/10 bg-white/[0.035] p-3 shadow-[0_30px_80px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:p-4">
+              <div className="relative overflow-hidden rounded-[1.6rem] border border-white/10 bg-black/30">
+                <img src={clinicalImageUrl} alt="Clinical workflow environment" className="h-[23rem] w-full object-cover sm:h-[27rem] lg:h-[31rem]" />
+                <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(7,7,13,0.08),rgba(7,7,13,0.26))]" />
+                <div className="absolute inset-x-4 bottom-4 rounded-[1.4rem] border border-white/10 bg-[linear-gradient(180deg,rgba(10,11,20,0.76),rgba(10,11,20,0.56))] p-4 backdrop-blur-xl sm:inset-x-6 sm:bottom-6 sm:p-5">
+                  <div className="text-sm text-white/58">Clinical workflow reality</div>
+                  <div className="mt-2 font-display text-2xl font-semibold tracking-[-0.05em] text-white">
+                    Missing signals are common. Insight still has to ship.
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
 
-        <section id="clinical" className="mx-auto mt-8 grid w-full max-w-[1520px] gap-6 lg:grid-cols-[0.88fr_1.12fr]">
+        <section id="digital-health" className="mx-auto mt-8 grid w-full max-w-[1520px] gap-6 lg:grid-cols-[0.82fr_1.18fr]">
           <article className="rounded-[2rem] border border-white/10 bg-white/[0.035] p-6 shadow-[0_30px_80px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:p-8 lg:p-10">
-            <div className="section-kicker">Clinical Intelligence</div>
+            <div className="section-kicker">Digital Health</div>
             <div className="mt-5 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-sm text-white/66">
               <Building2 className="h-4 w-4 text-[#cab7ff]" />
-              <span>For Healthcare Institutions</span>
+              <span>AI-powered clinical workflows and real-world data intelligence</span>
             </div>
             <h2 className="font-display mt-5 max-w-[14ch] text-3xl font-semibold tracking-[-0.06em] text-white sm:text-4xl lg:text-[2.9rem]">
-              Predictions that survive missing clinical signals.
+              Built for the data hospitals actually have.
             </h2>
             <p className="mt-5 max-w-[34rem] text-base leading-8 text-white/68 sm:text-lg">
-              Hospitals rarely have complete data. ECG, imaging, EHR, clinical notes — some are always missing. MedMIX fuses what exists and delivers accurate predictions anyway.
+              ECG, imaging, EHR, pathology, and clinical notes rarely arrive together in complete form. MedMIX works with incomplete multimodal clinical data and turns fragmented patient context into usable insight for real care environments.
             </p>
           </article>
 
-          <article className="overflow-hidden rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(15,12,29,0.92),rgba(8,7,18,0.98))] p-3 shadow-[0_30px_90px_rgba(0,0,0,0.34)] sm:p-4">
-            <div className="relative overflow-hidden rounded-[1.6rem] border border-white/10 bg-black/30">
-              <img src={clinicalImageUrl} alt="Clinical intelligence environment" className="h-[24rem] w-full object-cover sm:h-[29rem] lg:h-[32rem]" />
-              <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(7,7,13,0.06),rgba(7,7,13,0.24))]" />
+          <article className="rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(15,12,29,0.92),rgba(8,7,18,0.98))] p-6 shadow-[0_30px_90px_rgba(0,0,0,0.34)] sm:p-8 lg:p-10">
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+              {incompleteInputs.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <div key={item.label} className="rounded-[1.5rem] border border-white/10 bg-white/[0.035] p-4">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-black/20">
+                      <Icon className="h-5 w-5 text-[#cab7ff]" />
+                    </div>
+                    <div className="mt-4 text-base font-medium text-white/86">{item.label}</div>
+                    <div className="mt-2 text-sm leading-6 text-white/54">Available when present. Masked when absent.</div>
+                  </div>
+                );
+              })}
             </div>
           </article>
         </section>
 
-        <section id="bioprocess" className="mx-auto mt-8 grid w-full max-w-[1520px] gap-6 lg:grid-cols-[1.12fr_0.88fr]">
-          <article className="order-2 overflow-hidden rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(15,12,29,0.92),rgba(8,7,18,0.98))] p-3 shadow-[0_30px_90px_rgba(0,0,0,0.34)] sm:p-4 lg:order-1">
-            <div className="relative overflow-hidden rounded-[1.6rem] border border-white/10 bg-black/30">
-              <img src={bioprocessImageUrl} alt="Bioprocess intelligence manufacturing environment" className="h-[24rem] w-full object-cover sm:h-[29rem] lg:h-[32rem]" />
-              <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(7,7,13,0.08),rgba(7,7,13,0.22))]" />
-            </div>
-          </article>
-
-          <article className="order-1 rounded-[2rem] border border-white/10 bg-white/[0.035] p-6 shadow-[0_30px_80px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:p-8 lg:order-2 lg:p-10">
-            <div className="section-kicker">Bioprocess Intelligence</div>
-            <div className="mt-5 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-sm text-white/66">
-              <Factory className="h-4 w-4 text-[#cab7ff]" />
-              <span>For Biomanufacturing and CDMOs</span>
-            </div>
-            <h2 className="font-display mt-5 max-w-[15ch] text-3xl font-semibold tracking-[-0.06em] text-white sm:text-4xl lg:text-[2.9rem]">
-              Outcome prediction across variable batch reality.
+        <section id="insights" className="mx-auto mt-8 w-full max-w-[1520px] rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(15,12,29,0.92),rgba(8,7,18,0.98))] p-6 shadow-[0_30px_90px_rgba(0,0,0,0.34)] sm:p-8 lg:p-10">
+          <div className="max-w-[48rem]">
+            <div className="section-kicker">Prediction to insight</div>
+            <h2 className="font-display mt-5 max-w-[13ch] text-3xl font-semibold tracking-[-0.06em] text-white sm:text-4xl lg:text-[2.9rem]">
+              Prediction tasks become workflow-ready insight.
             </h2>
-            <p className="mt-5 max-w-[34rem] text-base leading-8 text-white/68 sm:text-lg">
-              Every batch looks different. Apheresis results, flow cytometry, process parameters — coverage varies by client and stage. MedMIX predicts outcomes from whatever is available.
+            <p className="mt-5 max-w-[38rem] text-base leading-8 text-white/66 sm:text-lg">
+              Instead of stopping at a score, Sapiens Health turns clinical predictions into signals that care teams can prioritize, review, and act on.
             </p>
-          </article>
+          </div>
+
+          <div className="mt-8 grid gap-4 lg:grid-cols-2">
+            {insightFlows.map((item) => {
+              const Icon = item.icon;
+              return (
+                <article key={item.task} className="grid gap-4 rounded-[1.6rem] border border-white/10 bg-white/[0.035] p-5 md:grid-cols-[1fr_auto_1fr] md:items-center">
+                  <div>
+                    <div className="text-sm text-white/52">Prediction task</div>
+                    <div className="mt-2 text-xl font-semibold tracking-[-0.03em] text-white">{item.task}</div>
+                  </div>
+                  <div className="flex items-center justify-center">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-[linear-gradient(180deg,rgba(126,92,255,0.14),rgba(255,255,255,0.03))]">
+                      <MoveRight className="h-5 w-5 text-[#cbb8ff]" />
+                    </div>
+                  </div>
+                  <div className="rounded-[1.25rem] border border-white/10 bg-black/20 p-4">
+                    <div className="flex items-center gap-2 text-sm text-white/52">
+                      <Icon className="h-4 w-4 text-[#cab7ff]" />
+                      <span>Insight</span>
+                    </div>
+                    <div className="mt-2 text-base font-medium text-white/86">{item.insight}</div>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
         </section>
 
-        <section id="framework" className="mx-auto mt-8 w-full max-w-[1520px] rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(15,12,29,0.92),rgba(8,7,18,0.98))] p-6 shadow-[0_30px_90px_rgba(0,0,0,0.34)] sm:p-8 lg:p-10">
+        <section id="framework" className="mx-auto mt-8 w-full max-w-[1520px] rounded-[2rem] border border-white/10 bg-white/[0.035] p-6 shadow-[0_30px_80px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:p-8 lg:p-10">
           <div className="max-w-[44rem]">
             <div className="section-kicker">How MedMIX works</div>
             <h2 className="font-display mt-5 max-w-[14ch] text-3xl font-semibold tracking-[-0.06em] text-white sm:text-4xl lg:text-[2.9rem]">
-              Diverse inputs enter. Missing ones are masked, not fabricated. Predictions ship.
+              Incomplete inputs enter. Missing ones are masked. Clinical insight ships.
             </h2>
           </div>
 
@@ -178,7 +251,7 @@ export default function Home() {
               <div className="mt-4 rounded-[1.3rem] border border-white/10 bg-[linear-gradient(180deg,rgba(138,116,255,0.12),rgba(255,255,255,0.02))] p-4">
                 <div className="font-display text-2xl font-semibold tracking-[-0.05em] text-white">MedMIX</div>
                 <p className="mt-2 text-sm leading-7 text-white/66">
-                  Entropy-guided multimodal fusion.
+                  Entropy-guided multimodal fusion for real-world clinical data.
                 </p>
               </div>
             </article>
@@ -199,18 +272,21 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="contact" className="mx-auto mt-8 w-full max-w-[1520px] rounded-[2rem] border border-white/10 bg-white/[0.035] p-6 shadow-[0_30px_80px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:p-8 lg:p-10">
+        <section id="contact" className="mx-auto mt-8 w-full max-w-[1520px] rounded-[2rem] border border-white/10 bg-[linear-gradient(135deg,rgba(255,255,255,0.04),rgba(64,212,255,0.05))] p-6 shadow-[0_30px_80px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:p-8 lg:p-10">
           <div className="max-w-[50rem]">
             <div className="section-kicker">Contact</div>
             <h2 className="font-display mt-5 max-w-[16ch] text-3xl font-semibold tracking-[-0.06em] text-white sm:text-4xl lg:text-[2.9rem]">
-              Working with incomplete clinical or bioprocess data?
+              Building digital health workflows on incomplete clinical data?
             </h2>
+            <p className="mt-5 max-w-[34rem] text-base leading-8 text-white/66 sm:text-lg">
+              We work with care teams and digital health partners that need reliable insight from real-world multimodal data.
+            </p>
             <div className="mt-8">
               <a
                 href="mailto:team@sapienshealth.co"
                 className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[linear-gradient(135deg,#d8b1ff_0%,#9c8cff_56%,#81ddff_100%)] px-6 py-4 text-base font-semibold text-[#080612] shadow-[0_22px_50px_rgba(145,118,255,0.34)] transition duration-300 hover:-translate-y-0.5"
               >
-                Request Evaluation
+                Request evaluation
                 <ArrowRight className="h-4 w-4" />
               </a>
             </div>
