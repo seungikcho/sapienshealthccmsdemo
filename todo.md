@@ -114,3 +114,6 @@
 - [x] Rebuild the right-side intelligence visual into a 3 columns × 2 rows block.
 - [x] Raise the right-side intelligence block so its top aligns with the hero headline area marked by the user.
 - [x] Match the overall visual height of the intelligence block to the left hero text column more precisely.
+- [x] Crop the overall hero panel height to match the user's newly marked composition.
+- [x] Refit the right-side 3x2 intelligence block so it sits cleanly within the shortened hero panel.
+- [x] Rebalance spacing between the hero text column and the 3x2 intelligence block after the crop.

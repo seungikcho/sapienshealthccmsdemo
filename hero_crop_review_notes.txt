@@ -1,0 +1,4 @@
+2026-04-28 hero crop review
+The hero panel now reads visibly shorter than the previous version, closer to the user's cropped reference.
+The right-side intelligence visual remains a 3 by 2 block and now fits more tightly inside the reduced hero height.
+The spacing between the headline column and the 3x2 visual reads balanced in the first screen composition.
