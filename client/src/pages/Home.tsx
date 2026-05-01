@@ -290,21 +290,23 @@ export default function Home() {
 
         <section
           id="contact"
-          className="mx-auto mt-8 w-full max-w-[1520px] rounded-[2rem] border border-white/10 bg-[linear-gradient(135deg,rgba(255,255,255,0.04),rgba(64,212,255,0.05))] p-6 shadow-[0_30px_80px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:p-8 lg:p-10"
+          className="mx-auto mt-8 w-full max-w-[1520px] rounded-[2rem] border border-white/10 bg-[linear-gradient(135deg,rgba(255,255,255,0.04),rgba(64,212,255,0.05))] p-5 shadow-[0_30px_80px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:p-6 lg:p-7"
         >
-          <div className="grid gap-8 lg:grid-cols-[0.92fr_1.08fr] lg:items-end">
-            <div className="max-w-[36rem]">
+          <div className="grid gap-5 lg:grid-cols-[0.96fr_1.04fr] lg:items-end">
+            <div className="max-w-[35rem]">
               <div className="section-kicker">Contact</div>
-              <h2 className="font-display mt-5 max-w-[14ch] text-3xl font-semibold tracking-[-0.06em] text-white sm:text-4xl lg:text-[2.7rem]">
-                Working with incomplete multimodal clinical data?
+              <h2 className="font-display mt-3 max-w-[17ch] text-[2.15rem] font-semibold tracking-[-0.06em] text-white sm:text-[2.4rem] lg:text-[2.65rem]">
+                Working with incomplete
+                <br />
+                multimodal clinical data?
               </h2>
-              <p className="mt-5 max-w-[32rem] text-base leading-7 text-white/66 sm:text-[1.02rem]">
+              <p className="mt-3 max-w-[31rem] text-[0.95rem] leading-6 text-white/66 sm:text-[0.98rem]">
                 We work with care teams and digital partners that need reliable insight from real-world multimodal patient data.
               </p>
-              <div className="mt-7">
+              <div className="mt-5">
                 <a
                   href={evaluationHref}
-                  className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[linear-gradient(135deg,#d8b1ff_0%,#9c8cff_56%,#81ddff_100%)] px-6 py-4 text-base font-semibold text-[#080612] shadow-[0_22px_50px_rgba(145,118,255,0.34)] transition duration-300 hover:-translate-y-0.5"
+                  className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[linear-gradient(135deg,#d8b1ff_0%,#9c8cff_56%,#81ddff_100%)] px-6 py-3.5 text-[0.98rem] font-semibold text-[#080612] shadow-[0_22px_50px_rgba(145,118,255,0.34)] transition duration-300 hover:-translate-y-0.5"
                 >
                   Request evaluation
                   <ArrowRight className="h-4 w-4" />
@@ -312,14 +314,14 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-2 lg:max-w-[34rem] lg:justify-self-end lg:self-end">
-              <article className="rounded-[1.45rem] border border-white/10 bg-[linear-gradient(180deg,rgba(18,14,34,0.72),rgba(9,8,19,0.9))] px-5 py-5">
+            <div className="grid gap-3.5 sm:grid-cols-2 lg:max-w-[33rem] lg:justify-self-end lg:self-end">
+              <article className="rounded-[1.3rem] border border-white/10 bg-[linear-gradient(180deg,rgba(18,14,34,0.72),rgba(9,8,19,0.9))] px-5 py-4">
                 <div className="text-[0.7rem] uppercase tracking-[0.2em] text-white/42">Email</div>
                 <a href="mailto:info@sapienshealth.co" className="mt-3 block text-base font-medium text-white/88 transition hover:text-white">
                   info@sapienshealth.co
                 </a>
               </article>
-              <article className="rounded-[1.45rem] border border-white/10 bg-[linear-gradient(180deg,rgba(18,14,34,0.72),rgba(9,8,19,0.9))] px-5 py-5">
+              <article className="rounded-[1.3rem] border border-white/10 bg-[linear-gradient(180deg,rgba(18,14,34,0.72),rgba(9,8,19,0.9))] px-5 py-4">
                 <div className="text-[0.7rem] uppercase tracking-[0.2em] text-white/42">Headquarters</div>
                 <div className="mt-3 text-base font-medium text-white/88">Houston, TX</div>
               </article>

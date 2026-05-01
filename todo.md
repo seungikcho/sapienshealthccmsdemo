@@ -154,4 +154,7 @@
 - [x] Ensure the support logos appear cleanly on the dark background without visible black fill.
 - [x] Remove the descriptive sentence from the Supported by strip so only the label and logos remain.
 - [x] Re-check the homepage layout after simplifying the Supported by strip.
-- [ ] Save a checkpoint for the simplified Supported by strip update.
+- [x] Save a checkpoint for the simplified Supported by strip update.
+- [x] Rewrite the Contact section headline into a cleaner two-line layout.
+- [x] Reduce the Contact section height by tightening spacing and proportions.
+- [ ] Validate the refined Contact section and save a checkpoint.
