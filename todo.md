@@ -170,4 +170,7 @@
 - [x] Validate the updated hero and save a checkpoint for the new visual direction.
 - [x] Remove the chevron-like icon from the hero announcement pill.
 - [x] Replace the icon with a small light dot that does not read as clickable.
-- [ ] Re-check the hero announcement pill and save a checkpoint.
+- [x] Re-check the hero announcement pill and save a checkpoint.
+- [x] Remove the small light dot from the hero announcement pill.
+- [x] Re-check the hero announcement pill after removing the dot.
+- [ ] Save a checkpoint for the plain-text hero announcement pill.

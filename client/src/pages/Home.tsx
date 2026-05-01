@@ -151,7 +151,6 @@ export default function Home() {
           <div className="border-b border-white/8 px-5 py-6 sm:px-8 lg:px-10">
             <div className="inline-flex items-center gap-2 rounded-full border border-[#8f7dff]/25 bg-[linear-gradient(180deg,rgba(126,92,255,0.18),rgba(80,48,160,0.10))] px-5 py-2 text-sm text-[#e9deff] shadow-[0_8px_30px_rgba(120,80,255,0.18)]">
               <span className="font-medium">Launching MedMIX I: Best multimodal engine for medical outcome prediction</span>
-              <span className="h-2 w-2 rounded-full bg-[#9fdcff] shadow-[0_0_14px_rgba(126,214,255,0.75)] chip-pulse" aria-hidden="true" />
             </div>
           </div>
 
