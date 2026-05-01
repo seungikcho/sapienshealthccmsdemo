@@ -12,13 +12,14 @@ import {
   Database,
   FileText,
   HeartPulse,
-  Layers3,
   LucideIcon,
   Microscope,
-  MoveRight,
-  ScanLine,
   Sparkles,
   Stethoscope,
+  Syringe,
+  TestTubeDiagonal,
+  TimerReset,
+  UserRoundCheck,
 } from "lucide-react";
 
 type ImageTile = {
@@ -91,28 +92,46 @@ const modalityTiles: Array<ImageTile | DataTile> = [
 const insightFlows = [
   {
     task: "Deterioration risk",
-    insight: "Escalation insight for clinical teams",
+    insight: "Escalation insight",
     icon: AlertTriangle,
   },
   {
     task: "Discharge readiness",
-    insight: "Bed planning and transition signal",
+    insight: "Transition planning",
     icon: Building2,
   },
   {
     task: "Readmission risk",
-    insight: "Follow-up prioritization cue",
+    insight: "Follow-up cue",
     icon: Stethoscope,
   },
   {
     task: "Treatment response",
-    insight: "Review signal for care pathways",
+    insight: "Care-path review",
     icon: Sparkles,
+  },
+  {
+    task: "Length of stay",
+    insight: "Resource planning",
+    icon: TimerReset,
+  },
+  {
+    task: "Trial eligibility",
+    insight: "Screening shortlist",
+    icon: UserRoundCheck,
+  },
+  {
+    task: "Infusion duration",
+    insight: "Chair utilization",
+    icon: Syringe,
+  },
+  {
+    task: "Disease classification",
+    insight: "Subtype stratification",
+    icon: TestTubeDiagonal,
   },
 ];
 
-const frameworkInputs = ["CT", "EHR", "Pathology", "Notes", "Vitals"];
-const frameworkOutputs = ["Workflow insight", "Prioritization signal", "Clinical prediction"];
 const evaluationHref = "mailto:info@sapienshealth.co?subject=Request%20evaluation";
 
 export default function Home() {
@@ -193,8 +212,7 @@ export default function Home() {
           <div className="hidden items-center gap-8 md:flex">
             <nav className="flex items-center gap-8 text-sm text-white/74">
               <a href="#platform" className="transition hover:text-white">Platform</a>
-              <a href="#insights" className="transition hover:text-white">Insights</a>
-              <a href="#framework" className="transition hover:text-white">How it works</a>
+              <a href="#insights" className="transition hover:text-white">Prediction tasks</a>
               <a href="#contact" className="transition hover:text-white">Contact</a>
             </nav>
             <a
@@ -216,18 +234,18 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="grid items-start gap-6 px-5 py-7 sm:px-8 sm:py-8 lg:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)] lg:gap-8 lg:px-10 lg:py-7">
-            <div className="max-w-[36rem]">
+          <div className="px-5 py-7 sm:px-8 sm:py-8 lg:px-10 lg:py-7">
+            <div className="max-w-[42rem]">
               <h1 className="font-display max-w-[18ch] text-[2.45rem] font-semibold leading-[0.99] tracking-[-0.055em] text-white sm:text-[2.95rem] lg:text-[3.1rem] xl:text-[3.45rem]">
                 <span className="block">Intelligence layer for</span>
                 <span className="block">incomplete patient data.</span>
               </h1>
 
-              <p className="mt-5 max-w-[34rem] text-[1.02rem] leading-7 text-white/72 sm:text-[1.12rem] sm:leading-8">
+              <p className="mt-5 max-w-[32rem] text-[1.02rem] leading-7 text-white/72 sm:text-[1.12rem] sm:leading-8">
                 Sapiens Health delivers clinical predictions from multimodal patient data — even when modalities are missing.
               </p>
 
-              <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+              <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
                 <a
                   href="#contact"
                   className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/14 bg-white/[0.04] px-6 py-4 text-base font-semibold text-white transition duration-300 hover:-translate-y-0.5 hover:bg-white/[0.07]"
@@ -238,9 +256,6 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3 lg:self-start">
-              {modalityTiles.map((tile) => renderModalityTile(tile, "hero"))}
-            </div>
           </div>
         </section>
 
@@ -262,113 +277,63 @@ export default function Home() {
           </article>
         </section>
 
-        <section id="insights" className="mx-auto mt-8 w-full max-w-[1520px] rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(15,12,29,0.92),rgba(8,7,18,0.98))] p-6 shadow-[0_30px_90px_rgba(0,0,0,0.34)] sm:p-8 lg:p-10">
-          <div className="max-w-[48rem]">
-            <div className="section-kicker">Prediction to insight</div>
-            <h2 className="font-display mt-5 max-w-[13ch] text-3xl font-semibold tracking-[-0.06em] text-white sm:text-4xl lg:text-[2.95rem]">
-              Prediction tasks become workflow-ready insight.
-            </h2>
-            <p className="mt-5 max-w-[38rem] text-base leading-8 text-white/66 sm:text-lg">
-              Instead of stopping at a score, Sapiens Health turns clinical predictions into signals that care teams can prioritize, review, and act on.
-            </p>
-          </div>
+        <section id="insights" className="mx-auto mt-8 w-full max-w-[1520px] rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(15,12,29,0.92),rgba(8,7,18,0.98))] p-6 shadow-[0_30px_90px_rgba(0,0,0,0.34)] sm:p-8 lg:p-9">
+          <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
+            <div className="max-w-[34rem]">
+              <div className="section-kicker">Prediction to insight</div>
+              <h2 className="font-display mt-4 max-w-[11ch] text-3xl font-semibold tracking-[-0.06em] text-white sm:text-4xl lg:text-[2.7rem]">
+                Prediction tasks become workflow-ready insight.
+              </h2>
+              <p className="mt-4 max-w-[33rem] text-base leading-7 text-white/66 sm:text-[1.02rem]">
+                Instead of stopping at a score, Sapiens Health turns clinical predictions into signals that care teams can prioritize, review, and act on.
+              </p>
+            </div>
 
-          <div className="mt-8 grid gap-4 lg:grid-cols-2">
-            {insightFlows.map((item) => {
-              const Icon = item.icon;
-              return (
-                <article key={item.task} className="grid gap-4 rounded-[1.6rem] border border-white/10 bg-white/[0.035] p-5 md:grid-cols-[1fr_auto_1fr] md:items-center">
-                  <div>
-                    <div className="text-sm text-white/52">Prediction task</div>
-                    <div className="mt-2 text-xl font-semibold tracking-[-0.03em] text-white">{item.task}</div>
-                  </div>
-                  <div className="flex items-center justify-center">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-[linear-gradient(180deg,rgba(126,92,255,0.14),rgba(255,255,255,0.03))]">
-                      <MoveRight className="h-5 w-5 text-[#cbb8ff]" />
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+              {insightFlows.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <article key={item.task} className="rounded-[1.35rem] border border-white/10 bg-white/[0.035] p-4 shadow-[0_16px_38px_rgba(0,0,0,0.22)]">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-[linear-gradient(180deg,rgba(126,92,255,0.16),rgba(255,255,255,0.03))]">
+                      <Icon className="h-4.5 w-4.5 text-[#d7c9ff]" />
                     </div>
-                  </div>
-                  <div className="rounded-[1.25rem] border border-white/10 bg-black/20 p-4">
-                    <div className="flex items-center gap-2 text-sm text-white/52">
-                      <Icon className="h-4 w-4 text-[#cab7ff]" />
-                      <span>Insight</span>
-                    </div>
-                    <div className="mt-2 text-base font-medium text-white/86">{item.insight}</div>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
-        </section>
-
-        <section id="framework" className="mx-auto mt-8 w-full max-w-[1520px] rounded-[2rem] border border-white/10 bg-white/[0.035] p-6 shadow-[0_30px_80px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:p-8 lg:p-10">
-          <div className="max-w-[44rem]">
-            <div className="section-kicker">How MedMIX works</div>
-            <h2 className="font-display mt-5 max-w-[14ch] text-3xl font-semibold tracking-[-0.06em] text-white sm:text-4xl lg:text-[2.95rem]">
-              Incomplete inputs enter. Missing ones are masked. Clinical insight ships.
-            </h2>
-          </div>
-
-          <div className="mt-8 grid gap-4 lg:grid-cols-3">
-            <article className="rounded-[1.6rem] border border-white/10 bg-white/[0.035] p-5">
-              <div className="flex items-center gap-2 text-sm font-medium text-white/68">
-                <Layers3 className="h-4 w-4 text-[#cab7ff]" />
-                <span>Inputs</span>
-              </div>
-              <div className="mt-4 flex flex-wrap gap-2">
-                {frameworkInputs.map((item) => (
-                  <span key={item} className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-sm text-white/72">
-                    {item}
-                  </span>
-                ))}
-              </div>
-            </article>
-
-            <article className="rounded-[1.6rem] border border-white/10 bg-white/[0.035] p-5">
-              <div className="flex items-center gap-2 text-sm font-medium text-white/68">
-                <CircleGauge className="h-4 w-4 text-[#cab7ff]" />
-                <span>Engine</span>
-              </div>
-              <div className="mt-4 rounded-[1.3rem] border border-white/10 bg-[linear-gradient(180deg,rgba(138,116,255,0.12),rgba(255,255,255,0.02))] p-4">
-                <div className="font-display text-2xl font-semibold tracking-[-0.05em] text-white">MedMIX</div>
-                <p className="mt-2 text-sm leading-7 text-white/66">
-                  Entropy-guided multimodal fusion for real-world clinical data.
-                </p>
-              </div>
-            </article>
-
-            <article className="rounded-[1.6rem] border border-white/10 bg-white/[0.035] p-5">
-              <div className="flex items-center gap-2 text-sm font-medium text-white/68">
-                <Database className="h-4 w-4 text-[#cab7ff]" />
-                <span>Outputs</span>
-              </div>
-              <div className="mt-4 grid gap-2">
-                {frameworkOutputs.map((item) => (
-                  <div key={item} className="rounded-[1rem] border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white/72">
-                    {item}
-                  </div>
-                ))}
-              </div>
-            </article>
+                    <div className="mt-4 text-[0.68rem] uppercase tracking-[0.18em] text-white/42">Prediction task</div>
+                    <div className="mt-1 text-[1rem] font-semibold leading-5 tracking-[-0.03em] text-white">{item.task}</div>
+                    <div className="mt-4 text-[0.68rem] uppercase tracking-[0.18em] text-white/42">Insight</div>
+                    <div className="mt-1 text-sm leading-6 text-white/72">{item.insight}</div>
+                  </article>
+                );
+              })}
+            </div>
           </div>
         </section>
 
         <section id="contact" className="mx-auto mt-8 w-full max-w-[1520px] rounded-[2rem] border border-white/10 bg-[linear-gradient(135deg,rgba(255,255,255,0.04),rgba(64,212,255,0.05))] p-6 shadow-[0_30px_80px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:p-8 lg:p-10">
-          <div className="max-w-[50rem]">
-            <div className="section-kicker">Contact</div>
-            <h2 className="font-display mt-5 max-w-[16ch] text-3xl font-semibold tracking-[-0.06em] text-white sm:text-4xl lg:text-[2.95rem]">
-              Working with incomplete multimodal clinical data?
-            </h2>
-            <p className="mt-5 max-w-[34rem] text-base leading-8 text-white/66 sm:text-lg">
-              We work with care teams and digital partners that need reliable insight from real-world multimodal patient data.
-            </p>
-            <div className="mt-8">
-              <a
-                href={evaluationHref}
-                className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[linear-gradient(135deg,#d8b1ff_0%,#9c8cff_56%,#81ddff_100%)] px-6 py-4 text-base font-semibold text-[#080612] shadow-[0_22px_50px_rgba(145,118,255,0.34)] transition duration-300 hover:-translate-y-0.5"
-              >
-                Request evaluation
-                <ArrowRight className="h-4 w-4" />
-              </a>
+          <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
+            <div className="max-w-[36rem]">
+              <div className="section-kicker">Contact</div>
+              <h2 className="font-display mt-5 max-w-[14ch] text-3xl font-semibold tracking-[-0.06em] text-white sm:text-4xl lg:text-[2.7rem]">
+                Working with incomplete multimodal clinical data?
+              </h2>
+              <p className="mt-5 max-w-[32rem] text-base leading-7 text-white/66 sm:text-[1.02rem]">
+                We work with care teams and digital partners that need reliable insight from real-world multimodal patient data.
+              </p>
+              <div className="mt-7">
+                <a
+                  href={evaluationHref}
+                  className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[linear-gradient(135deg,#d8b1ff_0%,#9c8cff_56%,#81ddff_100%)] px-6 py-4 text-base font-semibold text-[#080612] shadow-[0_22px_50px_rgba(145,118,255,0.34)] transition duration-300 hover:-translate-y-0.5"
+                >
+                  Request evaluation
+                  <ArrowRight className="h-4 w-4" />
+                </a>
+              </div>
+            </div>
+
+            <div className="rounded-[1.7rem] border border-white/10 bg-[linear-gradient(180deg,rgba(18,14,34,0.72),rgba(9,8,19,0.9))] px-6 py-7 sm:px-8 lg:px-10">
+              <div className="text-sm uppercase tracking-[0.22em] text-white/42">Headquarters</div>
+              <div className="font-display mt-3 text-[2.6rem] font-semibold tracking-[-0.06em] text-[#dcb7ff] sm:text-[3.3rem] lg:text-[4.25rem]">
+                Houston, TX
+              </div>
             </div>
           </div>
         </section>

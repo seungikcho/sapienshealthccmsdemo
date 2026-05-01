@@ -1,0 +1,6 @@
+2026-04-30 simplified layout review
+The top navigation now shows Platform, Prediction tasks, and Contact, matching the simplified site structure.
+The How MedMIX works section is no longer present in the page flow.
+The Prediction to insight section now reads as a compact icon-card gallery with eight tightly packed task boxes and reduced dead space.
+The bottom contact section includes a large Headquarters treatment with the location rendered as Houston, TX.
+The overall page feels simpler and more compact than the previous checkpoint.

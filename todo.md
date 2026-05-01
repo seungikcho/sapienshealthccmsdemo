@@ -131,3 +131,10 @@
 - [x] Remove the unwanted white-border treatment from the modality cards.
 - [x] Replace synthetic modality visuals with real clinical imagery such as pathology and X-ray.
 - [x] Normalize the modality cards to equal box sizes for a real-data gallery feel.
+- [x] Remove the entire right-side hero tile block including X-ray and data cards.
+- [x] Keep the top hero section thin after removing the right-side block.
+- [x] Rebalance the hero text layout so the remaining section still feels intentional.
+- [x] Redesign the Prediction to insight section into compact icon-style task boxes with less empty space.
+- [x] Remove the How MedMIX works section from the page.
+- [x] Update the top navigation to match the simplified section structure.
+- [x] Add a bottom location line in a Houston, TX style treatment.
