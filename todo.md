@@ -157,4 +157,7 @@
 - [x] Save a checkpoint for the simplified Supported by strip update.
 - [x] Rewrite the Contact section headline into a cleaner two-line layout.
 - [x] Reduce the Contact section height by tightening spacing and proportions.
-- [ ] Validate the refined Contact section and save a checkpoint.
+- [x] Validate the refined Contact section and save a checkpoint.
+- [x] Restore the Contact section headline to a single-line layout on desktop.
+- [x] Re-check the Contact section balance after removing the forced line break.
+- [ ] Save a checkpoint for the single-line Contact heading revision.

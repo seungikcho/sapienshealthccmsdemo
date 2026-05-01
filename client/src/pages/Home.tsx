@@ -295,10 +295,8 @@ export default function Home() {
           <div className="grid gap-5 lg:grid-cols-[0.96fr_1.04fr] lg:items-end">
             <div className="max-w-[35rem]">
               <div className="section-kicker">Contact</div>
-              <h2 className="font-display mt-3 max-w-[17ch] text-[2.15rem] font-semibold tracking-[-0.06em] text-white sm:text-[2.4rem] lg:text-[2.65rem]">
-                Working with incomplete
-                <br />
-                multimodal clinical data?
+              <h2 className="font-display mt-3 max-w-none text-[2.15rem] font-semibold tracking-[-0.06em] text-white sm:text-[2.3rem] lg:whitespace-nowrap lg:text-[2.45rem]">
+                Working with incomplete multimodal clinical data?
               </h2>
               <p className="mt-3 max-w-[31rem] text-[0.95rem] leading-6 text-white/66 sm:text-[0.98rem]">
                 We work with care teams and digital partners that need reliable insight from real-world multimodal patient data.
