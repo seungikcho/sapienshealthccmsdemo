@@ -14,6 +14,29 @@ type ModalityTile = {
 const logoUrl =
   "https://d36hbw14aib5lz.cloudfront.net/310519663318202729/TdsfYCSbV9xhvU4DsPP84j/sapienslabs-logo-delta-s-ZjHQetHDXzKos43yZtYjhG.webp?Expires=1807943486&Signature=bfdsDHdM6VbnOCGdixbHpPYBMIrYD2Iaoli5PD2tmAlSbGwChYR7nNxUJIRSQ2Pliwgd7Vz3RvRDPXKLq87uJM5lNGBrieObDqPDN~gGsfmBUgMg-mB-7KN3h~BkL14M12o3i9aw89YHbu2KvJHqdAQPvU~X3MIYpnWR2DSTuKXoNitY490GJbM5LmyBIL2FezT~o04fHDRaALkBcifH7eKRlLab7boYuNTC3G4WEPXTyIyBDoPUZrPps1lyVnu~71IYflncNFZkMiadkvu7DAO5Vs1LfO7qBrII9lx8MzsA4lyPZmJugxjgK8DJ2Dtf1YNTCctpMCNZBxrDmNg8Lw__&Key-Pair-Id=K1MP89RTKNH4J";
 
+const supportLogos = [
+  {
+    name: "K2I Investment",
+    src: "https://d2xsxph8kpxj0f.cloudfront.net/310519663318202729/TdsfYCSbV9xhvU4DsPP84j/logo-k2i-invest-trans_826e641c.png",
+    className: "h-7 w-auto sm:h-8",
+  },
+  {
+    name: "Texas Medical Center",
+    src: "https://d2xsxph8kpxj0f.cloudfront.net/310519663318202729/TdsfYCSbV9xhvU4DsPP84j/logo-texas-medical-trans_a8802624.png",
+    className: "h-10 w-auto sm:h-11",
+  },
+  {
+    name: "THC",
+    src: "https://d2xsxph8kpxj0f.cloudfront.net/310519663318202729/TdsfYCSbV9xhvU4DsPP84j/logo-thc-trans_4b0f97b4.png",
+    className: "h-6 w-auto sm:h-7",
+  },
+  {
+    name: "Nucleate",
+    src: "https://d2xsxph8kpxj0f.cloudfront.net/310519663318202729/TdsfYCSbV9xhvU4DsPP84j/logo-nucleate-trans_8bb0c215.png",
+    className: "h-8 w-auto sm:h-9",
+  },
+];
+
 const modalityTiles: ModalityTile[] = [
   {
     label: "X-ray",
@@ -177,6 +200,24 @@ export default function Home() {
                     </div>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="mx-auto mt-5 w-full max-w-[1520px]">
+          <div className="rounded-[1.7rem] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.035),rgba(255,255,255,0.018))] px-5 py-5 shadow-[0_24px_70px_rgba(0,0,0,0.24)] backdrop-blur-xl sm:px-6 sm:py-6 lg:px-8">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+              <div>
+                <div className="text-[0.72rem] uppercase tracking-[0.22em] text-white/44">Supported by</div>
+                <p className="mt-2 text-sm text-white/58">Backed by partners across research, medical innovation, and translational care.</p>
+              </div>
+              <div className="grid grid-cols-2 items-center gap-x-7 gap-y-5 sm:flex sm:flex-wrap sm:items-center sm:justify-end sm:gap-x-10 sm:gap-y-4">
+                {supportLogos.map((logo) => (
+                  <div key={logo.name} className="flex min-h-[2.75rem] items-center justify-center opacity-88 transition duration-300 hover:opacity-100">
+                    <img src={logo.src} alt={`${logo.name} logo`} className={`${logo.className} object-contain`} />
+                  </div>
+                ))}
               </div>
             </div>
           </div>

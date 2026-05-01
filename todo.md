@@ -149,3 +149,6 @@
 - [x] Remove the modality text labels from the hero graphic.
 - [x] Make the hero graphic slightly wider horizontally while preserving its mood.
 - [x] Recheck the hero balance after the graphic refinement.
+- [x] Prepare four transparent white logo assets for a Supported by strip.
+- [x] Add a Supported by box between the hero CTA area and the Platform section.
+- [x] Ensure the support logos appear cleanly on the dark background without visible black fill.
