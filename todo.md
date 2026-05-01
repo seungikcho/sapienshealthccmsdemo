@@ -120,3 +120,10 @@
 - [x] Crop the hero panel even tighter to match the user's latest reference more closely.
 - [x] Remove the visible bottom empty space beneath the 3x2 intelligence block.
 - [x] Refit the right-side visual height again after eliminating the lower gap.
+- [x] Prepare a downloadable file of the Sapiens Health logo for the user.
+- [x] Deliver the logo file attachment to the user.
+- [x] Create a white-background version of the provided 3x2 intelligence image.
+- [x] Deliver the white-background image file to the user.
+- [x] Densify the hero center so the empty space feels more like an intelligence layer.
+- [x] Connect the Request evaluation CTA to mailto:info@sapienshealth.co.
+- [x] Verify the revised hero composition and CTA behavior.
