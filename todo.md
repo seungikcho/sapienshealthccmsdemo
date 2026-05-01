@@ -160,4 +160,11 @@
 - [x] Validate the refined Contact section and save a checkpoint.
 - [x] Restore the Contact section headline to a single-line layout on desktop.
 - [x] Re-check the Contact section balance after removing the forced line break.
-- [ ] Save a checkpoint for the single-line Contact heading revision.
+- [x] Save a checkpoint for the single-line Contact heading revision.
+- [x] Evaluate where an animated hospital-operations support graphic could fit best on the homepage.
+- [x] Define a motion concept that uses floating cards and inference cues without breaking the current design language.
+- [x] Recommend whether to prototype the animated graphic in the hero or a downstream section.
+- [x] Create a high-resolution hospital-room hero graphic inspired by the user's reference image.
+- [x] Match the generated hospital scene to the website's dark color language and product mood.
+- [x] Integrate the new hospital operations visual into the hero with restrained motion cues.
+- [ ] Validate the updated hero and save a checkpoint for the new visual direction.

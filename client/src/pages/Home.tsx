@@ -14,6 +14,9 @@ type ModalityTile = {
 const logoUrl =
   "https://d36hbw14aib5lz.cloudfront.net/310519663318202729/TdsfYCSbV9xhvU4DsPP84j/sapienslabs-logo-delta-s-ZjHQetHDXzKos43yZtYjhG.webp?Expires=1807943486&Signature=bfdsDHdM6VbnOCGdixbHpPYBMIrYD2Iaoli5PD2tmAlSbGwChYR7nNxUJIRSQ2Pliwgd7Vz3RvRDPXKLq87uJM5lNGBrieObDqPDN~gGsfmBUgMg-mB-7KN3h~BkL14M12o3i9aw89YHbu2KvJHqdAQPvU~X3MIYpnWR2DSTuKXoNitY490GJbM5LmyBIL2FezT~o04fHDRaALkBcifH7eKRlLab7boYuNTC3G4WEPXTyIyBDoPUZrPps1lyVnu~71IYflncNFZkMiadkvu7DAO5Vs1LfO7qBrII9lx8MzsA4lyPZmJugxjgK8DJ2Dtf1YNTCctpMCNZBxrDmNg8Lw__&Key-Pair-Id=K1MP89RTKNH4J";
 
+const heroHospitalGraphic =
+  "https://d2xsxph8kpxj0f.cloudfront.net/310519663318202729/TdsfYCSbV9xhvU4DsPP84j/sapiens-hospital-hero-v2-aNekoNh4s6oDWSarMqDYVd.webp";
+
 const supportLogos = [
   {
     name: "K2I Investment",
@@ -176,28 +179,41 @@ export default function Home() {
               </div>
 
               <div className="relative hidden lg:flex lg:min-h-[320px] lg:items-center lg:justify-center">
-                <div className="hero-stage relative h-[320px] w-full max-w-[640px] overflow-hidden rounded-[2rem] border border-white/8 bg-[radial-gradient(circle_at_28%_24%,rgba(124,97,255,0.18),transparent_24%),radial-gradient(circle_at_72%_68%,rgba(92,211,255,0.12),transparent_22%),linear-gradient(180deg,rgba(12,10,24,0.94),rgba(8,7,18,0.98))]">
-                  <div className="engine-core-glow" />
-                  <div className="engine-ring engine-ring-a" />
-                  <div className="engine-ring engine-ring-b" />
+                <div className="hero-stage relative h-[320px] w-full max-w-[640px] overflow-hidden rounded-[2rem] border border-white/8 bg-[radial-gradient(circle_at_22%_18%,rgba(124,97,255,0.18),transparent_24%),radial-gradient(circle_at_78%_72%,rgba(92,211,255,0.11),transparent_22%),linear-gradient(180deg,rgba(12,10,24,0.94),rgba(8,7,18,0.98))] shadow-[0_30px_90px_rgba(0,0,0,0.34)]">
+                  <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.04),rgba(255,255,255,0))]" />
+                  <div className="absolute inset-[1rem] overflow-hidden rounded-[1.55rem] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.01))] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
+                    <img
+                      src={heroHospitalGraphic}
+                      alt="Isometric hospital room scene with a patient bed, clinician, and care support interface"
+                      className="h-full w-full object-cover opacity-[0.94] saturate-[0.92] [animation:floatCard_12s_ease-in-out_infinite]"
+                    />
+                    <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,7,18,0.02),rgba(8,7,18,0.2))]" />
+                    <div className="absolute inset-y-0 left-0 w-[18%] bg-[linear-gradient(90deg,rgba(9,8,18,0.26),rgba(9,8,18,0))]" />
+                    <div className="absolute inset-y-0 right-0 w-[12%] bg-[linear-gradient(270deg,rgba(9,8,18,0.18),rgba(9,8,18,0))]" />
+                  </div>
 
-                  <div className="absolute inset-x-[14%] top-[50%] h-px -translate-y-1/2 bg-[linear-gradient(90deg,rgba(255,255,255,0),rgba(146,123,255,0.75),rgba(106,213,255,0.75),rgba(255,255,255,0))] opacity-80" />
-                  <div className="absolute inset-y-[18%] left-1/2 w-px -translate-x-1/2 bg-[linear-gradient(180deg,rgba(255,255,255,0),rgba(146,123,255,0.55),rgba(106,213,255,0.55),rgba(255,255,255,0))] opacity-60" />
-                  <div className="absolute left-[10%] top-[22%] h-2.5 w-2.5 rounded-full bg-[#c8b7ff]/80 shadow-[0_0_18px_rgba(184,165,255,0.55)] chip-pulse" />
-                  <div className="absolute right-[11%] top-[30%] h-2 w-2 rounded-full bg-[#91d7ff]/75 shadow-[0_0_18px_rgba(108,210,255,0.5)] chip-pulse [animation-delay:1.1s]" />
-                  <div className="absolute bottom-[19%] left-[16%] h-2.5 w-2.5 rounded-full bg-[#8e7cff]/75 shadow-[0_0_18px_rgba(142,124,255,0.55)] chip-pulse [animation-delay:1.8s]" />
-                  <div className="absolute bottom-[17%] right-[15%] h-2.5 w-2.5 rounded-full bg-[#88d3ff]/75 shadow-[0_0_18px_rgba(136,211,255,0.5)] chip-pulse [animation-delay:2.5s]" />
-
-                  <div className="floating-card floating-card-a absolute left-[28%] top-[23%] h-[10.75rem] w-[12rem] rounded-[2.2rem] border border-white/10 bg-[linear-gradient(145deg,rgba(128,101,255,0.2),rgba(17,15,34,0.95)_58%,rgba(7,7,18,0.98))] shadow-[0_30px_80px_rgba(0,0,0,0.35)] [transform:rotate(-18deg)_skewY(6deg)]" />
-                  <div className="floating-card floating-card-b absolute left-[40%] top-[25%] h-[11.5rem] w-[12.8rem] rounded-[2.4rem] border border-white/12 bg-[linear-gradient(160deg,rgba(86,214,255,0.22),rgba(16,15,36,0.96)_54%,rgba(7,7,18,0.98))] shadow-[0_34px_90px_rgba(0,0,0,0.42)] [transform:rotate(14deg)_skewY(-5deg)]" />
-                  <div className="floating-card floating-card-c absolute left-[36%] top-[29%] h-[10.5rem] w-[11.8rem] rounded-[2rem] border border-white/12 bg-[linear-gradient(180deg,rgba(255,255,255,0.09),rgba(255,255,255,0.03))] backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_24px_70px_rgba(0,0,0,0.34)] [transform:rotate(-2deg)]">
-                    <div className="absolute inset-[0.9rem] rounded-[1.5rem] border border-white/10" />
-                    <div className="absolute inset-x-[1.2rem] top-[1.4rem] h-px bg-[linear-gradient(90deg,rgba(255,255,255,0),rgba(198,185,255,0.72),rgba(255,255,255,0))]" />
-                    <div className="absolute inset-x-[1.5rem] bottom-[1.4rem] flex items-end justify-between">
-                      <span className="h-10 w-10 rounded-[1rem] border border-white/10 bg-white/[0.04]" />
-                      <span className="h-14 w-14 rounded-[1.15rem] border border-white/10 bg-[linear-gradient(180deg,rgba(120,101,255,0.18),rgba(255,255,255,0.04))]" />
-                      <span className="h-9 w-9 rounded-[0.9rem] border border-white/10 bg-white/[0.04]" />
+                  <div className="absolute left-[5%] top-[8%] rounded-[1.1rem] border border-white/12 bg-[linear-gradient(180deg,rgba(18,16,35,0.74),rgba(10,9,20,0.86))] px-4 py-3 backdrop-blur-md shadow-[0_18px_45px_rgba(0,0,0,0.28)] [animation:floatCard_10s_ease-in-out_infinite]">
+                    <div className="text-[0.62rem] uppercase tracking-[0.22em] text-white/40">Inference</div>
+                    <div className="mt-1 text-[0.92rem] font-medium tracking-[-0.03em] text-white/88">Deterioration risk</div>
+                    <div className="mt-2 h-1.5 w-20 overflow-hidden rounded-full bg-white/8">
+                      <div className="h-full w-[72%] rounded-full bg-[linear-gradient(90deg,#a67dff,#72d8ff)]" />
                     </div>
+                  </div>
+
+                  <div className="absolute right-[6%] top-[12%] rounded-[1.1rem] border border-cyan-300/16 bg-[linear-gradient(180deg,rgba(14,16,33,0.66),rgba(10,11,22,0.82))] px-4 py-3 backdrop-blur-md shadow-[0_18px_45px_rgba(0,0,0,0.24)] [animation:floatCard_11s_ease-in-out_infinite] [animation-delay:1.3s]">
+                    <div className="text-[0.62rem] uppercase tracking-[0.22em] text-white/40">Operations</div>
+                    <div className="mt-1 text-[0.92rem] font-medium tracking-[-0.03em] text-white/88">Discharge readiness</div>
+                    <div className="mt-2 flex items-center gap-1.5">
+                      <span className="h-2 w-2 rounded-full bg-[#86dbff] chip-pulse" />
+                      <span className="h-2 w-2 rounded-full bg-[#b391ff]/85 chip-pulse [animation-delay:1.2s]" />
+                      <span className="h-2 w-2 rounded-full bg-white/30" />
+                    </div>
+                  </div>
+
+                  <div className="absolute bottom-[7%] right-[10%] rounded-[1.1rem] border border-white/12 bg-[linear-gradient(180deg,rgba(18,16,35,0.76),rgba(10,9,20,0.88))] px-4 py-3 backdrop-blur-md shadow-[0_18px_45px_rgba(0,0,0,0.28)] [animation:floatCard_9s_ease-in-out_infinite] [animation-delay:2.2s]">
+                    <div className="text-[0.62rem] uppercase tracking-[0.22em] text-white/40">Care team</div>
+                    <div className="mt-1 text-[0.92rem] font-medium tracking-[-0.03em] text-white/88">Bed status · alert</div>
+                    <div className="mt-2 h-px w-24 bg-[linear-gradient(90deg,rgba(255,255,255,0),rgba(143,125,255,0.7),rgba(114,216,255,0.7))]" />
                   </div>
                 </div>
               </div>
