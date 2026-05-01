@@ -146,3 +146,6 @@
 - [x] Add a tasteful 3D animated graphic to the empty right side of the hero.
 - [x] Keep the hero animation restrained so it matches the dark clinical product mood.
 - [x] Rebalance the hero so the typography and new animation feel proportionate.
+- [x] Remove the modality text labels from the hero graphic.
+- [x] Make the hero graphic slightly wider horizontally while preserving its mood.
+- [x] Recheck the hero balance after the graphic refinement.

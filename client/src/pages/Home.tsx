@@ -130,7 +130,7 @@ export default function Home() {
           </div>
 
           <div className="px-5 py-7 sm:px-8 sm:py-8 lg:px-10 lg:py-7">
-            <div className="grid gap-8 lg:grid-cols-[0.88fr_1.12fr] lg:items-center lg:gap-10">
+            <div className="grid gap-8 lg:grid-cols-[0.82fr_1.18fr] lg:items-center lg:gap-10">
               <div className="max-w-[42rem]">
                 <h1 className="font-display max-w-[18ch] text-[2.45rem] font-semibold leading-[0.99] tracking-[-0.055em] text-white sm:text-[2.95rem] lg:text-[3.1rem] xl:text-[3.45rem]">
                   <span className="block">Intelligence layer for</span>
@@ -153,30 +153,21 @@ export default function Home() {
               </div>
 
               <div className="relative hidden lg:flex lg:min-h-[320px] lg:items-center lg:justify-center">
-                <div className="hero-stage relative h-[320px] w-full max-w-[560px] overflow-hidden rounded-[2rem] border border-white/8 bg-[radial-gradient(circle_at_28%_24%,rgba(124,97,255,0.18),transparent_24%),radial-gradient(circle_at_72%_68%,rgba(92,211,255,0.12),transparent_22%),linear-gradient(180deg,rgba(12,10,24,0.94),rgba(8,7,18,0.98))]">
+                <div className="hero-stage relative h-[320px] w-full max-w-[640px] overflow-hidden rounded-[2rem] border border-white/8 bg-[radial-gradient(circle_at_28%_24%,rgba(124,97,255,0.18),transparent_24%),radial-gradient(circle_at_72%_68%,rgba(92,211,255,0.12),transparent_22%),linear-gradient(180deg,rgba(12,10,24,0.94),rgba(8,7,18,0.98))]">
                   <div className="engine-core-glow" />
                   <div className="engine-ring engine-ring-a" />
                   <div className="engine-ring engine-ring-b" />
 
-                  <div className="absolute left-[14%] top-[18%] rounded-full border border-white/10 bg-white/[0.05] px-3 py-1.5 text-[0.7rem] uppercase tracking-[0.22em] text-white/56 chip-pulse">
-                    X-ray
-                  </div>
-                  <div className="absolute right-[10%] top-[24%] rounded-full border border-white/10 bg-white/[0.05] px-3 py-1.5 text-[0.7rem] uppercase tracking-[0.22em] text-white/56 chip-pulse [animation-delay:0.8s]">
-                    Pathology
-                  </div>
-                  <div className="absolute bottom-[19%] left-[18%] rounded-full border border-white/10 bg-white/[0.05] px-3 py-1.5 text-[0.7rem] uppercase tracking-[0.22em] text-white/56 chip-pulse [animation-delay:1.6s]">
-                    EHR
-                  </div>
-                  <div className="absolute bottom-[16%] right-[16%] rounded-full border border-white/10 bg-white/[0.05] px-3 py-1.5 text-[0.7rem] uppercase tracking-[0.22em] text-white/56 chip-pulse [animation-delay:2.2s]">
-                    CT
-                  </div>
-
-                  <div className="absolute inset-x-[18%] top-[50%] h-px -translate-y-1/2 bg-[linear-gradient(90deg,rgba(255,255,255,0),rgba(146,123,255,0.75),rgba(106,213,255,0.75),rgba(255,255,255,0))] opacity-80" />
+                  <div className="absolute inset-x-[14%] top-[50%] h-px -translate-y-1/2 bg-[linear-gradient(90deg,rgba(255,255,255,0),rgba(146,123,255,0.75),rgba(106,213,255,0.75),rgba(255,255,255,0))] opacity-80" />
                   <div className="absolute inset-y-[18%] left-1/2 w-px -translate-x-1/2 bg-[linear-gradient(180deg,rgba(255,255,255,0),rgba(146,123,255,0.55),rgba(106,213,255,0.55),rgba(255,255,255,0))] opacity-60" />
+                  <div className="absolute left-[10%] top-[22%] h-2.5 w-2.5 rounded-full bg-[#c8b7ff]/80 shadow-[0_0_18px_rgba(184,165,255,0.55)] chip-pulse" />
+                  <div className="absolute right-[11%] top-[30%] h-2 w-2 rounded-full bg-[#91d7ff]/75 shadow-[0_0_18px_rgba(108,210,255,0.5)] chip-pulse [animation-delay:1.1s]" />
+                  <div className="absolute bottom-[19%] left-[16%] h-2.5 w-2.5 rounded-full bg-[#8e7cff]/75 shadow-[0_0_18px_rgba(142,124,255,0.55)] chip-pulse [animation-delay:1.8s]" />
+                  <div className="absolute bottom-[17%] right-[15%] h-2.5 w-2.5 rounded-full bg-[#88d3ff]/75 shadow-[0_0_18px_rgba(136,211,255,0.5)] chip-pulse [animation-delay:2.5s]" />
 
-                  <div className="floating-card floating-card-a absolute left-[31%] top-[23%] h-[10.75rem] w-[10.75rem] rounded-[2.2rem] border border-white/10 bg-[linear-gradient(145deg,rgba(128,101,255,0.2),rgba(17,15,34,0.95)_58%,rgba(7,7,18,0.98))] shadow-[0_30px_80px_rgba(0,0,0,0.35)] [transform:rotate(-18deg)_skewY(6deg)]" />
-                  <div className="floating-card floating-card-b absolute left-[41%] top-[25%] h-[11.5rem] w-[11.5rem] rounded-[2.4rem] border border-white/12 bg-[linear-gradient(160deg,rgba(86,214,255,0.22),rgba(16,15,36,0.96)_54%,rgba(7,7,18,0.98))] shadow-[0_34px_90px_rgba(0,0,0,0.42)] [transform:rotate(14deg)_skewY(-5deg)]" />
-                  <div className="floating-card floating-card-c absolute left-[38%] top-[29%] h-[10.5rem] w-[10.5rem] rounded-[2rem] border border-white/12 bg-[linear-gradient(180deg,rgba(255,255,255,0.09),rgba(255,255,255,0.03))] backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_24px_70px_rgba(0,0,0,0.34)] [transform:rotate(-2deg)]">
+                  <div className="floating-card floating-card-a absolute left-[28%] top-[23%] h-[10.75rem] w-[12rem] rounded-[2.2rem] border border-white/10 bg-[linear-gradient(145deg,rgba(128,101,255,0.2),rgba(17,15,34,0.95)_58%,rgba(7,7,18,0.98))] shadow-[0_30px_80px_rgba(0,0,0,0.35)] [transform:rotate(-18deg)_skewY(6deg)]" />
+                  <div className="floating-card floating-card-b absolute left-[40%] top-[25%] h-[11.5rem] w-[12.8rem] rounded-[2.4rem] border border-white/12 bg-[linear-gradient(160deg,rgba(86,214,255,0.22),rgba(16,15,36,0.96)_54%,rgba(7,7,18,0.98))] shadow-[0_34px_90px_rgba(0,0,0,0.42)] [transform:rotate(14deg)_skewY(-5deg)]" />
+                  <div className="floating-card floating-card-c absolute left-[36%] top-[29%] h-[10.5rem] w-[11.8rem] rounded-[2rem] border border-white/12 bg-[linear-gradient(180deg,rgba(255,255,255,0.09),rgba(255,255,255,0.03))] backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_24px_70px_rgba(0,0,0,0.34)] [transform:rotate(-2deg)]">
                     <div className="absolute inset-[0.9rem] rounded-[1.5rem] border border-white/10" />
                     <div className="absolute inset-x-[1.2rem] top-[1.4rem] h-px bg-[linear-gradient(90deg,rgba(255,255,255,0),rgba(198,185,255,0.72),rgba(255,255,255,0))]" />
                     <div className="absolute inset-x-[1.5rem] bottom-[1.4rem] flex items-end justify-between">
