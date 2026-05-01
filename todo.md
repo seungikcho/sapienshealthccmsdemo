@@ -167,4 +167,7 @@
 - [x] Create a high-resolution hospital-room hero graphic inspired by the user's reference image.
 - [x] Match the generated hospital scene to the website's dark color language and product mood.
 - [x] Integrate the new hospital operations visual into the hero with restrained motion cues.
-- [ ] Validate the updated hero and save a checkpoint for the new visual direction.
+- [x] Validate the updated hero and save a checkpoint for the new visual direction.
+- [x] Remove the chevron-like icon from the hero announcement pill.
+- [x] Replace the icon with a small light dot that does not read as clickable.
+- [ ] Re-check the hero announcement pill and save a checkpoint.
