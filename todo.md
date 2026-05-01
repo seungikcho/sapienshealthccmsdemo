@@ -138,3 +138,8 @@
 - [x] Remove the How MedMIX works section from the page.
 - [x] Update the top navigation to match the simplified section structure.
 - [x] Add a bottom location line in a Houston, TX style treatment.
+- [ ] Move the Houston, TX location into the main contact content area instead of isolating it in a separate block.
+- [ ] Tighten the Prediction to insight headline into a clean two-line layout with shorter supporting copy.
+- [ ] Remove extra modality metadata labels such as AP radiograph from the platform tiles.
+- [ ] Replace the current platform tiles with six modality boxes for X-ray, EHR, WSI (Pathology), Clinical Notes, CT, and Genomics.
+- [ ] Use realistic imagery for the six modality boxes, either sourced or generated to feel like real data.
