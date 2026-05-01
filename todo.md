@@ -127,3 +127,7 @@
 - [x] Densify the hero center so the empty space feels more like an intelligence layer.
 - [x] Connect the Request evaluation CTA to mailto:info@sapienshealth.co.
 - [x] Verify the revised hero composition and CTA behavior.
+- [x] Remove the remaining futuristic hero graphics and simplify the visual language.
+- [x] Remove the unwanted white-border treatment from the modality cards.
+- [x] Replace synthetic modality visuals with real clinical imagery such as pathology and X-ray.
+- [x] Normalize the modality cards to equal box sizes for a real-data gallery feel.

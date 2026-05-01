@@ -13,6 +13,7 @@ import {
   FileText,
   HeartPulse,
   Layers3,
+  LucideIcon,
   Microscope,
   MoveRight,
   ScanLine,
@@ -20,33 +21,70 @@ import {
   Stethoscope,
 } from "lucide-react";
 
+type ImageTile = {
+  label: string;
+  meta: string;
+  kind: "image";
+  image: string;
+  imageClassName: string;
+};
+
+type DataTile = {
+  label: string;
+  meta: string;
+  kind: "data";
+  icon: LucideIcon;
+  lines: string[];
+};
+
 const logoUrl =
   "https://d36hbw14aib5lz.cloudfront.net/310519663318202729/TdsfYCSbV9xhvU4DsPP84j/sapienslabs-logo-delta-s-ZjHQetHDXzKos43yZtYjhG.webp?Expires=1807943486&Signature=bfdsDHdM6VbnOCGdixbHpPYBMIrYD2Iaoli5PD2tmAlSbGwChYR7nNxUJIRSQ2Pliwgd7Vz3RvRDPXKLq87uJM5lNGBrieObDqPDN~gGsfmBUgMg-mB-7KN3h~BkL14M12o3i9aw89YHbu2KvJHqdAQPvU~X3MIYpnWR2DSTuKXoNitY490GJbM5LmyBIL2FezT~o04fHDRaALkBcifH7eKRlLab7boYuNTC3G4WEPXTyIyBDoPUZrPps1lyVnu~71IYflncNFZkMiadkvu7DAO5Vs1LfO7qBrII9lx8MzsA4lyPZmJugxjgK8DJ2Dtf1YNTCctpMCNZBxrDmNg8Lw__&Key-Pair-Id=K1MP89RTKNH4J";
-const modalityTiles = [
+const xrayImageUrl =
+  "https://d2xsxph8kpxj0f.cloudfront.net/310519663318202729/TdsfYCSbV9xhvU4DsPP84j/sapiens-real-xray_9b5f194e.webp";
+const pathologyImageUrl =
+  "https://d2xsxph8kpxj0f.cloudfront.net/310519663318202729/TdsfYCSbV9xhvU4DsPP84j/sapiens-real-pathology_48ac508d.jpeg";
+const modalityTiles: Array<ImageTile | DataTile> = [
   {
-    label: "CT",
-    image:
-      "https://d2xsxph8kpxj0f.cloudfront.net/310519663318202729/TdsfYCSbV9xhvU4DsPP84j/sapiens-imaging-tile-oBWATGFLeZuQR9syf4mkyW.webp",
-  },
-  {
-    label: "EHR",
-    image:
-      "https://d2xsxph8kpxj0f.cloudfront.net/310519663318202729/TdsfYCSbV9xhvU4DsPP84j/sapiens-ehr-tile-L4Mxc73s5P7RBVBdrsGSpd.webp",
+    label: "Chest X-ray",
+    meta: "AP radiograph",
+    kind: "image",
+    image: xrayImageUrl,
+    imageClassName: "object-cover object-center grayscale-[0.08]",
   },
   {
     label: "Pathology",
-    image:
-      "https://d2xsxph8kpxj0f.cloudfront.net/310519663318202729/TdsfYCSbV9xhvU4DsPP84j/sapiens-pathology-tile-G4z9pvJ6Mi4kSWMjgowmn7.webp",
+    meta: "H&E tissue section",
+    kind: "image",
+    image: pathologyImageUrl,
+    imageClassName: "object-cover object-center saturate-[0.88]",
   },
   {
-    label: "Clinical notes",
-    image:
-      "https://d2xsxph8kpxj0f.cloudfront.net/310519663318202729/TdsfYCSbV9xhvU4DsPP84j/sapiens-notes-tile-C83VT9ULuSmsJZYG6srnZA.webp",
+    label: "EHR extract",
+    meta: "recent encounters",
+    kind: "data",
+    icon: FileText,
+    lines: ["Creatinine 1.9", "WBC 14.2", "LOS 4 days"],
   },
   {
-    label: "Vitals",
-    image:
-      "https://d2xsxph8kpxj0f.cloudfront.net/310519663318202729/TdsfYCSbV9xhvU4DsPP84j/sapiens-vitals-tile-a4nFJTE6ASqXHRaHm54mEF.webp",
+    label: "Clinical note",
+    meta: "assessment excerpt",
+    kind: "data",
+    icon: Database,
+    lines: ["Dyspnea x 2 days", "Left effusion", "Needs escalation"],
+  },
+  {
+    label: "Vitals trend",
+    meta: "last 12 hours",
+    kind: "data",
+    icon: HeartPulse,
+    lines: ["HR 108", "SpO2 92%", "MAP 67"],
+  },
+  {
+    label: "Risk routing",
+    meta: "priority signals",
+    kind: "data",
+    icon: CircleGauge,
+    lines: ["Sepsis flag", "Readmit high", "Review pending"],
   },
 ];
 
@@ -77,38 +115,62 @@ const frameworkInputs = ["CT", "EHR", "Pathology", "Notes", "Vitals"];
 const frameworkOutputs = ["Workflow insight", "Prioritization signal", "Clinical prediction"];
 const evaluationHref = "mailto:info@sapienshealth.co?subject=Request%20evaluation";
 
-const heroSignals = [
-  {
-    label: "CT mask",
-    detail: "partial slices",
-    icon: ScanLine,
-    tint: "from-cyan-300/20 via-cyan-300/6 to-transparent",
-    iconColor: "text-cyan-200",
-  },
-  {
-    label: "EHR gaps",
-    detail: "sparse fields",
-    icon: FileText,
-    tint: "from-[#c7b5ff]/18 via-[#c7b5ff]/6 to-transparent",
-    iconColor: "text-[#d8cbff]",
-  },
-  {
-    label: "Pathology",
-    detail: "patch context",
-    icon: Microscope,
-    tint: "from-[#b796ff]/18 via-[#b796ff]/6 to-transparent",
-    iconColor: "text-[#dcc6ff]",
-  },
-  {
-    label: "Vitals prior",
-    detail: "temporal cues",
-    icon: HeartPulse,
-    tint: "from-cyan-200/16 via-violet-300/8 to-transparent",
-    iconColor: "text-cyan-100",
-  },
-];
-
 export default function Home() {
+  const renderModalityTile = (tile: (typeof modalityTiles)[number], variant: "hero" | "platform") => {
+    const bodyHeight = variant === "hero" ? "h-36" : "h-40";
+
+    if (tile.kind === "image") {
+      return (
+        <article
+          key={`${variant}-${tile.label}`}
+          className="overflow-hidden rounded-[1.35rem] border border-white/8 bg-[linear-gradient(180deg,rgba(19,17,31,0.96),rgba(11,10,20,0.98))] shadow-[0_18px_45px_rgba(0,0,0,0.28)]"
+        >
+          <div className={`${bodyHeight} overflow-hidden bg-black/25`}>
+            <img
+              src={tile.image}
+              alt={`${tile.label} clinical data preview`}
+              className={`h-full w-full ${tile.imageClassName}`}
+            />
+          </div>
+          <div className="border-t border-white/8 px-4 py-3">
+            <div className="text-[0.95rem] font-medium text-white/86">{tile.label}</div>
+            <div className="mt-1 text-[0.66rem] uppercase tracking-[0.18em] text-white/44">{tile.meta}</div>
+          </div>
+        </article>
+      );
+    }
+
+    const Icon = tile.icon;
+
+    return (
+      <article
+        key={`${variant}-${tile.label}`}
+        className="overflow-hidden rounded-[1.35rem] border border-white/8 bg-[linear-gradient(180deg,rgba(19,17,31,0.96),rgba(11,10,20,0.98))] shadow-[0_18px_45px_rgba(0,0,0,0.28)]"
+      >
+        <div className={`${bodyHeight} flex flex-col justify-between p-4`}>
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04]">
+              <Icon className="h-4.5 w-4.5 text-[#d7cbff]" />
+            </div>
+            <div className="text-right text-[0.62rem] uppercase tracking-[0.2em] text-white/36">{tile.meta}</div>
+          </div>
+          <div className="space-y-2 rounded-[1rem] border border-white/8 bg-black/18 p-3">
+            {tile.lines.map((line) => (
+              <div key={line} className="flex items-center justify-between gap-3 border-b border-white/6 pb-2 text-[0.88rem] text-white/78 last:border-b-0 last:pb-0">
+                <span>{line}</span>
+                <span className="h-1.5 w-1.5 rounded-full bg-[#bdaeff]/70" />
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="border-t border-white/8 px-4 py-3">
+          <div className="text-[0.95rem] font-medium text-white/86">{tile.label}</div>
+          <div className="mt-1 text-[0.66rem] uppercase tracking-[0.18em] text-white/44">{tile.meta}</div>
+        </div>
+      </article>
+    );
+  };
+
   return (
     <div className="min-h-screen overflow-x-hidden bg-background text-foreground">
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
@@ -154,11 +216,11 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="grid items-start gap-5 px-5 py-7 sm:px-8 sm:py-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(16.75rem,0.5fr)_minmax(19rem,0.5fr)] lg:gap-4 lg:px-10 lg:py-7">
+          <div className="grid items-start gap-6 px-5 py-7 sm:px-8 sm:py-8 lg:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)] lg:gap-8 lg:px-10 lg:py-7">
             <div className="max-w-[36rem]">
               <h1 className="font-display max-w-[18ch] text-[2.45rem] font-semibold leading-[0.99] tracking-[-0.055em] text-white sm:text-[2.95rem] lg:text-[3.1rem] xl:text-[3.45rem]">
-                <span className="block whitespace-nowrap">Intelligence layer for</span>
-                <span className="block whitespace-nowrap">incomplete patient data.</span>
+                <span className="block">Intelligence layer for</span>
+                <span className="block">incomplete patient data.</span>
               </h1>
 
               <p className="mt-5 max-w-[34rem] text-[1.02rem] leading-7 text-white/72 sm:text-[1.12rem] sm:leading-8">
@@ -176,120 +238,8 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="hidden lg:block">
-              <div className="relative overflow-hidden rounded-[1.5rem] border border-white/10 bg-[linear-gradient(180deg,rgba(18,14,34,0.94),rgba(10,9,20,0.98))] p-4 shadow-[0_24px_60px_rgba(0,0,0,0.32)]">
-                <div className="pointer-events-none absolute inset-0 opacity-80">
-                  <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.028)_1px,transparent_1px)] bg-[size:38px_38px]" />
-                  <div className="absolute inset-y-[12%] left-1/2 w-px -translate-x-1/2 bg-gradient-to-b from-transparent via-white/18 to-transparent" />
-                  <div className="absolute inset-x-[12%] top-[36%] h-px bg-gradient-to-r from-transparent via-white/16 to-transparent" />
-                  <div className="absolute inset-x-[12%] bottom-[30%] h-px bg-gradient-to-r from-transparent via-[#bdaeff]/22 to-transparent" />
-                  <div className="absolute left-1/2 top-[59%] h-24 w-24 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#8f7dff]/18 blur-2xl" />
-                </div>
-
-                <div className="relative flex items-start justify-between gap-3 text-[0.6rem] uppercase tracking-[0.22em] text-white/42">
-                  <span>Intelligence layer</span>
-                  <span>Missingness aware</span>
-                </div>
-
-                <div className="relative mt-4 grid grid-cols-2 gap-3">
-                  {heroSignals.map((signal) => {
-                    const Icon = signal.icon;
-
-                    return (
-                      <div key={signal.label} className="relative overflow-hidden rounded-[1.1rem] border border-white/10 bg-white/[0.045] p-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
-                        <div className={`absolute inset-x-0 top-0 h-16 bg-gradient-to-b ${signal.tint} opacity-90`} />
-                        <div className="relative flex items-start gap-3">
-                          <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-black/25 backdrop-blur-sm">
-                            <Icon className={`h-4.5 w-4.5 ${signal.iconColor}`} />
-                          </div>
-                          <div>
-                            <div className="text-[0.82rem] font-medium leading-4 text-white/84">{signal.label}</div>
-                            <div className="mt-1 text-[0.62rem] uppercase tracking-[0.16em] leading-4 text-white/42">{signal.detail}</div>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                <div className="relative mt-3 overflow-hidden rounded-[1.2rem] border border-[#b69cff]/16 bg-[linear-gradient(135deg,rgba(132,107,255,0.18),rgba(255,255,255,0.03))] p-4">
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,rgba(221,205,255,0.14),transparent_56%)]" />
-                  <div className="relative flex items-center justify-between text-sm font-medium text-white/80">
-                    <span>Fusion core</span>
-                    <span className="rounded-full border border-white/10 bg-black/15 px-2 py-0.5 text-[0.68rem] uppercase tracking-[0.22em] text-white/54">MedMIX</span>
-                  </div>
-                  <p className="relative mt-2 text-[0.82rem] leading-6 text-white/60">
-                    Entropy-guided masking, routing, and confidence scoring run across incomplete patient inputs.
-                  </p>
-                  <div className="relative mt-3 flex flex-wrap gap-2 text-[0.68rem] uppercase tracking-[0.18em] text-white/48">
-                    <span className="rounded-full border border-white/10 bg-black/20 px-2.5 py-1">confidence</span>
-                    <span className="rounded-full border border-white/10 bg-black/20 px-2.5 py-1">routing</span>
-                    <span className="rounded-full border border-white/10 bg-black/20 px-2.5 py-1">missingness</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="rounded-[1.55rem] border border-white/10 bg-white/[0.03] p-2 shadow-[0_30px_80px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:mx-auto sm:w-full sm:max-w-[21rem] sm:p-2.5 lg:-mt-1 lg:mx-0 lg:max-w-[21.5rem] lg:justify-self-end lg:self-start lg:p-2.5">
-              <div className="relative overflow-hidden rounded-[1.2rem] border border-white/10 bg-[radial-gradient(circle_at_50%_45%,rgba(146,117,255,0.18),transparent_28%),linear-gradient(180deg,rgba(12,12,24,0.96),rgba(8,8,18,0.98))] px-2.5 py-2.5 sm:px-3 sm:py-3">
-                <div className="pointer-events-none absolute inset-0 opacity-75">
-                  <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:64px_64px]" />
-                  <div className="absolute inset-y-0 left-[-28%] w-[52%] rotate-[18deg] bg-gradient-to-r from-transparent via-cyan-300/10 to-transparent blur-2xl animate-[pulse_5s_ease-in-out_infinite]" />
-                  <div className="absolute inset-y-0 right-[-24%] w-[48%] -rotate-[16deg] bg-gradient-to-r from-transparent via-fuchsia-300/10 to-transparent blur-2xl animate-[pulse_6.4s_ease-in-out_infinite]" />
-                  <div className="absolute left-1/2 top-1/2 h-32 w-32 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#9c8cff]/20 blur-3xl animate-pulse" />
-                  <div className="absolute left-[16%] top-[18%] h-24 w-24 rounded-full bg-cyan-300/10 blur-3xl animate-[pulse_7s_ease-in-out_infinite]" />
-                  <div className="absolute bottom-[14%] right-[10%] h-28 w-28 rounded-full bg-fuchsia-300/12 blur-3xl animate-[pulse_6s_ease-in-out_infinite]" />
-                </div>
-
-                <div className="pointer-events-none absolute inset-x-[10%] top-1/2 h-px -translate-y-1/2 bg-gradient-to-r from-transparent via-white/18 to-transparent opacity-80" />
-                <div className="pointer-events-none absolute inset-y-[10%] left-1/3 w-px -translate-x-1/2 bg-gradient-to-b from-transparent via-white/14 to-transparent opacity-70" />
-                <div className="pointer-events-none absolute inset-y-[10%] left-2/3 w-px -translate-x-1/2 bg-gradient-to-b from-transparent via-white/14 to-transparent opacity-70" />
-
-                <div className="relative grid grid-cols-3 gap-2">
-                  {[
-                    "ct",
-                    "pathology",
-                    "ehr",
-                    "medmix",
-                    "notes",
-                    "vitals",
-                  ].map((cell, index) => (
-                    <div
-                      key={cell}
-                      className={`group relative aspect-[0.9] overflow-hidden rounded-[1rem] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02))] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_18px_40px_rgba(0,0,0,0.28)] ${index === 4 ? "chip-pulse sm:scale-[1.03]" : index % 2 === 0 ? "floating-card floating-card-a" : "floating-card floating-card-b"}`}
-                    >
-                      <div
-                        className="absolute inset-0 opacity-80"
-                        style={{
-                          background:
-                            index === 4
-                              ? "radial-gradient(circle at 50% 50%, rgba(214,185,255,0.36), rgba(148,117,255,0.16) 38%, rgba(10,10,18,0) 68%)"
-                              : index % 2 === 0
-                                ? "linear-gradient(135deg, rgba(74,226,255,0.18), rgba(120,83,255,0.06))"
-                                : "linear-gradient(135deg, rgba(221,176,255,0.15), rgba(70,212,255,0.06))",
-                        }}
-                      />
-                      <div className="absolute inset-[14%] rounded-[1rem] border border-white/10 bg-black/20 backdrop-blur-sm" />
-                      <div className="absolute inset-x-[24%] top-[22%] h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
-                      <div className="absolute inset-y-[24%] left-[50%] w-px -translate-x-1/2 bg-gradient-to-b from-transparent via-white/25 to-transparent" />
-                      {index === 4 ? (
-                        <>
-                          <div className="absolute left-1/2 top-1/2 h-14 w-14 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/15 bg-[radial-gradient(circle,rgba(255,255,255,0.34),rgba(140,112,255,0.16)_45%,rgba(255,255,255,0)_70%)] shadow-[0_0_34px_rgba(161,134,255,0.42)] animate-pulse" />
-                          <div className="absolute left-1/2 top-1/2 h-20 w-20 -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#cdb7ff]/25 animate-[spin_22s_linear_infinite]" />
-                          <div className="absolute left-1/2 top-1/2 h-[6.25rem] w-[6.25rem] -translate-x-1/2 -translate-y-1/2 rounded-full border border-cyan-300/10 animate-[spin_28s_linear_infinite_reverse]" />
-                        </>
-                      ) : (
-                        <>
-                          <div className="absolute left-[18%] top-[22%] h-2.5 w-2.5 rounded-full bg-white/55 shadow-[0_0_14px_rgba(255,255,255,0.45)] animate-[pulse_4.8s_ease-in-out_infinite]" />
-                          <div className="absolute bottom-[24%] left-[22%] right-[22%] h-px bg-gradient-to-r from-transparent via-white/35 to-transparent" />
-                          <div className="absolute bottom-[22%] left-[22%] h-9 w-9 rounded-full border border-white/10 bg-white/5" />
-                          <div className="absolute right-[20%] top-[20%] h-8 w-8 rounded-xl border border-white/10 bg-white/5" />
-                        </>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3 lg:self-start">
+              {modalityTiles.map((tile) => renderModalityTile(tile, "hero"))}
             </div>
           </div>
         </section>
@@ -306,19 +256,8 @@ export default function Home() {
           </article>
 
           <article className="rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(15,12,29,0.92),rgba(8,7,18,0.98))] p-6 shadow-[0_30px_90px_rgba(0,0,0,0.34)] sm:p-8 lg:p-10">
-            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
-              {modalityTiles.map((tile) => (
-                <div key={tile.label} className="group">
-                  <div className="overflow-hidden rounded-[1.6rem] border border-white/10 bg-black/20 shadow-[0_20px_45px_rgba(0,0,0,0.28)]">
-                    <img
-                      src={tile.image}
-                      alt={`${tile.label} modality tile`}
-                      className="aspect-square w-full object-cover transition duration-500 group-hover:scale-[1.02]"
-                    />
-                  </div>
-                  <div className="px-1 pt-3 text-base font-medium text-white/82">{tile.label}</div>
-                </div>
-              ))}
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              {modalityTiles.map((tile) => renderModalityTile(tile, "platform"))}
             </div>
           </article>
         </section>
