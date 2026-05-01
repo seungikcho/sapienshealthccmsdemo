@@ -152,3 +152,6 @@
 - [x] Prepare four transparent white logo assets for a Supported by strip.
 - [x] Add a Supported by box between the hero CTA area and the Platform section.
 - [x] Ensure the support logos appear cleanly on the dark background without visible black fill.
+- [x] Remove the descriptive sentence from the Supported by strip so only the label and logos remain.
+- [x] Re-check the homepage layout after simplifying the Supported by strip.
+- [ ] Save a checkpoint for the simplified Supported by strip update.

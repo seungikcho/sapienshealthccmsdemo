@@ -210,7 +210,6 @@ export default function Home() {
             <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
               <div>
                 <div className="text-[0.72rem] uppercase tracking-[0.22em] text-white/44">Supported by</div>
-                <p className="mt-2 text-sm text-white/58">Backed by partners across research, medical innovation, and translational care.</p>
               </div>
               <div className="grid grid-cols-2 items-center gap-x-7 gap-y-5 sm:flex sm:flex-wrap sm:items-center sm:justify-end sm:gap-x-10 sm:gap-y-4">
                 {supportLogos.map((logo) => (
