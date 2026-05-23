@@ -173,4 +173,8 @@
 - [x] Re-check the hero announcement pill and save a checkpoint.
 - [x] Remove the small light dot from the hero announcement pill.
 - [x] Re-check the hero announcement pill after removing the dot.
-- [ ] Save a checkpoint for the plain-text hero announcement pill.
+- [x] Save a checkpoint for the plain-text hero announcement pill.
+- [x] Keep the existing Supported by logos, including TMC.
+- [x] Add the NVIDIA Inception Program full lockup to the Supported by row.
+- [x] Prepare a transparent-background NVIDIA logo asset sized to fit the partner strip.
+- [ ] Validate the updated Supported by row and save a checkpoint.
