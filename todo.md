@@ -181,4 +181,4 @@
 - [x] Replace the NVIDIA Inception Program asset with a truly transparent background version.
 - [x] Increase the NVIDIA lockup size in the Supported by strip by about 30%.
 - [x] Re-check the Supported by strip after the NVIDIA logo correction.
-- [ ] Save a checkpoint for the corrected NVIDIA logo treatment.
+- [x] Save a checkpoint for the corrected NVIDIA logo treatment.
