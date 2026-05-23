@@ -35,8 +35,8 @@ const supportLogos = [
   },
   {
     name: "NVIDIA Inception Program",
-    src: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663318202729/JQoWczImUTgFXieE.png",
-    className: "h-10 w-auto sm:h-12",
+    src: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663318202729/VsfYuRGWGApWwFyj.png",
+    className: "h-[3.25rem] w-auto sm:h-[3.9rem]",
   },
   {
     name: "Nucleate",

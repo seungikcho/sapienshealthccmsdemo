@@ -177,4 +177,8 @@
 - [x] Keep the existing Supported by logos, including TMC.
 - [x] Add the NVIDIA Inception Program full lockup to the Supported by row.
 - [x] Prepare a transparent-background NVIDIA logo asset sized to fit the partner strip.
-- [ ] Validate the updated Supported by row and save a checkpoint.
+- [x] Validate the updated Supported by row and save a checkpoint.
+- [x] Replace the NVIDIA Inception Program asset with a truly transparent background version.
+- [x] Increase the NVIDIA lockup size in the Supported by strip by about 30%.
+- [x] Re-check the Supported by strip after the NVIDIA logo correction.
+- [ ] Save a checkpoint for the corrected NVIDIA logo treatment.
