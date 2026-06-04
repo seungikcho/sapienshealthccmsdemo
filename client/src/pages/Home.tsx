@@ -2,13 +2,44 @@
 Design philosophy for this page: A dark editorial product homepage inspired by premium healthcare software.
 The layout should stay minimal, text-led, and compact. Product sections should feel intentional,
 not crowded, with realistic modality tiles and concise clinical language.
+Each interaction should read like a real public-facing company website, not a concept landing page.
 */
-import { AlertTriangle, ArrowRight, Building2, Sparkles, Stethoscope } from "lucide-react";
+import {
+  AlertTriangle,
+  ArrowRight,
+  Building2,
+  CalendarClock,
+  ChevronRight,
+  ClipboardCheck,
+  FileCheck2,
+  LifeBuoy,
+  ShieldCheck,
+  Sparkles,
+  Stethoscope,
+} from "lucide-react";
 
 type ModalityTile = {
   label: string;
   image: string;
   imageClassName: string;
+};
+
+type InsightFlow = {
+  task: string;
+  insight: string;
+  icon: typeof AlertTriangle;
+};
+
+type WorkflowCard = {
+  title: string;
+  summary: string;
+  signal: string;
+};
+
+type TrustItem = {
+  title: string;
+  detail: string;
+  icon: typeof ShieldCheck;
 };
 
 const logoUrl =
@@ -36,7 +67,7 @@ const supportLogos = [
   {
     name: "NVIDIA Inception Program",
     src: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663318202729/VsfYuRGWGApWwFyj.png",
-    className: "h-[2.6rem] w-auto sm:h-[3.12rem]",
+    className: "h-[2.08rem] w-auto sm:h-[2.5rem]",
   },
   {
     name: "Nucleate",
@@ -84,7 +115,7 @@ const modalityTiles: ModalityTile[] = [
   },
 ];
 
-const insightFlows = [
+const insightFlows: InsightFlow[] = [
   {
     task: "Deterioration risk",
     insight: "Escalation insight for clinical teams",
@@ -107,7 +138,120 @@ const insightFlows = [
   },
 ];
 
+const workflowCards: WorkflowCard[] = [
+  {
+    title: "Operational triage",
+    summary: "Surface deterioration and escalation signals so teams can review high-risk patients sooner.",
+    signal: "Signal package: risk score, rationale snapshot, queue priority",
+  },
+  {
+    title: "Discharge coordination",
+    summary: "Translate multimodal context into readiness cues that support bed planning and transition workflows.",
+    signal: "Signal package: readiness state, blockers, care-team handoff prompt",
+  },
+  {
+    title: "Review workflows",
+    summary: "Turn prediction output into compact artifacts that can be reviewed by clinical or translational teams.",
+    signal: "Signal package: review summary, source modalities, follow-up recommendation",
+  },
+];
+
+const trustItems: TrustItem[] = [
+  {
+    title: "Clear evaluation path",
+    detail: "Every core CTA routes to a direct evaluation request so external reviewers can understand the intended next step immediately.",
+    icon: ClipboardCheck,
+  },
+  {
+    title: "Review-ready public materials",
+    detail: "The site now includes company context, contact details, and core legal pages so it reads like an operating organization rather than a concept page.",
+    icon: FileCheck2,
+  },
+  {
+    title: "Human follow-up",
+    detail: "Initial conversations, partnership requests, and evaluation outreach all route to the same monitored team address: info@sapienshealth.co.",
+    icon: LifeBuoy,
+  },
+  {
+    title: "Healthcare-oriented framing",
+    detail: "Language is written to explain how MedMIX fits real workflow review, hospital operations support, and translational data settings.",
+    icon: ShieldCheck,
+  },
+];
+
 const evaluationHref = "mailto:info@sapienshealth.co?subject=Request%20evaluation";
+const partnershipHref = "mailto:info@sapienshealth.co?subject=Partnership%20inquiry";
+const generalContactHref = "mailto:info@sapienshealth.co?subject=General%20inquiry";
+
+function SiteWordmark() {
+  return (
+    <a href="/" className="flex min-w-0 items-center gap-3">
+      <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-white/12 bg-black shadow-[0_14px_30px_rgba(0,0,0,0.45)]">
+        <img src={logoUrl} alt="Sapiens Health logo" className="h-full w-full object-cover" />
+      </div>
+      <div className="min-w-0">
+        <div className="font-wordmark truncate text-white/96">Sapiens Health</div>
+      </div>
+    </a>
+  );
+}
+
+function SiteFooter() {
+  return (
+    <footer className="mx-auto mt-8 w-full max-w-[1520px] rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.015))] px-6 py-7 shadow-[0_24px_70px_rgba(0,0,0,0.22)] backdrop-blur-xl sm:px-8 lg:px-10">
+      <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr_0.8fr]">
+        <div>
+          <div className="flex items-center gap-3">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-white/12 bg-black shadow-[0_14px_30px_rgba(0,0,0,0.45)]">
+              <img src={logoUrl} alt="Sapiens Health logo" className="h-full w-full object-cover" />
+            </div>
+            <div>
+              <div className="font-wordmark text-white/96">Sapiens Health</div>
+              <div className="mt-1 text-sm text-white/48">Multimodal clinical prediction and workflow intelligence</div>
+            </div>
+          </div>
+          <p className="mt-4 max-w-[36rem] text-sm leading-7 text-white/64 sm:text-[0.98rem]">
+            Sapiens Health is building MedMIX to turn incomplete multimodal clinical data into reviewable outcome and workflow signals for care teams, research partners, and translational settings.
+          </p>
+        </div>
+
+        <div>
+          <div className="section-kicker text-white/40">Company</div>
+          <div className="mt-4 space-y-3 text-sm text-white/70">
+            <a href="/about" className="block transition hover:text-white">
+              About
+            </a>
+            <a href="#platform" className="block transition hover:text-white">
+              Platform
+            </a>
+            <a href="#workflows" className="block transition hover:text-white">
+              Workflows
+            </a>
+            <a href="#contact" className="block transition hover:text-white">
+              Contact
+            </a>
+          </div>
+        </div>
+
+        <div>
+          <div className="section-kicker text-white/40">Policies</div>
+          <div className="mt-4 space-y-3 text-sm text-white/70">
+            <a href="/privacy" className="block transition hover:text-white">
+              Privacy Policy
+            </a>
+            <a href="/terms" className="block transition hover:text-white">
+              Terms of Use
+            </a>
+            <a href={generalContactHref} className="block transition hover:text-white">
+              General inquiry
+            </a>
+            <div className="pt-1 text-white/48">Houston, TX</div>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+}
 
 export default function Home() {
   return (
@@ -120,22 +264,18 @@ export default function Home() {
 
       <header className="relative z-30 px-4 pb-6 pt-5 sm:px-6 lg:px-8">
         <div className="mx-auto flex w-full max-w-[1520px] items-center justify-between rounded-full border border-white/10 bg-white/[0.045] px-4 py-3 shadow-[0_0_0_1px_rgba(255,255,255,0.02),0_30px_90px_rgba(0,0,0,0.32)] backdrop-blur-xl sm:px-6">
-          <a href="#top" className="flex min-w-0 items-center gap-3">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-white/12 bg-black shadow-[0_14px_30px_rgba(0,0,0,0.45)]">
-              <img src={logoUrl} alt="Sapiens Health logo" className="h-full w-full object-cover" />
-            </div>
-            <div className="min-w-0">
-              <div className="font-wordmark truncate text-white/96">Sapiens Health</div>
-            </div>
-          </a>
+          <SiteWordmark />
 
           <div className="hidden items-center gap-8 md:flex">
             <nav className="flex items-center gap-8 text-sm text-white/74">
               <a href="#platform" className="transition hover:text-white">
                 Platform
               </a>
-              <a href="#insights" className="transition hover:text-white">
-                Prediction tasks
+              <a href="#workflows" className="transition hover:text-white">
+                Workflows
+              </a>
+              <a href="#trust" className="transition hover:text-white">
+                Review readiness
               </a>
               <a href="#contact" className="transition hover:text-white">
                 Contact
@@ -167,18 +307,31 @@ export default function Home() {
                   <span className="block">incomplete patient data.</span>
                 </h1>
 
-                <p className="mt-5 max-w-[32rem] text-[1.02rem] leading-7 text-white/72 sm:text-[1.12rem] sm:leading-8">
-                  Sapiens Health delivers clinical predictions from multimodal patient data, even when modalities are missing.
+                <p className="mt-5 max-w-[34rem] text-[1.02rem] leading-7 text-white/72 sm:text-[1.12rem] sm:leading-8">
+                  Sapiens Health delivers clinical predictions from multimodal patient data, even when modalities are missing, and translates them into reviewable signals for care and translational workflows.
                 </p>
 
                 <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
                   <a
-                    href="#contact"
+                    href={evaluationHref}
                     className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/14 bg-white/[0.04] px-6 py-4 text-base font-semibold text-white transition duration-300 hover:-translate-y-0.5 hover:bg-white/[0.07]"
                   >
-                    Get In Touch
+                    Request evaluation
                     <ArrowRight className="h-4 w-4" />
                   </a>
+                  <a
+                    href="#workflows"
+                    className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/10 px-6 py-4 text-base font-medium text-white/72 transition duration-300 hover:border-white/18 hover:text-white"
+                  >
+                    Explore workflows
+                    <ChevronRight className="h-4 w-4" />
+                  </a>
+                </div>
+
+                <div className="mt-6 flex flex-wrap gap-3 text-sm text-white/54">
+                  <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5">For hospital operations support</span>
+                  <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5">For translational teams</span>
+                  <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5">For incomplete multimodal context</span>
                 </div>
               </div>
 
@@ -251,6 +404,14 @@ export default function Home() {
             <p className="mt-5 max-w-[32rem] text-base leading-7 text-white/68 sm:text-lg sm:leading-8">
               MedMIX works across the modalities care teams already have, turning incomplete multimodal context into usable clinical signal.
             </p>
+            <div className="mt-6 rounded-[1.4rem] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.015))] p-4">
+              <div className="flex items-start gap-3">
+                <CalendarClock className="mt-0.5 h-4.5 w-4.5 text-[#cdbcff]" />
+                <p className="text-sm leading-6 text-white/64">
+                  The product story is centered on incomplete multimodal clinical context, so reviewers can quickly understand why the engine exists and what operational problem it addresses.
+                </p>
+              </div>
+            </div>
           </article>
 
           <article className="rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(15,12,29,0.92),rgba(8,7,18,0.98))] p-5 shadow-[0_30px_90px_rgba(0,0,0,0.34)] sm:p-6 lg:p-8">
@@ -308,6 +469,93 @@ export default function Home() {
           </div>
         </section>
 
+        <section id="workflows" className="mx-auto mt-8 w-full max-w-[1520px] rounded-[2rem] border border-white/10 bg-white/[0.03] p-6 shadow-[0_30px_80px_rgba(0,0,0,0.26)] backdrop-blur-xl sm:p-8 lg:p-10">
+          <div className="grid gap-8 lg:grid-cols-[0.72fr_1.28fr]">
+            <div className="max-w-[34rem]">
+              <div className="section-kicker">Workflow fit</div>
+              <h2 className="font-display mt-4 text-3xl font-semibold tracking-[-0.065em] text-white sm:text-4xl lg:text-[2.9rem] lg:leading-[0.97]">
+                A landing page that now reads like a working company website.
+              </h2>
+              <p className="mt-5 text-base leading-7 text-white/66 sm:text-[1.02rem]">
+                We clarified where the product fits, what the next step is, and how external reviewers can interpret the company quickly without guessing whether the site is still under construction.
+              </p>
+              <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+                <a
+                  href="/about"
+                  className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/12 bg-white/[0.04] px-5 py-3.5 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-white/[0.06]"
+                >
+                  Read company overview
+                  <ArrowRight className="h-4 w-4" />
+                </a>
+                <a
+                  href={partnershipHref}
+                  className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/10 px-5 py-3.5 text-sm font-medium text-white/70 transition hover:border-white/16 hover:text-white"
+                >
+                  Partnership inquiry
+                  <ChevronRight className="h-4 w-4" />
+                </a>
+              </div>
+            </div>
+
+            <div className="grid gap-4 lg:grid-cols-3">
+              {workflowCards.map((card) => (
+                <article
+                  key={card.title}
+                  className="rounded-[1.4rem] border border-white/10 bg-[linear-gradient(180deg,rgba(16,14,30,0.92),rgba(9,8,19,0.98))] p-5 shadow-[0_18px_45px_rgba(0,0,0,0.22)]"
+                >
+                  <div className="text-[0.68rem] uppercase tracking-[0.2em] text-white/40">Workflow</div>
+                  <h3 className="mt-3 text-[1.02rem] font-semibold tracking-[-0.03em] text-white">{card.title}</h3>
+                  <p className="mt-3 text-sm leading-6 text-white/66">{card.summary}</p>
+                  <div className="mt-5 rounded-[1rem] border border-white/8 bg-white/[0.03] px-3.5 py-3 text-[0.82rem] leading-5 text-white/58">
+                    {card.signal}
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section id="trust" className="mx-auto mt-8 w-full max-w-[1520px] rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(12,10,24,0.94),rgba(8,7,18,0.98))] p-6 shadow-[0_30px_90px_rgba(0,0,0,0.3)] sm:p-8 lg:p-10">
+          <div className="grid gap-8 lg:grid-cols-[0.78fr_1.22fr] lg:items-start">
+            <div className="max-w-[34rem]">
+              <div className="section-kicker">Review readiness</div>
+              <h2 className="font-display mt-4 text-3xl font-semibold tracking-[-0.065em] text-white sm:text-4xl lg:text-[2.9rem] lg:leading-[0.98]">
+                Stronger trust signals for external reviewers.
+              </h2>
+              <p className="mt-5 text-base leading-7 text-white/66 sm:text-[1.02rem]">
+                The site now gives reviewers a direct contact path, clear company framing, visible partner context, and supporting legal pages so it feels closer to a live operating website.
+              </p>
+              <div className="mt-6 rounded-[1.35rem] border border-white/10 bg-white/[0.03] p-5">
+                <div className="text-[0.68rem] uppercase tracking-[0.2em] text-white/42">Public-facing essentials</div>
+                <div className="mt-3 grid gap-3 text-sm leading-6 text-white/66 sm:grid-cols-2">
+                  <div>Evaluation request route</div>
+                  <div>Company overview page</div>
+                  <div>Privacy and terms pages</div>
+                  <div>Direct contact and location</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              {trustItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <article
+                    key={item.title}
+                    className="rounded-[1.35rem] border border-white/10 bg-white/[0.03] p-5 shadow-[0_18px_45px_rgba(0,0,0,0.22)]"
+                  >
+                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-[linear-gradient(180deg,rgba(126,92,255,0.16),rgba(255,255,255,0.03))]">
+                      <Icon className="h-5 w-5 text-[#d9cbff]" />
+                    </div>
+                    <h3 className="mt-4 text-[1.02rem] font-semibold tracking-[-0.03em] text-white">{item.title}</h3>
+                    <p className="mt-3 text-sm leading-6 text-white/66">{item.detail}</p>
+                  </article>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
         <section
           id="contact"
           className="mx-auto mt-8 w-full max-w-[1520px] rounded-[2rem] border border-white/10 bg-[linear-gradient(135deg,rgba(255,255,255,0.04),rgba(64,212,255,0.05))] p-5 shadow-[0_30px_80px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:p-6 lg:p-7"
@@ -319,15 +567,22 @@ export default function Home() {
                 Working with incomplete multimodal clinical data?
               </h2>
               <p className="mt-3 max-w-[31rem] text-[0.95rem] leading-6 text-white/66 sm:text-[0.98rem]">
-                We work with care teams and digital partners that need reliable insight from real-world multimodal patient data.
+                We work with care teams, research collaborators, and digital health partners that need reliable insight from real-world multimodal patient data.
               </p>
-              <div className="mt-5">
+              <div className="mt-5 flex flex-col gap-3 sm:flex-row">
                 <a
                   href={evaluationHref}
                   className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[linear-gradient(135deg,#d8b1ff_0%,#9c8cff_56%,#81ddff_100%)] px-6 py-3.5 text-[0.98rem] font-semibold text-[#080612] shadow-[0_22px_50px_rgba(145,118,255,0.34)] transition duration-300 hover:-translate-y-0.5"
                 >
                   Request evaluation
                   <ArrowRight className="h-4 w-4" />
+                </a>
+                <a
+                  href={generalContactHref}
+                  className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/12 px-6 py-3.5 text-[0.98rem] font-medium text-white/74 transition hover:border-white/18 hover:text-white"
+                >
+                  General inquiry
+                  <ChevronRight className="h-4 w-4" />
                 </a>
               </div>
             </div>
@@ -346,8 +601,9 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        <SiteFooter />
       </main>
     </div>
   );
 }
-

@@ -182,3 +182,8 @@
 - [x] Increase the NVIDIA lockup size in the Supported by strip by about 30%.
 - [x] Re-check the Supported by strip after the NVIDIA logo correction.
 - [x] Save a checkpoint for the corrected NVIDIA logo treatment.
+- [ ] Audit the current site for any buttons, links, or sections that feel unfinished or ambiguous.
+- [ ] Add meaningful public-facing website content that improves company credibility for external reviewers.
+- [ ] Ensure every visible call to action leads to a real destination or useful behavior.
+- [ ] Add supporting information such as company context, trust signals, and policy-oriented pages where needed.
+- [ ] Validate the polished public-facing website experience and save a checkpoint.
