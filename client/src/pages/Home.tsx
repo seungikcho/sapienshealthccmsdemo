@@ -1,22 +1,9 @@
 /*
 Design philosophy for this page: A dark editorial product homepage inspired by premium healthcare software.
-The layout should stay minimal, text-led, and compact. Product sections should feel intentional,
-not crowded, with realistic modality tiles and concise clinical language.
-Each interaction should read like a real public-facing company website, not a concept landing page.
+The layout should feel like a real company website with concise product framing, clear navigation,
+and standard public-facing sections instead of meta commentary about website readiness.
 */
-import {
-  AlertTriangle,
-  ArrowRight,
-  Building2,
-  CalendarClock,
-  ChevronRight,
-  ClipboardCheck,
-  FileCheck2,
-  LifeBuoy,
-  ShieldCheck,
-  Sparkles,
-  Stethoscope,
-} from "lucide-react";
+import { ArrowRight, Building2, CalendarClock, ChevronRight, Mail, Sparkles, Stethoscope } from "lucide-react";
 
 type ModalityTile = {
   label: string;
@@ -27,7 +14,7 @@ type ModalityTile = {
 type InsightFlow = {
   task: string;
   insight: string;
-  icon: typeof AlertTriangle;
+  icon: typeof Building2;
 };
 
 type WorkflowCard = {
@@ -36,10 +23,12 @@ type WorkflowCard = {
   signal: string;
 };
 
-type TrustItem = {
+type CompanyLinkCard = {
   title: string;
   detail: string;
-  icon: typeof ShieldCheck;
+  href: string;
+  cta: string;
+  icon: typeof Building2;
 };
 
 const logoUrl =
@@ -67,7 +56,7 @@ const supportLogos = [
   {
     name: "NVIDIA Inception Program",
     src: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663318202729/VsfYuRGWGApWwFyj.png",
-    className: "h-[2.08rem] w-auto sm:h-[2.5rem]",
+    className: "h-[1.66rem] w-auto sm:h-8",
   },
   {
     name: "Nucleate",
@@ -119,7 +108,7 @@ const insightFlows: InsightFlow[] = [
   {
     task: "Deterioration risk",
     insight: "Escalation insight for clinical teams",
-    icon: AlertTriangle,
+    icon: Stethoscope,
   },
   {
     task: "Discharge readiness",
@@ -129,7 +118,7 @@ const insightFlows: InsightFlow[] = [
   {
     task: "Readmission risk",
     insight: "Follow-up prioritization cue",
-    icon: Stethoscope,
+    icon: CalendarClock,
   },
   {
     task: "Treatment response",
@@ -141,41 +130,42 @@ const insightFlows: InsightFlow[] = [
 const workflowCards: WorkflowCard[] = [
   {
     title: "Operational triage",
-    summary: "Surface deterioration and escalation signals so teams can review high-risk patients sooner.",
-    signal: "Signal package: risk score, rationale snapshot, queue priority",
+    summary: "Surface deterioration and escalation signals so teams can review higher-risk patients sooner.",
+    signal: "Risk score, rationale snapshot, queue priority",
   },
   {
     title: "Discharge coordination",
     summary: "Translate multimodal context into readiness cues that support bed planning and transition workflows.",
-    signal: "Signal package: readiness state, blockers, care-team handoff prompt",
+    signal: "Readiness state, blockers, handoff prompt",
   },
   {
-    title: "Review workflows",
-    summary: "Turn prediction output into compact artifacts that can be reviewed by clinical or translational teams.",
-    signal: "Signal package: review summary, source modalities, follow-up recommendation",
+    title: "Translational review",
+    summary: "Turn prediction output into compact artifacts that can be reviewed by clinical and translational teams.",
+    signal: "Review summary, source modalities, follow-up recommendation",
   },
 ];
 
-const trustItems: TrustItem[] = [
+const companyLinkCards: CompanyLinkCard[] = [
   {
-    title: "Clear evaluation path",
-    detail: "Every core CTA routes to a direct evaluation request so external reviewers can understand the intended next step immediately.",
-    icon: ClipboardCheck,
+    title: "Company overview",
+    detail: "Learn how Sapiens Health is positioning MedMIX across multimodal clinical prediction and workflow intelligence.",
+    href: "/about",
+    cta: "Read overview",
+    icon: Building2,
   },
   {
-    title: "Review-ready public materials",
-    detail: "The site now includes company context, contact details, and core legal pages so it reads like an operating organization rather than a concept page.",
-    icon: FileCheck2,
+    title: "Partnership inquiry",
+    detail: "Start a conversation about evaluation, collaboration, or translational deployment with the Sapiens Health team.",
+    href: "mailto:info@sapienshealth.co?subject=Partnership%20inquiry",
+    cta: "Start inquiry",
+    icon: Mail,
   },
   {
-    title: "Human follow-up",
-    detail: "Initial conversations, partnership requests, and evaluation outreach all route to the same monitored team address: info@sapienshealth.co.",
-    icon: LifeBuoy,
-  },
-  {
-    title: "Healthcare-oriented framing",
-    detail: "Language is written to explain how MedMIX fits real workflow review, hospital operations support, and translational data settings.",
-    icon: ShieldCheck,
+    title: "Policies",
+    detail: "Review the public privacy and terms pages that support the company website and contact workflow.",
+    href: "/privacy",
+    cta: "View privacy",
+    icon: Sparkles,
   },
 ];
 
@@ -227,6 +217,9 @@ function SiteFooter() {
             <a href="#workflows" className="block transition hover:text-white">
               Workflows
             </a>
+            <a href="#company" className="block transition hover:text-white">
+              Company
+            </a>
             <a href="#contact" className="block transition hover:text-white">
               Contact
             </a>
@@ -274,8 +267,8 @@ export default function Home() {
               <a href="#workflows" className="transition hover:text-white">
                 Workflows
               </a>
-              <a href="#trust" className="transition hover:text-white">
-                Review readiness
+              <a href="#company" className="transition hover:text-white">
+                Company
               </a>
               <a href="#contact" className="transition hover:text-white">
                 Contact
@@ -408,7 +401,7 @@ export default function Home() {
               <div className="flex items-start gap-3">
                 <CalendarClock className="mt-0.5 h-4.5 w-4.5 text-[#cdbcff]" />
                 <p className="text-sm leading-6 text-white/64">
-                  The product story is centered on incomplete multimodal clinical context, so reviewers can quickly understand why the engine exists and what operational problem it addresses.
+                  MedMIX is positioned for teams working with mixed clinical inputs, partial modality coverage, and workflow decisions that need more than a single-source view.
                 </p>
               </div>
             </div>
@@ -472,12 +465,12 @@ export default function Home() {
         <section id="workflows" className="mx-auto mt-8 w-full max-w-[1520px] rounded-[2rem] border border-white/10 bg-white/[0.03] p-6 shadow-[0_30px_80px_rgba(0,0,0,0.26)] backdrop-blur-xl sm:p-8 lg:p-10">
           <div className="grid gap-8 lg:grid-cols-[0.72fr_1.28fr]">
             <div className="max-w-[34rem]">
-              <div className="section-kicker">Workflow fit</div>
+              <div className="section-kicker">Workflows</div>
               <h2 className="font-display mt-4 text-3xl font-semibold tracking-[-0.065em] text-white sm:text-4xl lg:text-[2.9rem] lg:leading-[0.97]">
-                A landing page that now reads like a working company website.
+                Examples of where MedMIX can support real teams.
               </h2>
               <p className="mt-5 text-base leading-7 text-white/66 sm:text-[1.02rem]">
-                We clarified where the product fits, what the next step is, and how external reviewers can interpret the company quickly without guessing whether the site is still under construction.
+                The product is framed around practical hospital and translational workflows where incomplete multimodal data still needs to become a usable decision signal.
               </p>
               <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                 <a
@@ -515,29 +508,23 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="trust" className="mx-auto mt-8 w-full max-w-[1520px] rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(12,10,24,0.94),rgba(8,7,18,0.98))] p-6 shadow-[0_30px_90px_rgba(0,0,0,0.3)] sm:p-8 lg:p-10">
-          <div className="grid gap-8 lg:grid-cols-[0.78fr_1.22fr] lg:items-start">
+        <section id="company" className="mx-auto mt-8 w-full max-w-[1520px] rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(12,10,24,0.94),rgba(8,7,18,0.98))] p-6 shadow-[0_30px_90px_rgba(0,0,0,0.3)] sm:p-8 lg:p-10">
+          <div className="grid gap-8 lg:grid-cols-[0.76fr_1.24fr] lg:items-start">
             <div className="max-w-[34rem]">
-              <div className="section-kicker">Review readiness</div>
+              <div className="section-kicker">Company</div>
               <h2 className="font-display mt-4 text-3xl font-semibold tracking-[-0.065em] text-white sm:text-4xl lg:text-[2.9rem] lg:leading-[0.98]">
-                Stronger trust signals for external reviewers.
+                A clearer public-facing path into Sapiens Health.
               </h2>
               <p className="mt-5 text-base leading-7 text-white/66 sm:text-[1.02rem]">
-                The site now gives reviewers a direct contact path, clear company framing, visible partner context, and supporting legal pages so it feels closer to a live operating website.
+                The website is structured to explain the company, show where MedMIX fits, and make it easy to start an evaluation or partnership conversation without unnecessary friction.
               </p>
-              <div className="mt-6 rounded-[1.35rem] border border-white/10 bg-white/[0.03] p-5">
-                <div className="text-[0.68rem] uppercase tracking-[0.2em] text-white/42">Public-facing essentials</div>
-                <div className="mt-3 grid gap-3 text-sm leading-6 text-white/66 sm:grid-cols-2">
-                  <div>Evaluation request route</div>
-                  <div>Company overview page</div>
-                  <div>Privacy and terms pages</div>
-                  <div>Direct contact and location</div>
-                </div>
+              <div className="mt-6 rounded-[1.35rem] border border-white/10 bg-white/[0.03] p-5 text-sm leading-6 text-white/64">
+                Core company links, policy pages, direct email routes, partner context, and headquarters information are all available through standard public website pathways.
               </div>
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-2">
-              {trustItems.map((item) => {
+            <div className="grid gap-4 sm:grid-cols-3">
+              {companyLinkCards.map((item) => {
                 const Icon = item.icon;
                 return (
                   <article
@@ -549,6 +536,13 @@ export default function Home() {
                     </div>
                     <h3 className="mt-4 text-[1.02rem] font-semibold tracking-[-0.03em] text-white">{item.title}</h3>
                     <p className="mt-3 text-sm leading-6 text-white/66">{item.detail}</p>
+                    <a
+                      href={item.href}
+                      className="mt-5 inline-flex items-center gap-2 text-sm font-medium text-white/80 transition hover:text-white"
+                    >
+                      {item.cta}
+                      <ChevronRight className="h-4 w-4" />
+                    </a>
                   </article>
                 );
               })}
