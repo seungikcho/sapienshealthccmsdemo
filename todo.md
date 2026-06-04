@@ -191,3 +191,7 @@
 - [x] Replace those sections with standard company-site content that feels natural for a live startup website.
 - [x] Keep CTAs meaningful without explicitly explaining the site to reviewers.
 - [ ] Validate the cleaner company-style presentation and save a checkpoint.
+- [ ] Remove website-about-website explanation copy from the Company section.
+- [ ] Replace the Company section with straightforward company and product messaging.
+- [ ] Re-check the Company section after removing meta website language.
+- [ ] Save a checkpoint for the cleaner company messaging revision.

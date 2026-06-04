@@ -147,22 +147,22 @@ const workflowCards: WorkflowCard[] = [
 
 const companyLinkCards: CompanyLinkCard[] = [
   {
-    title: "Company overview",
-    detail: "Learn how Sapiens Health is positioning MedMIX across multimodal clinical prediction and workflow intelligence.",
+    title: "About Sapiens Health",
+    detail: "Learn how MedMIX is being developed for multimodal clinical prediction and workflow intelligence in care and translational settings.",
     href: "/about",
     cta: "Read overview",
     icon: Building2,
   },
   {
     title: "Partnership inquiry",
-    detail: "Start a conversation about evaluation, collaboration, or translational deployment with the Sapiens Health team.",
+    detail: "Start a conversation with the Sapiens Health team about evaluation, collaboration, or translational deployment.",
     href: "mailto:info@sapienshealth.co?subject=Partnership%20inquiry",
     cta: "Start inquiry",
     icon: Mail,
   },
   {
-    title: "Policies",
-    detail: "Review the public privacy and terms pages that support the company website and contact workflow.",
+    title: "Privacy & terms",
+    detail: "Access the company privacy policy and terms pages for public-facing legal and contact information.",
     href: "/privacy",
     cta: "View privacy",
     icon: Sparkles,
@@ -401,7 +401,7 @@ export default function Home() {
               <div className="flex items-start gap-3">
                 <CalendarClock className="mt-0.5 h-4.5 w-4.5 text-[#cdbcff]" />
                 <p className="text-sm leading-6 text-white/64">
-                  MedMIX is positioned for teams working with mixed clinical inputs, partial modality coverage, and workflow decisions that need more than a single-source view.
+                  MedMIX is designed for teams working with mixed clinical inputs, partial modality coverage, and workflow decisions that need more than a single-source view.
                 </p>
               </div>
             </div>
@@ -470,7 +470,7 @@ export default function Home() {
                 Examples of where MedMIX can support real teams.
               </h2>
               <p className="mt-5 text-base leading-7 text-white/66 sm:text-[1.02rem]">
-                The product is framed around practical hospital and translational workflows where incomplete multimodal data still needs to become a usable decision signal.
+                MedMIX supports practical hospital and translational workflows where incomplete multimodal data still needs to become a usable decision signal.
               </p>
               <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                 <a
@@ -513,13 +513,13 @@ export default function Home() {
             <div className="max-w-[34rem]">
               <div className="section-kicker">Company</div>
               <h2 className="font-display mt-4 text-3xl font-semibold tracking-[-0.065em] text-white sm:text-4xl lg:text-[2.9rem] lg:leading-[0.98]">
-                A clearer public-facing path into Sapiens Health.
+                Sapiens Health is building MedMIX for real clinical workflows.
               </h2>
               <p className="mt-5 text-base leading-7 text-white/66 sm:text-[1.02rem]">
-                The website is structured to explain the company, show where MedMIX fits, and make it easy to start an evaluation or partnership conversation without unnecessary friction.
+                The company is focused on turning incomplete multimodal patient data into clearer prediction and workflow signals for care teams, research collaborators, and translational settings.
               </p>
               <div className="mt-6 rounded-[1.35rem] border border-white/10 bg-white/[0.03] p-5 text-sm leading-6 text-white/64">
-                Core company links, policy pages, direct email routes, partner context, and headquarters information are all available through standard public website pathways.
+                Based in Houston, Sapiens Health is developing MedMIX with support from research, medical innovation, and startup ecosystem partners.
               </div>
             </div>
 
