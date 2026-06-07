@@ -159,10 +159,11 @@ export default function Home() {
 
       <main className="relative z-10 px-4 pb-24 sm:px-6 lg:px-8">
         <section className="mx-auto w-full max-w-[1480px] py-6 sm:py-8 lg:py-10">
-          <div className="grid gap-12 lg:grid-cols-[minmax(0,0.84fr)_minmax(520px,1.16fr)] lg:items-center">
-            <div className="max-w-[34rem]">
-              <h1 className="max-w-[12ch] font-display text-[1.95rem] font-semibold leading-[1.01] tracking-[-0.05em] text-white sm:text-[2.45rem] lg:text-[2.95rem]">
-                AI-Native <span className="text-[#c8b7ff]">Executive Assistant</span> for Primary Care
+          <div className="grid gap-10 lg:grid-cols-[minmax(0,1.02fr)_minmax(420px,0.98fr)] lg:items-center lg:gap-8">
+            <div className="max-w-[40rem]">
+              <h1 className="max-w-[15ch] font-display text-[1.8rem] font-semibold leading-[1.01] tracking-[-0.05em] text-white sm:max-w-[18ch] sm:text-[2.28rem] lg:max-w-[21ch] lg:text-[2.74rem]">
+                <span className="block sm:whitespace-nowrap">AI-Native <span className="text-[#c8b7ff]">Executive Assistant</span></span>
+                <span className="mt-1 block">for Primary Care</span>
               </h1>
 
               <p className="mt-6 max-w-[34rem] text-[1.04rem] leading-8 text-white/66 sm:text-[1.1rem]">
@@ -185,7 +186,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="relative">
+            <div className="relative lg:max-w-[47rem] lg:justify-self-end">
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_84%_18%,rgba(127,103,214,0.16),transparent_24%)] blur-2xl" />
               <div className="relative overflow-hidden rounded-[1.9rem] border border-white/8 bg-[#1b142b] p-2 shadow-[0_28px_70px_rgba(17,11,34,0.42)] lg:p-3">
                 <img
