@@ -161,8 +161,8 @@ export default function Home() {
         <section className="mx-auto w-full max-w-[1480px] py-6 sm:py-8 lg:py-10">
           <div className="grid gap-12 lg:grid-cols-[minmax(0,0.84fr)_minmax(520px,1.16fr)] lg:items-center">
             <div className="max-w-[34rem]">
-              <h1 className="max-w-[12ch] font-display text-[2.15rem] font-semibold leading-[0.98] tracking-[-0.05em] text-white sm:text-[2.8rem] lg:text-[3.3rem]">
-                AI-Native Care Execution Layer for Healthcare
+              <h1 className="max-w-[12ch] font-display text-[1.95rem] font-semibold leading-[1.01] tracking-[-0.05em] text-white sm:text-[2.45rem] lg:text-[2.95rem]">
+                AI-Native <span className="text-[#c8b7ff]">Executive Assistant</span> for Primary Care
               </h1>
 
               <p className="mt-6 max-w-[34rem] text-[1.04rem] leading-8 text-white/66 sm:text-[1.1rem]">
