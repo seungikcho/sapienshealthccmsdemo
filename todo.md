@@ -195,3 +195,11 @@
 - [ ] Replace the Company section with straightforward company and product messaging.
 - [ ] Re-check the Company section after removing meta website language.
 - [ ] Save a checkpoint for the cleaner company messaging revision.
+- [x] 홈 히어로 배지 문구를 "AI-native care intelligence for healthcare"로 변경
+- [x] 홈 히어로 메인 헤드라인을 "AI-Native Care Execution Layer for Primary Care"로 변경
+- [x] 홈 히어로 본문 문구를 "Sapiens Health builds"까지만 남기도록 축약
+- [x] 홈 히어로 1차 CTA 라벨을 "Demo ->"로 변경
+- [x] 홈 히어로 2차 CTA 라벨을 "Learn More"로 변경
+- [x] pnpm check로 타입 검사를 실행
+- [x] 브라우저 미리보기로 히어로 문구 노출을 확인
+- [ ] 변경 사항 체크포인트를 저장

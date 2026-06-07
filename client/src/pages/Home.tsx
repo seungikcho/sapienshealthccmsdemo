@@ -288,7 +288,7 @@ export default function Home() {
         <section className="mx-auto w-full max-w-[1520px] overflow-hidden rounded-[2.2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(13,11,23,0.92),rgba(9,8,18,0.98))] shadow-[0_0_0_1px_rgba(255,255,255,0.02),0_60px_160px_rgba(0,0,0,0.52)]">
           <div className="border-b border-white/8 px-5 py-6 sm:px-8 lg:px-10">
             <div className="inline-flex items-center gap-2 rounded-full border border-[#8f7dff]/25 bg-[linear-gradient(180deg,rgba(126,92,255,0.18),rgba(80,48,160,0.10))] px-5 py-2 text-sm text-[#e9deff] shadow-[0_8px_30px_rgba(120,80,255,0.18)]">
-              <span className="font-medium">Launching MedMIX I: Best multimodal engine for medical outcome prediction</span>
+              <span className="font-medium">AI-native care intelligence for healthcare</span>
             </div>
           </div>
 
@@ -296,28 +296,26 @@ export default function Home() {
             <div className="grid gap-8 lg:grid-cols-[0.82fr_1.18fr] lg:items-center lg:gap-10">
               <div className="max-w-[42rem]">
                 <h1 className="font-display max-w-[18ch] text-[2.45rem] font-semibold leading-[0.99] tracking-[-0.055em] text-white sm:text-[2.95rem] lg:text-[3.1rem] xl:text-[3.45rem]">
-                  <span className="block">Intelligence layer for</span>
-                  <span className="block">incomplete patient data.</span>
+                  <span className="block">AI-Native Care Execution Layer</span>
+                  <span className="block">for Primary Care</span>
                 </h1>
 
                 <p className="mt-5 max-w-[34rem] text-[1.02rem] leading-7 text-white/72 sm:text-[1.12rem] sm:leading-8">
-                  Sapiens Health delivers clinical predictions from multimodal patient data, even when modalities are missing, and translates them into reviewable signals for care and translational workflows.
+                  Sapiens Health builds
                 </p>
 
                 <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
                   <a
                     href={evaluationHref}
-                    className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/14 bg-white/[0.04] px-6 py-4 text-base font-semibold text-white transition duration-300 hover:-translate-y-0.5 hover:bg-white/[0.07]"
+                    className="inline-flex items-center justify-center rounded-2xl border border-white/14 bg-white/[0.04] px-6 py-4 text-base font-semibold text-white transition duration-300 hover:-translate-y-0.5 hover:bg-white/[0.07]"
                   >
-                    Request evaluation
-                    <ArrowRight className="h-4 w-4" />
+                    Demo -&gt;
                   </a>
                   <a
                     href="#workflows"
-                    className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/10 px-6 py-4 text-base font-medium text-white/72 transition duration-300 hover:border-white/18 hover:text-white"
+                    className="inline-flex items-center justify-center rounded-2xl border border-white/10 px-6 py-4 text-base font-medium text-white/72 transition duration-300 hover:border-white/18 hover:text-white"
                   >
-                    Explore workflows
-                    <ChevronRight className="h-4 w-4" />
+                    Learn More
                   </a>
                 </div>
 
