@@ -220,3 +220,11 @@
 - [x] pnpm check로 단순화 리디자인 후 타입 검사를 실행
 - [x] 브라우저 미리보기로 심플한 새 랜딩 페이지를 검토
 - [ ] 단순화 리디자인 결과를 체크포인트로 저장
+- [x] Beacon 스타일의 밝고 심플한 히어로 구성으로 상단 섹션을 재정리
+- [x] 히어로 메인 카피를 "AI-Native Care Execution Layer for Healthcare"로 교체
+- [x] 히어로 본문을 "Sapiens Health builds intelligent AI-native care execution layer for primary care clinics."로 교체
+- [x] Demo와 Learn More 버튼을 더 얇고 정돈된 스타일로 수정
+- [x] 상단 배지의 보라색 강조를 제거하고 심플한 스타일로 정리
+- [x] pnpm check로 히어로 수정 후 타입 검사를 실행
+- [x] 브라우저 미리보기로 새 히어로 레이아웃을 검토
+- [ ] 히어로 리디자인 결과를 체크포인트로 저장

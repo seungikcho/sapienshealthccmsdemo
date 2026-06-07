@@ -38,10 +38,10 @@ const inquiryHref = "mailto:info@sapienshealth.co?subject=General%20inquiry";
 function SiteWordmark() {
   return (
     <a href="/" className="flex min-w-0 items-center gap-3">
-      <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-white/12 bg-black shadow-[0_14px_30px_rgba(0,0,0,0.45)]">
+      <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-[#e5ddd3] bg-[#17120d] shadow-[0_10px_22px_rgba(25,16,8,0.12)]">
         <img src={logoUrl} alt="Sapiens Health logo" className="h-full w-full object-cover" />
       </div>
-      <div className="font-wordmark truncate text-white/96">Sapiens Health</div>
+      <div className="font-wordmark truncate text-[#17120d]">Sapiens Health</div>
     </a>
   );
 }
@@ -111,21 +111,21 @@ export default function Home() {
       </div>
 
       <header className="relative z-30 px-4 pb-6 pt-5 sm:px-6 lg:px-8">
-        <div className="mx-auto flex w-full max-w-[1440px] items-center justify-between rounded-full border border-white/10 bg-white/[0.045] px-4 py-3 shadow-[0_0_0_1px_rgba(255,255,255,0.02),0_30px_90px_rgba(0,0,0,0.32)] backdrop-blur-xl sm:px-6">
+        <div className="mx-auto flex w-full max-w-[1440px] items-center justify-between rounded-full border border-[#e7ded4] bg-[#fcfaf7] px-4 py-3 shadow-[0_12px_35px_rgba(25,16,8,0.06)] sm:px-6">
           <SiteWordmark />
 
           <div className="hidden items-center gap-8 md:flex">
-            <nav className="flex items-center gap-8 text-sm text-white/74">
-              <a href="#how-it-works" className="transition hover:text-white">
+            <nav className="flex items-center gap-8 text-sm text-[#6d635a]">
+              <a href="#how-it-works" className="transition hover:text-[#17120d]">
                 How it works
               </a>
-              <a href="#contact" className="transition hover:text-white">
+              <a href="#contact" className="transition hover:text-[#17120d]">
                 Contact
               </a>
             </nav>
             <a
               href={demoHref}
-              className="inline-flex items-center justify-center rounded-full border border-white/18 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/6"
+              className="inline-flex items-center justify-center rounded-full border border-[#d9cfc3] px-5 py-2.5 text-sm font-medium text-[#17120d] transition hover:bg-[#f5efe8]"
             >
               Demo →
             </a>
@@ -134,31 +134,31 @@ export default function Home() {
       </header>
 
       <main className="relative z-10 px-4 pb-24 sm:px-6 lg:px-8">
-        <section className="mx-auto w-full max-w-[1440px] overflow-hidden rounded-[2.3rem] border border-white/10 bg-[linear-gradient(180deg,rgba(15,13,26,0.96),rgba(10,9,20,0.98))] shadow-[0_0_0_1px_rgba(255,255,255,0.02),0_60px_160px_rgba(0,0,0,0.52)]">
-          <div className="grid gap-10 px-5 py-8 sm:px-8 sm:py-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:px-10 lg:py-10">
+        <section className="mx-auto w-full max-w-[1440px] overflow-hidden rounded-[2.3rem] border border-[#ece2d8] bg-[linear-gradient(180deg,#fffdfa_0%,#fbf8f3_100%)] shadow-[0_30px_90px_rgba(31,20,9,0.08)]">
+          <div className="grid gap-12 px-5 py-8 sm:px-8 sm:py-10 lg:grid-cols-[0.84fr_1.16fr] lg:items-center lg:px-10 lg:py-10">
             <div className="max-w-[34rem]">
-              <div className="inline-flex items-center rounded-full border border-[#8f7dff]/25 bg-[linear-gradient(180deg,rgba(126,92,255,0.18),rgba(80,48,160,0.10))] px-4 py-2 text-[0.8rem] font-medium tracking-[0.04em] text-[#e7deff] shadow-[0_8px_30px_rgba(120,80,255,0.18)]">
-                AI-native execution layer for primary care
+              <div className="inline-flex items-center rounded-full border border-[#eadfcd] bg-[#faf6ef] px-4 py-2 text-[0.8rem] font-medium tracking-[0.01em] text-[#9b6a1f] shadow-none">
+                AI-Native Care Execution Layer for Primary Care
               </div>
 
-              <h1 className="mt-6 max-w-[10ch] font-display text-[3rem] font-semibold leading-[0.92] tracking-[-0.065em] text-white sm:text-[4rem] lg:text-[4.55rem]">
-                Turn fragmented patient data into completed care workflows.
+              <h1 className="mt-6 max-w-[10.6ch] font-display text-[2.9rem] font-semibold leading-[0.95] tracking-[-0.06em] text-[#17120d] sm:text-[3.85rem] lg:text-[4.45rem]">
+                AI-Native Care Execution Layer for Healthcare
               </h1>
 
-              <p className="mt-6 max-w-[31rem] text-[1.02rem] leading-8 text-white/68 sm:text-[1.08rem]">
-                Connect. Prioritize. Execute.
+              <p className="mt-6 max-w-[34rem] text-[1.06rem] leading-8 text-[#5d554d] sm:text-[1.12rem]">
+                Sapiens Health builds intelligent AI-native care execution layer for primary care clinics.
               </p>
 
-              <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
                 <a
                   href={demoHref}
-                  className="inline-flex items-center justify-center rounded-2xl border border-white/14 bg-white/[0.055] px-6 py-4 text-base font-semibold text-white transition duration-300 hover:-translate-y-0.5 hover:bg-white/[0.08]"
+                  className="inline-flex items-center justify-center rounded-full border border-[#dfd6cc] bg-[#d07a09] px-6 py-3.5 text-base font-medium text-white transition duration-300 hover:-translate-y-0.5 hover:bg-[#b96d08]"
                 >
                   Demo →
                 </a>
                 <a
                   href="#how-it-works"
-                  className="inline-flex items-center justify-center rounded-2xl border border-white/10 px-6 py-4 text-base font-medium text-white/74 transition duration-300 hover:border-white/18 hover:text-white"
+                  className="inline-flex items-center justify-center rounded-full border border-[#dfd6cc] bg-white px-6 py-3.5 text-base font-medium text-[#2a221c] transition duration-300 hover:border-[#cfc2b4] hover:bg-[#fbf8f3]"
                 >
                   Learn More
                 </a>
@@ -166,8 +166,8 @@ export default function Home() {
             </div>
 
             <div className="relative">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_84%_18%,rgba(255,255,255,0.10),transparent_24%)] blur-2xl" />
-              <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.035] p-3 shadow-[0_32px_90px_rgba(0,0,0,0.35)]">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_84%_18%,rgba(208,122,9,0.08),transparent_24%)] blur-2xl" />
+              <div className="relative overflow-hidden rounded-[2rem] border border-[#e2d8cd] bg-white p-3 shadow-[0_28px_70px_rgba(39,25,8,0.12)]">
                 <img
                   src={heroGraphic}
                   alt="Sapiens Health care execution interface"
