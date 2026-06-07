@@ -72,26 +72,26 @@ function SiteWordmark() {
 
 function SiteFooter() {
   return (
-    <footer className="mx-auto mt-8 w-full max-w-[1440px] rounded-[2rem] border border-white/10 bg-white/[0.03] px-6 py-7 shadow-[0_24px_70px_rgba(0,0,0,0.22)] backdrop-blur-xl sm:px-8 lg:px-10">
-      <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr_0.8fr]">
+    <footer className="border-t border-white/10 pt-10 sm:pt-12">
+      <div className="grid gap-10 lg:grid-cols-[1.15fr_0.85fr_0.85fr] lg:gap-16">
         <div>
           <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-white/12 bg-black shadow-[0_14px_30px_rgba(0,0,0,0.45)]">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-[#17120d] shadow-[0_14px_30px_rgba(0,0,0,0.45)]">
               <img src={logoUrl} alt="Sapiens Health logo" className="h-full w-full object-cover" />
             </div>
             <div>
-              <div className="font-wordmark text-white/96">Sapiens Health</div>
+              <div className="font-wordmark text-white">Sapiens Health</div>
               <div className="mt-1 text-sm text-white/46">AI-native execution layer for primary care</div>
             </div>
           </div>
-          <p className="mt-4 max-w-[32rem] text-sm leading-7 text-white/60 sm:text-[0.98rem]">
+          <p className="mt-5 max-w-[30rem] text-[0.98rem] leading-8 text-white/58">
             Sapiens Health turns fragmented patient data into completed clinical workflows.
           </p>
         </div>
 
         <div>
-          <div className="text-[0.76rem] font-semibold uppercase tracking-[0.28em] text-white/42">Navigation</div>
-          <div className="mt-4 space-y-3 text-sm text-white/70">
+          <div className="text-[0.76rem] font-semibold uppercase tracking-[0.28em] text-white/38">Navigation</div>
+          <div className="mt-5 space-y-4 text-[1rem] text-white/70">
             <a href="#how-it-works" className="block transition hover:text-white">
               How it works
             </a>
@@ -105,8 +105,8 @@ function SiteFooter() {
         </div>
 
         <div>
-          <div className="text-[0.76rem] font-semibold uppercase tracking-[0.28em] text-white/42">Company</div>
-          <div className="mt-4 space-y-3 text-sm text-white/70">
+          <div className="text-[0.76rem] font-semibold uppercase tracking-[0.28em] text-white/38">Company</div>
+          <div className="mt-5 space-y-4 text-[1rem] text-white/70">
             <a href={demoHref} className="block transition hover:text-white">
               Demo
             </a>
@@ -269,11 +269,11 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="contact" className="mx-auto mt-8 w-full max-w-[1440px] overflow-hidden rounded-[2.2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(92,79,148,0.14),rgba(14,12,23,0.94))] px-5 py-8 shadow-[0_28px_90px_rgba(0,0,0,0.22)] sm:px-8 sm:py-10 lg:px-10">
-          <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end">
+        <section id="contact" className="mx-auto mt-14 w-full max-w-[1480px] px-0 pb-10 pt-8 sm:pb-12 sm:pt-10 lg:pb-16">
+          <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end lg:gap-16">
             <div>
-              <div className="text-[0.76rem] font-semibold uppercase tracking-[0.28em] text-white/48">Contact</div>
-              <h2 className="mt-4 max-w-[12ch] font-display text-[2.35rem] font-semibold leading-[0.98] tracking-[-0.05em] text-white sm:text-[3rem]">
+              <div className="text-[0.76rem] font-semibold uppercase tracking-[0.28em] text-white/38">Contact</div>
+              <h2 className="mt-4 max-w-[11ch] font-display text-[2.35rem] font-semibold leading-[0.98] tracking-[-0.05em] text-white sm:text-[3rem] lg:text-[3.3rem]">
                 Built for teams that need care execution.
               </h2>
             </div>
@@ -281,22 +281,24 @@ export default function Home() {
             <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
               <a
                 href={demoHref}
-                className="inline-flex items-center justify-center rounded-2xl border border-white/14 bg-white/[0.08] px-6 py-4 text-base font-semibold text-white transition hover:bg-white/[0.11]"
+                className="inline-flex items-center justify-center rounded-full border border-white/16 bg-white/[0.06] px-6 py-3.5 text-base font-medium text-white transition hover:bg-white/[0.1]"
               >
                 Demo →
               </a>
               <a
                 href={inquiryHref}
-                className="inline-flex items-center justify-center rounded-2xl border border-white/10 px-6 py-4 text-base font-medium text-white/76 transition hover:border-white/18 hover:text-white"
+                className="inline-flex items-center justify-center rounded-full border border-white/12 px-6 py-3.5 text-base font-medium text-white/78 transition hover:border-white/20 hover:text-white"
               >
                 <Mail className="mr-2 h-4 w-4" />
                 General Inquiry
               </a>
             </div>
           </div>
-        </section>
 
-        <SiteFooter />
+          <div className="mt-12 sm:mt-14">
+            <SiteFooter />
+          </div>
+        </section>
       </main>
     </div>
   );
