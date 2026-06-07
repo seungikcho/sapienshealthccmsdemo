@@ -106,12 +106,12 @@ export default function Home() {
   return (
     <div className="min-h-screen overflow-x-hidden bg-background text-foreground">
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_14%_16%,rgba(133,102,255,0.12),transparent_24%),linear-gradient(180deg,#06050d_0%,#090713_52%,#06060d_100%)]" />
-        <div className="absolute left-[-8rem] top-[14rem] h-[30rem] w-[30rem] rounded-full bg-[#6f57ff]/8 blur-3xl" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_14%_16%,rgba(189,166,255,0.18),transparent_24%),linear-gradient(180deg,#110d1d_0%,#151124_52%,#0f0b19_100%)]" />
+        <div className="absolute left-[-8rem] top-[14rem] h-[30rem] w-[30rem] rounded-full bg-[#a88dff]/12 blur-3xl" />
       </div>
 
       <header className="relative z-30 px-4 pb-6 pt-5 sm:px-6 lg:px-8">
-        <div className="mx-auto flex w-full max-w-[1440px] items-center justify-between rounded-full border border-[#e7ded4] bg-[#fcfaf7] px-4 py-3 shadow-[0_12px_35px_rgba(25,16,8,0.06)] sm:px-6">
+        <div className="mx-auto flex w-full max-w-[1440px] items-center justify-between rounded-full border border-[#3e345a] bg-[#f3edff] px-4 py-3 shadow-[0_12px_35px_rgba(15,10,28,0.08)] sm:px-6">
           <SiteWordmark />
 
           <div className="hidden items-center gap-8 md:flex">
@@ -134,31 +134,27 @@ export default function Home() {
       </header>
 
       <main className="relative z-10 px-4 pb-24 sm:px-6 lg:px-8">
-        <section className="mx-auto w-full max-w-[1440px] overflow-hidden rounded-[2.3rem] border border-[#ece2d8] bg-[linear-gradient(180deg,#fffdfa_0%,#fbf8f3_100%)] shadow-[0_30px_90px_rgba(31,20,9,0.08)]">
+        <section className="mx-auto w-full max-w-[1440px] overflow-hidden rounded-[2.3rem] border border-[#4c3f72] bg-[linear-gradient(180deg,#eee6ff_0%,#e8ddff_100%)] shadow-[0_30px_90px_rgba(16,11,31,0.18)]">
           <div className="grid gap-12 px-5 py-8 sm:px-8 sm:py-10 lg:grid-cols-[0.84fr_1.16fr] lg:items-center lg:px-10 lg:py-10">
             <div className="max-w-[34rem]">
-              <div className="inline-flex items-center rounded-full border border-[#eadfcd] bg-[#faf6ef] px-4 py-2 text-[0.8rem] font-medium tracking-[0.01em] text-[#9b6a1f] shadow-none">
-                AI-Native Care Execution Layer for Primary Care
-              </div>
-
-              <h1 className="mt-6 max-w-[10.6ch] font-display text-[2.9rem] font-semibold leading-[0.95] tracking-[-0.06em] text-[#17120d] sm:text-[3.85rem] lg:text-[4.45rem]">
+              <h1 className="max-w-[11.6ch] font-display text-[2.45rem] font-semibold leading-[0.96] tracking-[-0.055em] text-[#1a1330] sm:text-[3.2rem] lg:text-[3.75rem]">
                 AI-Native Care Execution Layer for Healthcare
               </h1>
 
-              <p className="mt-6 max-w-[34rem] text-[1.06rem] leading-8 text-[#5d554d] sm:text-[1.12rem]">
+              <p className="mt-6 max-w-[34rem] text-[1.04rem] leading-8 text-[#51486a] sm:text-[1.1rem]">
                 Sapiens Health builds intelligent AI-native care execution layer for primary care clinics.
               </p>
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
                 <a
                   href={demoHref}
-                  className="inline-flex items-center justify-center rounded-full border border-[#dfd6cc] bg-[#d07a09] px-6 py-3.5 text-base font-medium text-white transition duration-300 hover:-translate-y-0.5 hover:bg-[#b96d08]"
+                  className="inline-flex items-center justify-center rounded-full border border-[#3e345a] bg-[#2f2648] px-6 py-3.5 text-base font-medium text-white transition duration-300 hover:-translate-y-0.5 hover:bg-[#241c3a]"
                 >
                   Demo →
                 </a>
                 <a
                   href="#how-it-works"
-                  className="inline-flex items-center justify-center rounded-full border border-[#dfd6cc] bg-white px-6 py-3.5 text-base font-medium text-[#2a221c] transition duration-300 hover:border-[#cfc2b4] hover:bg-[#fbf8f3]"
+                  className="inline-flex items-center justify-center rounded-full border border-[#c8b9f1] bg-[#f6f1ff] px-6 py-3.5 text-base font-medium text-[#2f2648] transition duration-300 hover:border-[#b8a5ea] hover:bg-[#efe7ff]"
                 >
                   Learn More
                 </a>
@@ -166,8 +162,8 @@ export default function Home() {
             </div>
 
             <div className="relative">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_84%_18%,rgba(208,122,9,0.08),transparent_24%)] blur-2xl" />
-              <div className="relative overflow-hidden rounded-[2rem] border border-[#e2d8cd] bg-white p-3 shadow-[0_28px_70px_rgba(39,25,8,0.12)]">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_84%_18%,rgba(168,141,255,0.16),transparent_24%)] blur-2xl" />
+              <div className="relative overflow-hidden rounded-[2rem] border border-[#d2c3fb] bg-[#fbf8ff] p-3 shadow-[0_28px_70px_rgba(39,25,77,0.14)]">
                 <img
                   src={heroGraphic}
                   alt="Sapiens Health care execution interface"
