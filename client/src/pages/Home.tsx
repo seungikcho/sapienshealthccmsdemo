@@ -38,10 +38,10 @@ const inquiryHref = "mailto:info@sapienshealth.co?subject=General%20inquiry";
 function SiteWordmark() {
   return (
     <a href="/" className="flex min-w-0 items-center gap-3">
-      <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-[#e5ddd3] bg-[#17120d] shadow-[0_10px_22px_rgba(25,16,8,0.12)]">
+      <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-[#17120d] shadow-[0_10px_22px_rgba(25,16,8,0.12)]">
         <img src={logoUrl} alt="Sapiens Health logo" className="h-full w-full object-cover" />
       </div>
-      <div className="font-wordmark truncate text-[#17120d]">Sapiens Health</div>
+      <div className="font-wordmark truncate text-white">Sapiens Health</div>
     </a>
   );
 }
@@ -110,12 +110,12 @@ export default function Home() {
         <div className="absolute left-[-8rem] top-[14rem] h-[30rem] w-[30rem] rounded-full bg-[#a88dff]/12 blur-3xl" />
       </div>
 
-      <header className="relative z-30 px-4 pb-6 pt-5 sm:px-6 lg:px-8">
-        <div className="mx-auto flex w-full max-w-[1440px] items-center justify-between rounded-full border border-[#4f417b] bg-[#171126]/92 px-4 py-2 shadow-[0_10px_28px_rgba(10,6,24,0.34)] backdrop-blur-xl sm:px-5">
+      <header className="relative z-30 px-4 pb-4 pt-5 sm:px-6 lg:px-8">
+        <div className="mx-auto flex w-full max-w-[1480px] items-center justify-between px-0 py-1 sm:px-1">
           <SiteWordmark />
 
           <div className="hidden items-center gap-8 md:flex">
-            <nav className="flex items-center gap-8 text-sm text-white/72">
+            <nav className="flex items-center gap-8 text-sm text-white">
               <a href="#how-it-works" className="transition hover:text-white">
                 How it works
               </a>
@@ -125,7 +125,7 @@ export default function Home() {
             </nav>
             <a
               href={demoHref}
-              className="inline-flex items-center justify-center rounded-full border border-[#5a4a8c] bg-transparent px-4 py-2 text-sm font-medium text-white transition hover:bg-white/6"
+              className="inline-flex items-center justify-center rounded-full border border-white/20 bg-transparent px-4 py-2 text-sm font-medium text-white transition hover:bg-white/6"
             >
               Demo →
             </a>
@@ -134,8 +134,8 @@ export default function Home() {
       </header>
 
       <main className="relative z-10 px-4 pb-24 sm:px-6 lg:px-8">
-        <section className="mx-auto w-full max-w-[1440px] overflow-hidden rounded-[2.3rem] border border-[#4e4278] bg-[linear-gradient(180deg,#171126_0%,#151022_48%,#120d1d_100%)] shadow-[0_30px_90px_rgba(9,6,20,0.44)]">
-          <div className="grid gap-12 px-5 py-8 sm:px-8 sm:py-10 lg:grid-cols-[0.84fr_1.16fr] lg:items-center lg:px-10 lg:py-10">
+        <section className="mx-auto w-full max-w-[1480px] py-6 sm:py-8 lg:py-10">
+          <div className="grid gap-12 lg:grid-cols-[minmax(0,0.84fr)_minmax(520px,1.16fr)] lg:items-center">
             <div className="max-w-[34rem]">
               <h1 className="max-w-[11.6ch] font-display text-[2.45rem] font-semibold leading-[0.96] tracking-[-0.055em] text-white sm:text-[3.2rem] lg:text-[3.75rem]">
                 AI-Native Care Execution Layer for Healthcare
@@ -163,7 +163,7 @@ export default function Home() {
 
             <div className="relative">
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_84%_18%,rgba(127,103,214,0.16),transparent_24%)] blur-2xl" />
-              <div className="relative overflow-hidden rounded-[2rem] border border-[#4d4177] bg-[#1b142b] p-3 shadow-[0_28px_70px_rgba(17,11,34,0.42)]">
+              <div className="relative overflow-hidden rounded-[1.9rem] border border-white/8 bg-[#1b142b] p-2 shadow-[0_28px_70px_rgba(17,11,34,0.42)] lg:p-3">
                 <img
                   src={heroGraphic}
                   alt="Sapiens Health care execution interface"
@@ -174,7 +174,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="how-it-works" className="mx-auto mt-8 w-full max-w-[1440px] rounded-[2.2rem] border border-white/10 bg-white/[0.03] px-5 py-8 shadow-[0_28px_90px_rgba(0,0,0,0.18)] backdrop-blur-xl sm:px-8 sm:py-10 lg:px-10">
+        <section id="how-it-works" className="mx-auto mt-10 w-full max-w-[1480px] px-0 py-6 sm:py-8 lg:py-10">
           <div className="max-w-[36rem]">
             <div className="text-[0.76rem] font-semibold uppercase tracking-[0.28em] text-white/42">How it works</div>
             <h2 className="mt-4 max-w-[12ch] font-display text-[2.35rem] font-semibold leading-[0.98] tracking-[-0.05em] text-white sm:text-[3rem]">
