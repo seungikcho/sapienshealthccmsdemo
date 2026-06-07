@@ -3,7 +3,7 @@ Design philosophy for this page: A stripped-down healthcare AI landing page insp
 This file should use fewer words, keep only the product core, and rely on one strong hospital graphic plus
 simple workflow cards to explain the product.
 */
-import { ArrowRight, FileStack, ListTodo, Mail, Sparkles } from "lucide-react";
+import { FileStack, ListTodo, Mail, Sparkles } from "lucide-react";
 
 const logoUrl =
   "https://d36hbw14aib5lz.cloudfront.net/310519663318202729/TdsfYCSbV9xhvU4DsPP84j/sapienslabs-logo-delta-s-ZjHQetHDXzKos43yZtYjhG.webp?Expires=1807943486&Signature=bfdsDHdM6VbnOCGdixbHpPYBMIrYD2Iaoli5PD2tmAlSbGwChYR7nNxUJIRSQ2Pliwgd7Vz3RvRDPXKLq87uJM5lNGBrieObDqPDN~gGsfmBUgMg-mB-7KN3h~BkL14M12o3i9aw89YHbu2KvJHqdAQPvU~X3MIYpnWR2DSTuKXoNitY490GJbM5LmyBIL2FezT~o04fHDRaALkBcifH7eKRlLab7boYuNTC3G4WEPXTyIyBDoPUZrPps1lyVnu~71IYflncNFZkMiadkvu7DAO5Vs1LfO7qBrII9lx8MzsA4lyPZmJugxjgK8DJ2Dtf1YNTCctpMCNZBxrDmNg8Lw__&Key-Pair-Id=K1MP89RTKNH4J";
@@ -15,19 +15,43 @@ const steps = [
   {
     number: "01",
     title: "Connect",
-    text: "Unify fragmented patient data into one care context.",
+    summary:
+      "Patient data is scattered across EMRs, emails, referral networks, and lab portals, leaving care teams with an incomplete patient picture.",
+    detail:
+      "Sapiens parses multimodal data across these sources and synthesizes it into one unified care context with an automatically generated task list.",
+    result:
+      "Care teams start the day with a complete patient profile and a clear list of what needs to happen next.",
+    demoLabel: "Connect demo",
+    demoMeta: "Unified care context",
+    demoLines: ["EMR + referral + email intake", "Unified patient summary", "Auto-generated task list"],
     Icon: FileStack,
   },
   {
     number: "02",
     title: "Prioritize",
-    text: "Rank the next task by urgency, timing, and impact.",
+    summary:
+      "Most tools surface tasks without meaningful ordering, so reimbursement deadlines and high-impact interventions are easy to miss.",
+    detail:
+      "Sapiens scores and sequences every task by clinical urgency, deadline proximity, and quality or revenue impact.",
+    result:
+      "Teams work from a prioritized queue that protects timing-sensitive interventions and reduces lost revenue.",
+    demoLabel: "Prioritize demo",
+    demoMeta: "Ranked task queue",
+    demoLines: ["Urgency + deadline scoring", "Assigned coordinator queue", "Quality and revenue impact"],
     Icon: ListTodo,
   },
   {
     number: "03",
     title: "Execute",
-    text: "Draft and complete repetitive workflows with one final review.",
+    summary:
+      "Even with the right priorities, follow-ups, referrals, and coding still depend on repetitive manual work and fragile institutional memory.",
+    detail:
+      "Sapiens learns each clinic's workflow patterns and drafts follow-ups, referral pipelines, and coding outputs for a single admin review.",
+    result:
+      "High-volume execution work is completed faster, more accurately, and in the clinic's own operating style.",
+    demoLabel: "Execute demo",
+    demoMeta: "Review-ready workflow",
+    demoLines: ["Follow-up draft ready", "Referral packet generated", "Coding pending one review"],
     Icon: Sparkles,
   },
 ] as const;
@@ -137,7 +161,7 @@ export default function Home() {
         <section className="mx-auto w-full max-w-[1480px] py-6 sm:py-8 lg:py-10">
           <div className="grid gap-12 lg:grid-cols-[minmax(0,0.84fr)_minmax(520px,1.16fr)] lg:items-center">
             <div className="max-w-[34rem]">
-              <h1 className="max-w-[11.6ch] font-display text-[2.45rem] font-semibold leading-[0.96] tracking-[-0.055em] text-white sm:text-[3.2rem] lg:text-[3.75rem]">
+              <h1 className="max-w-[12ch] font-display text-[2.15rem] font-semibold leading-[0.98] tracking-[-0.05em] text-white sm:text-[2.8rem] lg:text-[3.3rem]">
                 AI-Native Care Execution Layer for Healthcare
               </h1>
 
@@ -175,38 +199,71 @@ export default function Home() {
         </section>
 
         <section id="how-it-works" className="mx-auto mt-10 w-full max-w-[1480px] px-0 py-6 sm:py-8 lg:py-10">
-          <div className="max-w-[36rem]">
-            <div className="text-[0.76rem] font-semibold uppercase tracking-[0.28em] text-white/42">How it works</div>
-            <h2 className="mt-4 max-w-[12ch] font-display text-[2.35rem] font-semibold leading-[0.98] tracking-[-0.05em] text-white sm:text-[3rem]">
+          <div className="max-w-[68rem]">
+            <div className="text-[0.76rem] font-semibold uppercase tracking-[0.28em] text-white/42">How it Works</div>
+            <h2 className="mt-4 max-w-[13ch] font-display text-[2.2rem] font-semibold leading-[0.98] tracking-[-0.05em] text-white sm:text-[2.7rem]">
               Three steps. One execution layer.
             </h2>
+            <p className="mt-5 max-w-[62rem] text-[1rem] leading-8 text-white/62 sm:text-[1.04rem]">
+              Sapiens Health builds an AI-native execution layer with three steps — Connect, Prioritize, and Execute — that turns fragmented patient data into completed clinical workflows.
+            </p>
           </div>
 
-          <div className="mt-8 grid gap-4 lg:grid-cols-[1fr_auto_1fr_auto_1fr] lg:items-stretch">
-            {steps.map((step, index) => {
+          <div className="mt-12 space-y-10 lg:space-y-12">
+            {steps.map((step) => {
               const { Icon } = step;
               return (
-                <>
-                  <article
-                    key={step.number}
-                    className="rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(94,82,148,0.78),rgba(75,66,120,0.74))] p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
-                  >
+                <article
+                  key={step.number}
+                  className="grid gap-6 border-t border-white/10 pt-8 lg:grid-cols-[minmax(0,1.08fr)_minmax(320px,0.92fr)] lg:gap-10 lg:pt-10"
+                >
+                  <div className="max-w-[44rem]">
                     <div className="flex items-start justify-between gap-4">
-                      <div className="text-3xl font-semibold tracking-[-0.04em] text-white">{step.number}</div>
-                      <div className="rounded-2xl border border-white/14 bg-black/10 p-3 text-white/80">
+                      <div>
+                        <div className="text-sm font-semibold tracking-[0.24em] text-white/38">{step.number}</div>
+                        <h3 className="mt-4 text-[2rem] font-semibold tracking-[-0.05em] text-white sm:text-[2.25rem]">
+                          {step.title}.
+                        </h3>
+                      </div>
+                      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3 text-white/76">
                         <Icon className="h-6 w-6" strokeWidth={1.6} />
                       </div>
                     </div>
-                    <h3 className="mt-12 text-[2rem] font-semibold tracking-[-0.05em] text-white">{step.title}.</h3>
-                    <p className="mt-4 max-w-[18rem] text-[1rem] leading-8 text-white/82">{step.text}</p>
-                  </article>
 
-                  {index < steps.length - 1 ? (
-                    <div key={`${step.number}-arrow`} className="hidden items-center justify-center text-white/56 lg:flex">
-                      <ArrowRight className="h-8 w-8" strokeWidth={1.5} />
+                    <div className="mt-6 space-y-4 text-[1rem] leading-8 text-white/74">
+                      <p>{step.summary}</p>
+                      <p>{step.detail}</p>
+                      <p className="text-white/92">Result: {step.result}</p>
                     </div>
-                  ) : null}
-                </>
+                  </div>
+
+                  <div className="lg:pl-4">
+                    <div className="rounded-[1.8rem] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02))] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] sm:p-6">
+                      <div className="flex items-center justify-between gap-4">
+                        <div>
+                          <div className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-white/42">{step.demoLabel}</div>
+                          <div className="mt-2 text-lg font-medium tracking-[-0.03em] text-white">{step.demoMeta}</div>
+                        </div>
+                        <div className="rounded-full border border-white/10 px-3 py-1 text-[0.72rem] uppercase tracking-[0.2em] text-white/42">
+                          Placeholder
+                        </div>
+                      </div>
+
+                      <div className="mt-6 rounded-[1.35rem] border border-dashed border-white/12 bg-black/10 p-4">
+                        <div className="grid gap-3">
+                          {step.demoLines.map((line) => (
+                            <div key={line} className="rounded-2xl border border-white/8 bg-white/[0.03] px-4 py-3 text-sm text-white/72">
+                              {line}
+                            </div>
+                          ))}
+                        </div>
+                        <div className="mt-4 rounded-2xl border border-white/8 bg-[#120d1d] px-4 py-5 text-sm leading-7 text-white/40">
+                          Demo surface reserved for product walkthrough, workflow preview, or UI capture.
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </article>
               );
             })}
           </div>
