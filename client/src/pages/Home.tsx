@@ -11,34 +11,6 @@ const logoUrl =
 const heroGraphic =
   "https://d2xsxph8kpxj0f.cloudfront.net/310519663318202729/TdsfYCSbV9xhvU4DsPP84j/sapiens-hospital-hero-v2-aNekoNh4s6oDWSarMqDYVd.webp";
 
-const supportLogos = [
-  {
-    name: "K2I Investment",
-    src: "https://d2xsxph8kpxj0f.cloudfront.net/310519663318202729/TdsfYCSbV9xhvU4DsPP84j/logo-k2i-invest-trans_826e641c.png",
-    className: "h-7 w-auto sm:h-8",
-  },
-  {
-    name: "Texas Medical Center",
-    src: "https://d2xsxph8kpxj0f.cloudfront.net/310519663318202729/TdsfYCSbV9xhvU4DsPP84j/logo-texas-medical-trans_a8802624.png",
-    className: "h-10 w-auto sm:h-11",
-  },
-  {
-    name: "THC",
-    src: "https://d2xsxph8kpxj0f.cloudfront.net/310519663318202729/TdsfYCSbV9xhvU4DsPP84j/logo-thc-trans_4b0f97b4.png",
-    className: "h-6 w-auto sm:h-7",
-  },
-  {
-    name: "NVIDIA Inception Program",
-    src: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663318202729/VsfYuRGWGApWwFyj.png",
-    className: "h-[1.66rem] w-auto sm:h-8",
-  },
-  {
-    name: "Nucleate",
-    src: "https://d2xsxph8kpxj0f.cloudfront.net/310519663318202729/TdsfYCSbV9xhvU4DsPP84j/logo-nucleate-trans_8bb0c215.png",
-    className: "h-8 w-auto sm:h-9",
-  },
-];
-
 const steps = [
   {
     number: "01",
@@ -202,17 +174,6 @@ export default function Home() {
                   className="h-full w-full rounded-[1.6rem] object-cover object-center"
                 />
               </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="mx-auto mt-6 w-full max-w-[1440px] rounded-[2rem] border border-white/10 bg-white/[0.03] px-5 py-5 shadow-[0_22px_60px_rgba(0,0,0,0.18)] backdrop-blur-xl sm:px-8">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-            <div className="text-[0.75rem] font-semibold uppercase tracking-[0.28em] text-white/42">Supported by</div>
-            <div className="flex flex-wrap items-center gap-x-8 gap-y-4 opacity-90 sm:gap-x-10">
-              {supportLogos.map((logo) => (
-                <img key={logo.name} src={logo.src} alt={`${logo.name} logo`} className={`${logo.className} object-contain`} />
-              ))}
             </div>
           </div>
         </section>
