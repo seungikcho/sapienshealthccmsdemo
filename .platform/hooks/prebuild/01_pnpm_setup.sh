@@ -1,5 +1,7 @@
 #!/bin/bash
-echo "Enabling Corepack and configuring pnpm for Sapiens Health Monolith..."
+set -euo pipefail
+
+echo "Enabling Corepack and configuring pnpm for Sapiens Health..."
 corepack enable
 corepack prepare pnpm@10.4.1 --activate
 

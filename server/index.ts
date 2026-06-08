@@ -66,7 +66,15 @@ async function startServer() {
   });
 
   // ─── Auth ──────────────────────────────────────────────────────────────────
+  const isDevMode =
+    process.env.NODE_ENV !== "production" &&
+    (!process.env.GOOGLE_CLIENT_ID || process.env.GOOGLE_CLIENT_ID === "placeholder");
+
   app.get("/api/auth/status", (req, res) => {
+    if (isDevMode) {
+      res.json({ authenticated: true, email: "dev@localhost" });
+      return;
+    }
     res.json({
       authenticated: Boolean(req.session.googleTokens),
       email: req.session.userEmail ?? null,
@@ -74,6 +82,10 @@ async function startServer() {
   });
 
   app.get("/api/auth/google", (_req, res) => {
+    if (isDevMode) {
+      res.redirect(process.env.CLIENT_POST_AUTH_URL || "http://localhost:3000/patients");
+      return;
+    }
     try {
       res.redirect(generateConsentUrl());
     } catch (err) {
