@@ -102,6 +102,11 @@
     },
     "overrides": {
       "tailwindcss>nanoid": "3.3.7"
+    },
+    "peerDependencyRules": {
+      "allowedVersions": {
+        "@builder.io/vite-plugin-jsx-loc>vite": "7"
+      }
     }
   }
 }

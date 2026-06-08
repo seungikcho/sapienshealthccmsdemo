@@ -1,0 +1,3 @@
+# Keep shell scripts (e.g. AWS Elastic Beanstalk .platform hooks) as LF so they
+# execute on Linux — a CRLF shebang fails with "/bin/bash^M: bad interpreter".
+*.sh text eol=lf
