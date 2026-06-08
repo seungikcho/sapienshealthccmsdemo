@@ -3,7 +3,7 @@ Design philosophy for this page: A dark editorial product homepage inspired by p
 The layout should feel like a real company website with concise product framing, clear navigation,
 and standard public-facing sections instead of meta commentary about website readiness.
 */
-import { ArrowRight, Building2, CalendarClock, ChevronRight, Mail, Sparkles, Stethoscope } from "lucide-react";
+import { ArrowRight, Building2, CalendarClock, ChevronRight, LogIn, Mail, Sparkles, Stethoscope } from "lucide-react";
 
 type ModalityTile = {
   label: string;
@@ -280,6 +280,13 @@ export default function Home() {
             >
               Request evaluation
             </a>
+            <a
+              href="/patients"
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-[linear-gradient(135deg,#d8b1ff_0%,#9c8cff_56%,#81ddff_100%)] px-5 py-2.5 text-sm font-semibold text-[#080612] shadow-[0_14px_34px_rgba(145,118,255,0.34)] transition hover:-translate-y-0.5"
+            >
+              <LogIn className="h-4 w-4" />
+              Provider Portal
+            </a>
           </div>
         </div>
       </header>
@@ -305,6 +312,13 @@ export default function Home() {
                 </p>
 
                 <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
+                  <a
+                    href="/patients"
+                    className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[linear-gradient(135deg,#d8b1ff_0%,#9c8cff_56%,#81ddff_100%)] px-6 py-4 text-base font-semibold text-[#080612] shadow-[0_18px_44px_rgba(145,118,255,0.34)] transition hover:-translate-y-0.5"
+                  >
+                    <LogIn className="h-4 w-4" />
+                    Provider Portal Login
+                  </a>
                   <a
                     href={evaluationHref}
                     className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/14 bg-white/[0.04] px-6 py-4 text-base font-semibold text-white transition duration-300 hover:-translate-y-0.5 hover:bg-white/[0.07]"

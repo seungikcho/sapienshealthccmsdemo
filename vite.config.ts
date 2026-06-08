@@ -171,6 +171,13 @@ export default defineConfig({
     port: 3000,
     strictPort: false, // Will find next available port if 3000 is busy
     host: true,
+    proxy: {
+      // Forward API calls to the Express server in development.
+      "/api": {
+        target: "http://localhost:3001",
+        changeOrigin: true,
+      },
+    },
     allowedHosts: [
       ".manuspre.computer",
       ".manus.computer",
