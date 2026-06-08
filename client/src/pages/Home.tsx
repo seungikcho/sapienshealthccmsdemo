@@ -189,6 +189,21 @@ export default function Home() {
               <div className="hero-cutout-shell relative min-h-[21rem] sm:min-h-[24rem] lg:min-h-[31rem]">
                 <div className="hero-cutout-glow hero-cutout-glow-a" />
                 <div className="hero-cutout-glow hero-cutout-glow-b" />
+                <div className="hero-assist-card hero-assist-card-one">
+                  <p className="hero-assist-label">CONNECT</p>
+                  <p className="hero-assist-title">Claims, EHR, labs live</p>
+                  <p className="hero-assist-copy">Sapiens syncs fragmented inputs into one care execution view.</p>
+                </div>
+                <div className="hero-assist-card hero-assist-card-two">
+                  <p className="hero-assist-label">DRAFT</p>
+                  <p className="hero-assist-title">Follow-up drafted</p>
+                  <p className="hero-assist-copy">Call script, medication review, and next-step note prepared automatically.</p>
+                </div>
+                <div className="hero-assist-card hero-assist-card-three">
+                  <p className="hero-assist-label">QUEUE</p>
+                  <p className="hero-assist-title">Priority tasks ready</p>
+                  <p className="hero-assist-copy">Discharge outreach, coordinator handoff, and PCP review are sequenced.</p>
+                </div>
                 <img
                   src={heroTransparentGraphic}
                   alt="Doctor using Sapiens Health care execution interface"
