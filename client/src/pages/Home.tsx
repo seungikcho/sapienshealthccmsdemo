@@ -10,6 +10,9 @@ const logoUrl =
 
 const heroGraphic =
   "https://d2xsxph8kpxj0f.cloudfront.net/310519663318202729/TdsfYCSbV9xhvU4DsPP84j/sapiens-hospital-hero-v2-aNekoNh4s6oDWSarMqDYVd.webp";
+const heroAnimationPoster =
+  "https://d2xsxph8kpxj0f.cloudfront.net/310519663318202729/TdsfYCSbV9xhvU4DsPP84j/sapiens-hero-animation-reference-7m8zxTEKZzoVWqih6AVNcd.webp";
+const heroAnimationVideo = "/manus-storage/sapiens-hero-product-concept-6s_ae30c3a3.mp4";
 
 const steps = [
   {
@@ -189,11 +192,23 @@ export default function Home() {
             <div className="relative lg:max-w-[47rem] lg:justify-self-end">
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_84%_18%,rgba(127,103,214,0.16),transparent_24%)] blur-2xl" />
               <div className="relative overflow-hidden rounded-[1.9rem] border border-white/8 bg-[#1b142b] p-2 shadow-[0_28px_70px_rgba(17,11,34,0.42)] lg:p-3">
-                <img
-                  src={heroGraphic}
-                  alt="Sapiens Health care execution interface"
+                <video
+                  src={heroAnimationVideo}
+                  poster={heroAnimationPoster}
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  preload="auto"
+                  aria-label="Sapiens Health care execution concept animation"
                   className="h-full w-full rounded-[1.6rem] object-cover object-center"
-                />
+                >
+                  <img
+                    src={heroGraphic}
+                    alt="Sapiens Health care execution interface"
+                    className="h-full w-full rounded-[1.6rem] object-cover object-center"
+                  />
+                </video>
               </div>
             </div>
           </div>
