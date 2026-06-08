@@ -228,7 +228,7 @@ section headings, and restrained motion so the page feels polished, spacious, an
   .hero-cutout-frame {
     position: relative;
     z-index: 10;
-    margin-top: 1.7rem;
+    margin-top: 3.55rem;
     margin-right: 4.4rem;
     margin-left: auto;
     width: fit-content;
@@ -319,7 +319,7 @@ section headings, and restrained motion so the page feels polished, spacious, an
 
   @media (max-width: 1023px) {
     .hero-cutout-frame {
-      margin-top: 1rem;
+      margin-top: 2.2rem;
       margin-right: 1.15rem;
       padding: 0;
     }
@@ -335,7 +335,7 @@ section headings, and restrained motion so the page feels polished, spacious, an
   @media (max-width: 767px) {
     .hero-cutout-frame {
       margin-right: auto;
-      margin-top: 0.65rem;
+      margin-top: 1.15rem;
       padding: 0;
     }
 
