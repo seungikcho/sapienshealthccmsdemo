@@ -8,7 +8,7 @@ import { FileStack, ListTodo, Mail, Sparkles } from "lucide-react";
 const logoUrl =
   "https://d36hbw14aib5lz.cloudfront.net/310519663318202729/TdsfYCSbV9xhvU4DsPP84j/sapienslabs-logo-delta-s-ZjHQetHDXzKos43yZtYjhG.webp?Expires=1807943486&Signature=bfdsDHdM6VbnOCGdixbHpPYBMIrYD2Iaoli5PD2tmAlSbGwChYR7nNxUJIRSQ2Pliwgd7Vz3RvRDPXKLq87uJM5lNGBrieObDqPDN~gGsfmBUgMg-mB-7KN3h~BkL14M12o3i9aw89YHbu2KvJHqdAQPvU~X3MIYpnWR2DSTuKXoNitY490GJbM5LmyBIL2FezT~o04fHDRaALkBcifH7eKRlLab7boYuNTC3G4WEPXTyIyBDoPUZrPps1lyVnu~71IYflncNFZkMiadkvu7DAO5Vs1LfO7qBrII9lx8MzsA4lyPZmJugxjgK8DJ2Dtf1YNTCctpMCNZBxrDmNg8Lw__&Key-Pair-Id=K1MP89RTKNH4J";
 
-const heroTransparentGraphic = "/manus-storage/sapiens-doctor-hero-transparent-clean_908329fd.png";
+const heroTransparentGraphic = "/manus-storage/sapiens-doctor-hero-transparent-final_6a65ad22.png";
 
 const steps = [
   {
@@ -189,8 +189,6 @@ export default function Home() {
               <div className="hero-cutout-shell relative min-h-[21rem] sm:min-h-[24rem] lg:min-h-[31rem]">
                 <div className="hero-cutout-glow hero-cutout-glow-a" />
                 <div className="hero-cutout-glow hero-cutout-glow-b" />
-                <div className="hero-cutout-orb hero-cutout-orb-a" />
-                <div className="hero-cutout-orb hero-cutout-orb-b" />
                 <img
                   src={heroTransparentGraphic}
                   alt="Doctor using Sapiens Health care execution interface"
