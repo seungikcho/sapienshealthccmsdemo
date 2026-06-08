@@ -8,11 +8,7 @@ import { FileStack, ListTodo, Mail, Sparkles } from "lucide-react";
 const logoUrl =
   "https://d36hbw14aib5lz.cloudfront.net/310519663318202729/TdsfYCSbV9xhvU4DsPP84j/sapienslabs-logo-delta-s-ZjHQetHDXzKos43yZtYjhG.webp?Expires=1807943486&Signature=bfdsDHdM6VbnOCGdixbHpPYBMIrYD2Iaoli5PD2tmAlSbGwChYR7nNxUJIRSQ2Pliwgd7Vz3RvRDPXKLq87uJM5lNGBrieObDqPDN~gGsfmBUgMg-mB-7KN3h~BkL14M12o3i9aw89YHbu2KvJHqdAQPvU~X3MIYpnWR2DSTuKXoNitY490GJbM5LmyBIL2FezT~o04fHDRaALkBcifH7eKRlLab7boYuNTC3G4WEPXTyIyBDoPUZrPps1lyVnu~71IYflncNFZkMiadkvu7DAO5Vs1LfO7qBrII9lx8MzsA4lyPZmJugxjgK8DJ2Dtf1YNTCctpMCNZBxrDmNg8Lw__&Key-Pair-Id=K1MP89RTKNH4J";
 
-const heroGraphic =
-  "https://d2xsxph8kpxj0f.cloudfront.net/310519663318202729/TdsfYCSbV9xhvU4DsPP84j/sapiens-hospital-hero-v2-aNekoNh4s6oDWSarMqDYVd.webp";
-const heroAnimationPoster =
-  "https://d2xsxph8kpxj0f.cloudfront.net/310519663318202729/TdsfYCSbV9xhvU4DsPP84j/sapiens-hero-animation-reference-7m8zxTEKZzoVWqih6AVNcd.webp";
-const heroAnimationVideo = "/manus-storage/sapiens-hero-product-concept-6s_ae30c3a3.mp4";
+const heroTransparentGraphic = "/manus-storage/sapiens-doctor-hero-transparent-clean_908329fd.png";
 
 const steps = [
   {
@@ -190,25 +186,16 @@ export default function Home() {
             </div>
 
             <div className="relative lg:max-w-[47rem] lg:justify-self-end">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_84%_18%,rgba(127,103,214,0.16),transparent_24%)] blur-2xl" />
-              <div className="relative overflow-hidden rounded-[1.9rem] border border-white/8 bg-[#1b142b] p-2 shadow-[0_28px_70px_rgba(17,11,34,0.42)] lg:p-3">
-                <video
-                  src={heroAnimationVideo}
-                  poster={heroAnimationPoster}
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  preload="auto"
-                  aria-label="Sapiens Health care execution concept animation"
-                  className="h-full w-full rounded-[1.6rem] object-cover object-center"
-                >
-                  <img
-                    src={heroGraphic}
-                    alt="Sapiens Health care execution interface"
-                    className="h-full w-full rounded-[1.6rem] object-cover object-center"
-                  />
-                </video>
+              <div className="hero-cutout-shell relative min-h-[21rem] sm:min-h-[24rem] lg:min-h-[31rem]">
+                <div className="hero-cutout-glow hero-cutout-glow-a" />
+                <div className="hero-cutout-glow hero-cutout-glow-b" />
+                <div className="hero-cutout-orb hero-cutout-orb-a" />
+                <div className="hero-cutout-orb hero-cutout-orb-b" />
+                <img
+                  src={heroTransparentGraphic}
+                  alt="Doctor using Sapiens Health care execution interface"
+                  className="hero-cutout-image relative z-10 ml-auto w-full max-w-[46rem] object-contain"
+                />
               </div>
             </div>
           </div>
