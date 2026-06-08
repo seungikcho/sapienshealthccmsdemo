@@ -55,6 +55,16 @@ async function startServer() {
     }),
   );
 
+  // Trailing-slash tolerance: rewrite /api/foo/ → /api/foo before routing so the
+  // OAuth redirect (or any browser-appended slash) never 404s. Query string and
+  // request method/body are preserved (no redirect).
+  app.use((req, _res, next) => {
+    if (req.path.length > 1 && req.path.endsWith("/")) {
+      req.url = req.path.replace(/\/+$/, "") + req.url.slice(req.path.length);
+    }
+    next();
+  });
+
   // ─── Auth ──────────────────────────────────────────────────────────────────
   app.get("/api/auth/status", (req, res) => {
     res.json({
