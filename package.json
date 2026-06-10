@@ -75,6 +75,7 @@
     "@types/express": "4.17.21",
     "@types/express-session": "^1.19.0",
     "@types/google.maps": "^3.58.1",
+    "@types/multer": "^2.1.0",
     "@types/node": "^24.7.0",
     "@types/react": "^19.2.1",
     "@types/react-dom": "^19.2.1",
@@ -83,6 +84,7 @@
     "autoprefixer": "^10.4.20",
     "concurrently": "^10.0.3",
     "esbuild": "^0.25.0",
+    "multer": "^2.1.1",
     "pnpm": "^10.15.1",
     "postcss": "^8.4.47",
     "prettier": "^3.6.2",
@@ -96,7 +98,10 @@
   },
   "packageManager": "pnpm@10.4.1+sha512.c753b6c3ad7afa13af388fa6d808035a008e30ea9993f58c6663e2bc5ff21679aa834db094987129aa4d488b86df57f7b634981b2f827cdcacc698cc0cfb88af",
   "pnpm": {
-    "onlyBuiltDependencies": ["@tailwindcss/oxide", "esbuild"],
+    "onlyBuiltDependencies": [
+      "@tailwindcss/oxide",
+      "esbuild"
+    ],
     "patchedDependencies": {
       "wouter@3.7.1": "patches/wouter@3.7.1.patch"
     },
