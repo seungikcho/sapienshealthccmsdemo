@@ -1,0 +1,7 @@
+# Don't upload these to EB (built on server via platform hook)
+dist/
+node_modules/
+.pnpm-store/
+*.log
+.env
+.env.*
