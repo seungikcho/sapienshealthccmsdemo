@@ -1,0 +1,48 @@
+# 1. Save this to /etc/nginx/sites-available/sapienshealth
+# 2. Create symlink by `sudo ln -s /etc/nginx/sites-available/sapienshealth /etc/nginx/sites-enabled/`
+
+# Redirect HTTP to HTTPS
+server {
+    if ($host = sapienshealth.co) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+
+    listen 80;
+    server_name sapienshealth.co;
+
+    # Redirect all HTTP requests to HTTPS
+    return 301 https://$host$request_uri;
+}
+
+# HTTPS server
+server {
+    listen 443 ssl;
+    server_name sapienshealth.co;
+
+    # SSL certificate configuration
+    ssl_certificate /etc/letsencrypt/live/sapienshealth.co/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/sapienshealth.co/privkey.pem; # managed by Certbot
+
+    # SSL settings
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_prefer_server_ciphers on;
+    ssl_ciphers 'ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256';
+    ssl_session_timeout 1d;
+    ssl_session_cache shared:SSL:50m;
+    ssl_stapling on;
+    ssl_stapling_verify on;
+
+    # HSTS (optional but recommended)
+    add_header Strict-Transport-Security "max-age=63072000" always;
+
+    # Proxy to Express
+    location / {
+        proxy_pass http://localhost:3001;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+}
