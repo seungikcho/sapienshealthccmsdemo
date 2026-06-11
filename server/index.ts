@@ -41,6 +41,9 @@ async function startServer() {
   const app = express();
   const server = createServer(app);
 
+  // Trust EB/ALB load balancer so secure cookies work behind HTTPS termination
+  app.set("trust proxy", 1);
+
   app.use(express.json());
   app.use(
     session({
