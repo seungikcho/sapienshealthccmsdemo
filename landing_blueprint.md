@@ -10,14 +10,14 @@
 
 ## Information architecture
 
-| Section | Purpose | Content direction |
-| --- | --- | --- |
-| Hero | 제품의 한 줄 정의와 행동 유도 | AI-native execution layer, fragmented data to completed workflows, demo CTA |
-| Problem | 왜 지금 이 제품이 필요한지 설명 | value-based care, execution bottleneck, missed reimbursement, admin burden |
-| Three-step flow | 제품 동작 원리를 가장 직관적으로 전달 | Connect, Prioritize, Execute 카드 3개와 짧은 설명 |
-| Output / proof | 실제 팀이 무엇을 얻게 되는지 보여줌 | unified care context, ranked task queue, admin review before send |
-| Outcomes | 임상·운영·재무 측면의 변화 요약 | saved time, task completion, revenue capture, quality windows |
-| Final CTA | 전환 유도 | demo 또는 inquiry 연결 |
+| Section         | Purpose                               | Content direction                                                           |
+| --------------- | ------------------------------------- | --------------------------------------------------------------------------- |
+| Hero            | 제품의 한 줄 정의와 행동 유도         | AI-native execution layer, fragmented data to completed workflows, demo CTA |
+| Problem         | 왜 지금 이 제품이 필요한지 설명       | value-based care, execution bottleneck, missed reimbursement, admin burden  |
+| Three-step flow | 제품 동작 원리를 가장 직관적으로 전달 | Connect, Prioritize, Execute 카드 3개와 짧은 설명                           |
+| Output / proof  | 실제 팀이 무엇을 얻게 되는지 보여줌   | unified care context, ranked task queue, admin review before send           |
+| Outcomes        | 임상·운영·재무 측면의 변화 요약       | saved time, task completion, revenue capture, quality windows               |
+| Final CTA       | 전환 유도                             | demo 또는 inquiry 연결                                                      |
 
 ## Visual system
 

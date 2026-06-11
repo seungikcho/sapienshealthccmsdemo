@@ -6,7 +6,8 @@ const require = createRequire(import.meta.url);
 const { Image, createCanvas } = require("canvas");
 
 const inputPath = "/home/ubuntu/upload/pasted_file_Nae9Hz_image.png";
-const outputPath = "/home/ubuntu/webdev-static-assets/sapiens-doctor-hero-transparent-clean.png";
+const outputPath =
+  "/home/ubuntu/webdev-static-assets/sapiens-doctor-hero-transparent-clean.png";
 
 const img = new Image();
 img.src = fs.readFileSync(inputPath);
@@ -28,7 +29,7 @@ const queue = new Uint32Array(width * height);
 let head = 0;
 let tail = 0;
 
-const isNearBlack = (idx) => {
+const isNearBlack = idx => {
   const r = data[idx];
   const g = data[idx + 1];
   const b = data[idx + 2];

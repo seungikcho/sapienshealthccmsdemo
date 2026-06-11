@@ -10,20 +10,20 @@ The redesign needs a balanced set of assets. At minimum, the page should include
 
 ## Required asset categories
 
-| Category | Purpose |
-|---|---|
-| Hero brand visual | Establish a premium first impression with Sapiens Health colors and deep-tech mood |
-| Clinical imaging visuals | Show CT, scan, pathology, and monitoring-style inputs in a recognizable way |
-| Product framework graphics | Present the MEDMIX flow as a clean platform story rather than a research diagram |
-| Small icons and visual labels | Improve readability and help users understand each module quickly |
-| Motion treatments | Add subtle movement to image cards, background shapes, and engine activity |
+| Category                      | Purpose                                                                            |
+| ----------------------------- | ---------------------------------------------------------------------------------- |
+| Hero brand visual             | Establish a premium first impression with Sapiens Health colors and deep-tech mood |
+| Clinical imaging visuals      | Show CT, scan, pathology, and monitoring-style inputs in a recognizable way        |
+| Product framework graphics    | Present the MEDMIX flow as a clean platform story rather than a research diagram   |
+| Small icons and visual labels | Improve readability and help users understand each module quickly                  |
+| Motion treatments             | Add subtle movement to image cards, background shapes, and engine activity         |
 
 ## Implementation priorities
 
-| Priority | Goal |
-|---|---|
-| 1 | Fix full-screen desktop scaling and section width usage |
-| 2 | Replace text-heavy blocks with larger visual modules |
-| 3 | Introduce real or generated healthcare imagery into key sections |
-| 4 | Rebuild the framework section in a simpler, more elegant product language |
-| 5 | Validate responsive behavior after the visual rebuild |
+| Priority | Goal                                                                      |
+| -------- | ------------------------------------------------------------------------- |
+| 1        | Fix full-screen desktop scaling and section width usage                   |
+| 2        | Replace text-heavy blocks with larger visual modules                      |
+| 3        | Introduce real or generated healthcare imagery into key sections          |
+| 4        | Rebuild the framework section in a simpler, more elegant product language |
+| 5        | Validate responsive behavior after the visual rebuild                     |

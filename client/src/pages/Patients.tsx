@@ -1,6 +1,12 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
-import { LogOut, FlaskConical, GitBranch, FileText, BookOpen } from "lucide-react";
+import {
+  LogOut,
+  FlaskConical,
+  GitBranch,
+  FileText,
+  BookOpen,
+} from "lucide-react";
 
 const tools = [
   {
@@ -24,7 +30,8 @@ const tools = [
   {
     icon: BookOpen,
     label: "Medical Document Reader",
-    description: "Extract and summarize key information from medical documents.",
+    description:
+      "Extract and summarize key information from medical documents.",
     href: null,
   },
 ];
@@ -35,8 +42,8 @@ export default function Patients() {
 
   useEffect(() => {
     fetch("/api/auth/status")
-      .then((r) => r.json())
-      .then((d) => {
+      .then(r => r.json())
+      .then(d => {
         if (!d.authenticated) setLocation("/login");
         else setEmail(d.email ?? null);
       })
@@ -57,9 +64,15 @@ export default function Patients() {
 
       {/* Header */}
       <header className="relative z-20 flex items-center justify-between px-8 py-5 sm:px-14 lg:px-20">
-        <a href="/" className="font-wordmark text-white">Sapiens Health</a>
+        <a href="/" className="font-wordmark text-white">
+          Sapiens Health
+        </a>
         <div className="flex items-center gap-4">
-          {email && <span className="hidden text-xs text-white/40 sm:inline">{email}</span>}
+          {email && (
+            <span className="hidden text-xs text-white/40 sm:inline">
+              {email}
+            </span>
+          )}
           <button
             onClick={logout}
             className="inline-flex items-center gap-1.5 rounded-full border border-white/12 bg-white/[0.05] px-4 py-2 text-sm text-white/60 transition hover:bg-white/[0.1] hover:text-white"
@@ -73,7 +86,6 @@ export default function Patients() {
       {/* Main */}
       <main className="relative z-10 px-8 pb-28 pt-16 sm:px-14 lg:px-20">
         <div className="mx-auto max-w-[860px]">
-
           {/* Welcome heading */}
           <h1 className="font-display text-[2.2rem] font-semibold leading-[1.08] tracking-[-0.05em] sm:text-[2.8rem] lg:text-[3.2rem]">
             <span className="text-white">Welcome,</span>
@@ -87,7 +99,7 @@ export default function Patients() {
               <a
                 key={label}
                 href={href ?? undefined}
-                onClick={!href ? (e) => e.preventDefault() : undefined}
+                onClick={!href ? e => e.preventDefault() : undefined}
                 className={`group flex flex-col items-start gap-4 rounded-[1.4rem] border border-white/10 bg-white/[0.04] p-6 text-left transition duration-200 hover:-translate-y-1 hover:border-[#c8b7ff]/30 hover:bg-white/[0.07] ${!href ? "cursor-default opacity-60" : ""}`}
               >
                 <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-[#c8b7ff]/10 text-[#c8b7ff] transition group-hover:bg-[#c8b7ff]/18">
@@ -104,7 +116,6 @@ export default function Patients() {
               </a>
             ))}
           </div>
-
         </div>
       </main>
     </div>

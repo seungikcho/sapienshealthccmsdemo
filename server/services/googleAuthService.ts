@@ -14,7 +14,7 @@ export function createOAuthClient() {
   return new google.auth.OAuth2(
     required("GOOGLE_CLIENT_ID"),
     required("GOOGLE_CLIENT_SECRET"),
-    required("GOOGLE_REDIRECT_URI"),
+    required("GOOGLE_REDIRECT_URI")
   );
 }
 
@@ -31,7 +31,9 @@ export function generateConsentUrl(): string {
 }
 
 /** Exchange an authorization code (from the callback) for OAuth tokens. */
-export async function exchangeCodeForTokens(code: string): Promise<Auth.Credentials> {
+export async function exchangeCodeForTokens(
+  code: string
+): Promise<Auth.Credentials> {
   const { tokens } = await createOAuthClient().getToken(code);
   return tokens;
 }

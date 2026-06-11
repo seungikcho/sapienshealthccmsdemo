@@ -1,5 +1,14 @@
 import { useRef, useState, useEffect } from "react";
-import { ArrowLeft, Mic, MicOff, FileText, Copy, Check, Loader2, RotateCcw } from "lucide-react";
+import {
+  ArrowLeft,
+  Mic,
+  MicOff,
+  FileText,
+  Copy,
+  Check,
+  Loader2,
+  RotateCcw,
+} from "lucide-react";
 
 type Step = "idle" | "recording" | "recorded" | "generating" | "done";
 
@@ -25,7 +34,9 @@ export default function MeetingNoteGenerator() {
   const finalRef = useRef("");
   const interimRef = useRef("");
 
-  const canRecord = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+  const canRecord = !!(
+    window.SpeechRecognition || window.webkitSpeechRecognition
+  );
 
   function makeRecognition(): SpeechRecognition {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -34,7 +45,7 @@ export default function MeetingNoteGenerator() {
     rec.interimResults = true;
     rec.lang = "en-US";
 
-    rec.onresult = (e) => {
+    rec.onresult = e => {
       let fin = "";
       let interim = "";
       for (let i = 0; i < e.results.length; i++) {
@@ -46,7 +57,7 @@ export default function MeetingNoteGenerator() {
       setTranscript(fin + interim);
     };
 
-    rec.onerror = (e) => {
+    rec.onerror = e => {
       if ((e as SpeechRecognitionErrorEvent).error === "no-speech") return;
       doStop();
     };
@@ -147,7 +158,13 @@ export default function MeetingNoteGenerator() {
   }
 
   const stepLabels = ["Connect", "Organize", "Execute"];
-  const stepIdx = { idle: 0, recording: 0, recorded: 1, generating: 1, done: 2 };
+  const stepIdx = {
+    idle: 0,
+    recording: 0,
+    recorded: 1,
+    generating: 1,
+    done: 2,
+  };
   const currentIdx = stepIdx[step];
 
   return (
@@ -157,14 +174,16 @@ export default function MeetingNoteGenerator() {
       </div>
 
       <header className="relative z-20 flex items-center gap-4 px-8 py-5 sm:px-14 lg:px-20">
-        <a href="/patients" className="inline-flex items-center gap-2 text-sm text-white/50 transition hover:text-white">
+        <a
+          href="/patients"
+          className="inline-flex items-center gap-2 text-sm text-white/50 transition hover:text-white"
+        >
           <ArrowLeft className="h-4 w-4" /> Dashboard
         </a>
       </header>
 
       <main className="relative z-10 px-8 pb-28 pt-6 sm:px-14 lg:px-20">
         <div className="mx-auto max-w-[720px]">
-
           <h1 className="font-display text-[2rem] font-semibold tracking-[-0.04em] text-white sm:text-[2.4rem]">
             Meeting Note Generator
           </h1>
@@ -177,23 +196,30 @@ export default function MeetingNoteGenerator() {
             {stepLabels.map((s, i) => (
               <span key={s} className="flex items-center gap-2">
                 {i > 0 && <span className="h-px w-6 bg-white/14" />}
-                <span className={i <= currentIdx ? "text-[#c8b7ff] font-medium" : ""}>{s}</span>
+                <span
+                  className={
+                    i <= currentIdx ? "text-[#c8b7ff] font-medium" : ""
+                  }
+                >
+                  {s}
+                </span>
               </span>
             ))}
           </div>
 
           <div className="mt-8 flex flex-col gap-6">
-
             {/* ── IDLE / RECORDING ── */}
             {(step === "idle" || step === "recording") && (
               <>
                 {/* Patient name */}
                 <div className="flex flex-col gap-2">
-                  <label className="text-sm font-medium text-white/70">Patient Name</label>
+                  <label className="text-sm font-medium text-white/70">
+                    Patient Name
+                  </label>
                   <input
                     type="text"
                     value={patientName}
-                    onChange={(e) => setPatientName(e.target.value)}
+                    onChange={e => setPatientName(e.target.value)}
                     placeholder="e.g. John Doe"
                     disabled={step === "recording"}
                     className="rounded-[1rem] border border-white/12 bg-white/[0.04] px-4 py-3 text-sm text-white placeholder-white/28 outline-none transition focus:border-[#c8b7ff]/50 focus:bg-white/[0.06] disabled:opacity-50"
@@ -208,11 +234,15 @@ export default function MeetingNoteGenerator() {
 
                 {/* Record button + status */}
                 <div className="flex flex-col gap-3">
-                  <label className="text-sm font-medium text-white/70">Visit Recording</label>
+                  <label className="text-sm font-medium text-white/70">
+                    Visit Recording
+                  </label>
 
                   <div className="flex items-center gap-4">
                     <button
-                      onClick={step === "recording" ? stopRecording : startRecording}
+                      onClick={
+                        step === "recording" ? stopRecording : startRecording
+                      }
                       disabled={!canRecord}
                       className={`inline-flex items-center gap-2.5 rounded-full px-6 py-3 text-sm font-semibold transition duration-200 disabled:opacity-40 ${
                         step === "recording"
@@ -221,9 +251,13 @@ export default function MeetingNoteGenerator() {
                       }`}
                     >
                       {step === "recording" ? (
-                        <><MicOff className="h-4 w-4" /> Stop Recording</>
+                        <>
+                          <MicOff className="h-4 w-4" /> Stop Recording
+                        </>
                       ) : (
-                        <><Mic className="h-4 w-4" /> Start Recording</>
+                        <>
+                          <Mic className="h-4 w-4" /> Start Recording
+                        </>
                       )}
                     </button>
 
@@ -238,12 +272,16 @@ export default function MeetingNoteGenerator() {
                   {/* Live transcript */}
                   {transcript ? (
                     <div className="rounded-[1.1rem] border border-white/10 bg-white/[0.03] p-4 min-h-[120px] max-h-[200px] overflow-y-auto">
-                      <p className="text-sm leading-7 text-white/70 whitespace-pre-wrap">{transcript}</p>
+                      <p className="text-sm leading-7 text-white/70 whitespace-pre-wrap">
+                        {transcript}
+                      </p>
                     </div>
                   ) : (
                     <div className="flex h-[100px] items-center justify-center rounded-[1.1rem] border border-dashed border-white/10 bg-white/[0.02]">
                       <p className="text-xs text-white/28">
-                        {step === "recording" ? "Listening…" : "Transcript will appear here while recording"}
+                        {step === "recording"
+                          ? "Listening…"
+                          : "Transcript will appear here while recording"}
                       </p>
                     </div>
                   )}
@@ -255,9 +293,16 @@ export default function MeetingNoteGenerator() {
             {step === "recorded" && (
               <>
                 <div className="flex items-center justify-between">
-                  <h2 className="text-base font-semibold text-white">Review &amp; Generate</h2>
+                  <h2 className="text-base font-semibold text-white">
+                    Review &amp; Generate
+                  </h2>
                   <button
-                    onClick={() => { setStep("idle"); setTranscript(""); finalRef.current = ""; interimRef.current = ""; }}
+                    onClick={() => {
+                      setStep("idle");
+                      setTranscript("");
+                      finalRef.current = "";
+                      interimRef.current = "";
+                    }}
                     className="inline-flex items-center gap-1.5 rounded-full border border-white/14 px-3 py-1.5 text-xs text-white/50 transition hover:bg-white/[0.06] hover:text-white"
                   >
                     <RotateCcw className="h-3 w-3" /> Re-record
@@ -266,11 +311,13 @@ export default function MeetingNoteGenerator() {
 
                 {/* Patient name (editable still) */}
                 <div className="flex flex-col gap-2">
-                  <label className="text-sm font-medium text-white/70">Patient Name</label>
+                  <label className="text-sm font-medium text-white/70">
+                    Patient Name
+                  </label>
                   <input
                     type="text"
                     value={patientName}
-                    onChange={(e) => setPatientName(e.target.value)}
+                    onChange={e => setPatientName(e.target.value)}
                     placeholder="e.g. John Doe"
                     className="rounded-[1rem] border border-white/12 bg-white/[0.04] px-4 py-3 text-sm text-white placeholder-white/28 outline-none transition focus:border-[#c8b7ff]/50 focus:bg-white/[0.06]"
                   />
@@ -279,22 +326,34 @@ export default function MeetingNoteGenerator() {
                 {/* Raw transcript */}
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center justify-between">
-                    <label className="text-sm font-medium text-white/70">Raw Transcript</label>
+                    <label className="text-sm font-medium text-white/70">
+                      Raw Transcript
+                    </label>
                     <button
                       onClick={copyTranscript}
                       className="inline-flex items-center gap-1.5 rounded-full border border-white/14 px-3 py-1 text-xs text-white/50 transition hover:bg-white/[0.06] hover:text-white"
                     >
-                      {copiedTranscript ? <><Check className="h-3 w-3 text-green-400" /> Copied</> : <><Copy className="h-3 w-3" /> Copy</>}
+                      {copiedTranscript ? (
+                        <>
+                          <Check className="h-3 w-3 text-green-400" /> Copied
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="h-3 w-3" /> Copy
+                        </>
+                      )}
                     </button>
                   </div>
                   <textarea
                     value={transcript}
-                    onChange={(e) => setTranscript(e.target.value)}
+                    onChange={e => setTranscript(e.target.value)}
                     rows={6}
                     className="rounded-[1.1rem] border border-white/10 bg-white/[0.03] p-4 text-sm leading-7 text-white/70 outline-none transition resize-none focus:border-[#c8b7ff]/40 focus:bg-white/[0.05]"
                     placeholder="No transcript captured — type manually if needed."
                   />
-                  <p className="text-xs text-white/28">You can edit the transcript before generating.</p>
+                  <p className="text-xs text-white/28">
+                    You can edit the transcript before generating.
+                  </p>
                 </div>
 
                 {error && <p className="text-sm text-rose-400">{error}</p>}
@@ -321,7 +380,9 @@ export default function MeetingNoteGenerator() {
             {step === "done" && (
               <>
                 <div className="flex items-center justify-between">
-                  <h2 className="text-base font-semibold text-white">Visit Note</h2>
+                  <h2 className="text-base font-semibold text-white">
+                    Visit Note
+                  </h2>
                   <button
                     onClick={reset}
                     className="inline-flex items-center gap-1.5 rounded-full border border-white/14 px-3.5 py-1.5 text-xs text-white/60 transition hover:bg-white/[0.06] hover:text-white"
@@ -334,38 +395,61 @@ export default function MeetingNoteGenerator() {
                   {/* Raw transcript */}
                   <div className="flex flex-col gap-2">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-medium uppercase tracking-wider text-white/38">Raw Transcript</span>
+                      <span className="text-xs font-medium uppercase tracking-wider text-white/38">
+                        Raw Transcript
+                      </span>
                       <button
                         onClick={copyTranscript}
                         className="inline-flex items-center gap-1 rounded-full border border-white/12 px-3 py-1 text-xs text-white/40 transition hover:bg-white/[0.06] hover:text-white"
                       >
-                        {copiedTranscript ? <><Check className="h-3 w-3 text-green-400" /> Copied</> : <><Copy className="h-3 w-3" /> Copy</>}
+                        {copiedTranscript ? (
+                          <>
+                            <Check className="h-3 w-3 text-green-400" /> Copied
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="h-3 w-3" /> Copy
+                          </>
+                        )}
                       </button>
                     </div>
                     <div className="rounded-[1.2rem] border border-white/10 bg-white/[0.025] p-4 h-full min-h-[260px] overflow-y-auto">
-                      <p className="text-sm leading-7 text-white/55 whitespace-pre-wrap">{transcript || "—"}</p>
+                      <p className="text-sm leading-7 text-white/55 whitespace-pre-wrap">
+                        {transcript || "—"}
+                      </p>
                     </div>
                   </div>
 
                   {/* Formatted SOAP note */}
                   <div className="flex flex-col gap-2">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-medium uppercase tracking-wider text-white/38">SOAP Note</span>
+                      <span className="text-xs font-medium uppercase tracking-wider text-white/38">
+                        SOAP Note
+                      </span>
                       <button
                         onClick={copyNote}
                         className="inline-flex items-center gap-1 rounded-full border border-[#c8b7ff]/20 px-3 py-1 text-xs text-[#c8b7ff]/70 transition hover:bg-[#c8b7ff]/10 hover:text-[#c8b7ff]"
                       >
-                        {copied ? <><Check className="h-3 w-3 text-green-400" /> Copied</> : <><Copy className="h-3 w-3" /> Copy</>}
+                        {copied ? (
+                          <>
+                            <Check className="h-3 w-3 text-green-400" /> Copied
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="h-3 w-3" /> Copy
+                          </>
+                        )}
                       </button>
                     </div>
                     <div className="rounded-[1.2rem] border border-[#c8b7ff]/20 bg-[#c8b7ff]/[0.04] p-4 h-full min-h-[260px] overflow-y-auto">
-                      <pre className="whitespace-pre-wrap font-sans text-sm leading-7 text-white/80">{note}</pre>
+                      <pre className="whitespace-pre-wrap font-sans text-sm leading-7 text-white/80">
+                        {note}
+                      </pre>
                     </div>
                   </div>
                 </div>
               </>
             )}
-
           </div>
         </div>
       </main>

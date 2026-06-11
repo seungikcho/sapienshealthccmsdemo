@@ -26,7 +26,12 @@ const CONTEXT_LABEL: Record<ProfileContext, string> = {
 
 function initials(name: string | null): string {
   if (!name) return "–";
-  return name.split(/\s+/).map((p) => p[0]).slice(0, 2).join("").toUpperCase();
+  return name
+    .split(/\s+/)
+    .map(p => p[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
 }
 
 /** One labeled field section — renders the value(s) or a follow-up flag when missing. */
@@ -56,9 +61,13 @@ function Field({
         )}
       </div>
       {missing ? (
-        <p className="text-sm italic text-muted-foreground/70">Not yet provided</p>
+        <p className="text-sm italic text-muted-foreground/70">
+          Not yet provided
+        </p>
       ) : (
-        <div className="text-sm leading-relaxed text-foreground/90">{children}</div>
+        <div className="text-sm leading-relaxed text-foreground/90">
+          {children}
+        </div>
       )}
     </section>
   );
@@ -85,7 +94,10 @@ export interface PatientProfileCardProps {
   onDraftFollowUp?: (profile: PatientProfile) => void;
 }
 
-export function PatientProfileCard({ profile, onDraftFollowUp }: PatientProfileCardProps) {
+export function PatientProfileCard({
+  profile,
+  onDraftFollowUp,
+}: PatientProfileCardProps) {
   const complete = isProfileComplete(profile);
   const missing = missingFields(profile);
 
@@ -131,23 +143,51 @@ export function PatientProfileCard({ profile, onDraftFollowUp }: PatientProfileC
         <Field icon={User} label="Patient Name" missing={!profile.patientName}>
           {profile.patientName}
         </Field>
-        <Field icon={FileText} label="Context of Situation" missing={!profile.context}>
+        <Field
+          icon={FileText}
+          label="Context of Situation"
+          missing={!profile.context}
+        >
           {profile.context && CONTEXT_LABEL[profile.context]}
         </Field>
-        <Field icon={Stethoscope} label="Symptoms" missing={!profile.symptoms?.length}>
+        <Field
+          icon={Stethoscope}
+          label="Symptoms"
+          missing={!profile.symptoms?.length}
+        >
           {profile.symptoms && <Chips items={profile.symptoms} />}
         </Field>
-        <Field icon={HeartPulse} label="Past Diseases" missing={!profile.pastDiseases?.length}>
+        <Field
+          icon={HeartPulse}
+          label="Past Diseases"
+          missing={!profile.pastDiseases?.length}
+        >
           {profile.pastDiseases && <Chips items={profile.pastDiseases} />}
         </Field>
-        <Field icon={FileText} label="Past Medical Tests" missing={!profile.pastMedicalTests?.length}>
-          {profile.pastMedicalTests && <Chips items={profile.pastMedicalTests} />}
+        <Field
+          icon={FileText}
+          label="Past Medical Tests"
+          missing={!profile.pastMedicalTests?.length}
+        >
+          {profile.pastMedicalTests && (
+            <Chips items={profile.pastMedicalTests} />
+          )}
         </Field>
-        <Field icon={Pill} label="Allergies" missing={!profile.allergies?.length}>
+        <Field
+          icon={Pill}
+          label="Allergies"
+          missing={!profile.allergies?.length}
+        >
           {profile.allergies && <Chips items={profile.allergies} />}
         </Field>
-        <Field icon={Hospital} label="Visited Hospitals" missing={!profile.visitedHospitals?.length}>
-          {profile.visitedHospitals && <Chips items={profile.visitedHospitals} />}
+        <Field
+          icon={Hospital}
+          label="Visited Hospitals"
+          missing={!profile.visitedHospitals?.length}
+        >
+          {profile.visitedHospitals && (
+            <Chips items={profile.visitedHospitals} />
+          )}
         </Field>
       </div>
 

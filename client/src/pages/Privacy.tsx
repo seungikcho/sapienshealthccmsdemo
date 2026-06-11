@@ -18,11 +18,20 @@ export default function Privacy() {
         <div className="mx-auto flex w-full max-w-[1100px] items-center justify-between rounded-full border border-white/10 bg-white/[0.045] px-4 py-3 shadow-[0_0_0_1px_rgba(255,255,255,0.02),0_30px_90px_rgba(0,0,0,0.32)] backdrop-blur-xl sm:px-6">
           <a href="/" className="flex min-w-0 items-center gap-3">
             <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-white/12 bg-black shadow-[0_14px_30px_rgba(0,0,0,0.45)]">
-              <img src={logoUrl} alt="Sapiens Health logo" className="h-full w-full object-cover" />
+              <img
+                src={logoUrl}
+                alt="Sapiens Health logo"
+                className="h-full w-full object-cover"
+              />
             </div>
-            <div className="font-wordmark truncate text-white/96">Sapiens Health</div>
+            <div className="font-wordmark truncate text-white/96">
+              Sapiens Health
+            </div>
           </a>
-          <a href="/" className="inline-flex items-center gap-2 text-sm text-white/68 transition hover:text-white">
+          <a
+            href="/"
+            className="inline-flex items-center gap-2 text-sm text-white/68 transition hover:text-white"
+          >
             <ArrowLeft className="h-4 w-4" />
             Back to home
           </a>
@@ -36,35 +45,59 @@ export default function Privacy() {
             Privacy information for this public website.
           </h1>
           <p className="mt-5 max-w-[48rem] text-base leading-8 text-white/68 sm:text-[1.02rem]">
-            This page explains, at a high level, how Sapiens Health handles information submitted through the public-facing website and direct contact channels.
+            This page explains, at a high level, how Sapiens Health handles
+            information submitted through the public-facing website and direct
+            contact channels.
           </p>
 
           <div className="mt-8 space-y-5">
             <article className="rounded-[1.35rem] border border-white/10 bg-white/[0.03] p-5">
-              <h2 className="text-lg font-semibold tracking-[-0.03em] text-white">Information you may provide</h2>
+              <h2 className="text-lg font-semibold tracking-[-0.03em] text-white">
+                Information you may provide
+              </h2>
               <p className="mt-3 text-sm leading-7 text-white/66 sm:text-[0.98rem]">
-                If you contact Sapiens Health through the public email links on this site, you may choose to provide your name, organization, email address, and the contents of your message.
+                If you contact Sapiens Health through the public email links on
+                this site, you may choose to provide your name, organization,
+                email address, and the contents of your message.
               </p>
             </article>
 
             <article className="rounded-[1.35rem] border border-white/10 bg-white/[0.03] p-5">
-              <h2 className="text-lg font-semibold tracking-[-0.03em] text-white">How website inquiries are used</h2>
+              <h2 className="text-lg font-semibold tracking-[-0.03em] text-white">
+                How website inquiries are used
+              </h2>
               <p className="mt-3 text-sm leading-7 text-white/66 sm:text-[0.98rem]">
-                Information submitted through public contact channels may be used to respond to evaluation requests, partnership inquiries, or general company questions.
+                Information submitted through public contact channels may be
+                used to respond to evaluation requests, partnership inquiries,
+                or general company questions.
               </p>
             </article>
 
             <article className="rounded-[1.35rem] border border-white/10 bg-white/[0.03] p-5">
-              <h2 className="text-lg font-semibold tracking-[-0.03em] text-white">Clinical and sensitive information</h2>
+              <h2 className="text-lg font-semibold tracking-[-0.03em] text-white">
+                Clinical and sensitive information
+              </h2>
               <p className="mt-3 text-sm leading-7 text-white/66 sm:text-[0.98rem]">
-                This public website is informational in nature. Visitors should avoid sending unnecessary patient-identifiable or highly sensitive clinical information through open email channels unless a more appropriate secure workflow has been established.
+                This public website is informational in nature. Visitors should
+                avoid sending unnecessary patient-identifiable or highly
+                sensitive clinical information through open email channels
+                unless a more appropriate secure workflow has been established.
               </p>
             </article>
 
             <article className="rounded-[1.35rem] border border-white/10 bg-white/[0.03] p-5">
-              <h2 className="text-lg font-semibold tracking-[-0.03em] text-white">Questions</h2>
+              <h2 className="text-lg font-semibold tracking-[-0.03em] text-white">
+                Questions
+              </h2>
               <p className="mt-3 text-sm leading-7 text-white/66 sm:text-[0.98rem]">
-                For privacy-related questions about this website, please contact <a className="text-white/88 underline decoration-white/20 underline-offset-4" href="mailto:info@sapienshealth.co?subject=Privacy%20inquiry">info@sapienshealth.co</a>.
+                For privacy-related questions about this website, please contact{" "}
+                <a
+                  className="text-white/88 underline decoration-white/20 underline-offset-4"
+                  href="mailto:info@sapienshealth.co?subject=Privacy%20inquiry"
+                >
+                  info@sapienshealth.co
+                </a>
+                .
               </p>
             </article>
           </div>

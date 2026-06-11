@@ -46,10 +46,15 @@ export const PROFILE_FIELDS = [
   { key: "pastDiseases", label: "Past Diseases" },
   { key: "allergies", label: "Allergies" },
   { key: "visitedHospitals", label: "Visited Hospitals" },
-] as const satisfies ReadonlyArray<{ key: keyof PatientProfile; label: string }>;
+] as const satisfies ReadonlyArray<{
+  key: keyof PatientProfile;
+  label: string;
+}>;
 
 /** A field is "missing" when null, empty string, or empty array — drives follow-up. */
-export function isFieldMissing(value: PatientProfile[keyof PatientProfile]): boolean {
+export function isFieldMissing(
+  value: PatientProfile[keyof PatientProfile]
+): boolean {
   if (value == null) return true;
   if (Array.isArray(value)) return value.length === 0;
   return value === "";
@@ -57,7 +62,9 @@ export function isFieldMissing(value: PatientProfile[keyof PatientProfile]): boo
 
 /** Labels of the seven fields that still need data from the patient. */
 export function missingFields(profile: PatientProfile): string[] {
-  return PROFILE_FIELDS.filter((f) => isFieldMissing(profile[f.key])).map((f) => f.label);
+  return PROFILE_FIELDS.filter(f => isFieldMissing(profile[f.key])).map(
+    f => f.label
+  );
 }
 
 /** True when all seven fields are satisfied (loop terminates → thank-you draft). */
@@ -67,7 +74,11 @@ export function isProfileComplete(profile: PatientProfile): boolean {
 
 /** Deterministic id slug from a patient name — shared by the store and the client. */
 export function profileIdFromName(name: string): string {
-  return name.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+  return name
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 }
 
 /** A fresh profile with only the name populated — all clinical fields await extraction. */

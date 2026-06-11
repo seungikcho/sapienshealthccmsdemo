@@ -18,11 +18,20 @@ export default function Terms() {
         <div className="mx-auto flex w-full max-w-[1100px] items-center justify-between rounded-full border border-white/10 bg-white/[0.045] px-4 py-3 shadow-[0_0_0_1px_rgba(255,255,255,0.02),0_30px_90px_rgba(0,0,0,0.32)] backdrop-blur-xl sm:px-6">
           <a href="/" className="flex min-w-0 items-center gap-3">
             <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-white/12 bg-black shadow-[0_14px_30px_rgba(0,0,0,0.45)]">
-              <img src={logoUrl} alt="Sapiens Health logo" className="h-full w-full object-cover" />
+              <img
+                src={logoUrl}
+                alt="Sapiens Health logo"
+                className="h-full w-full object-cover"
+              />
             </div>
-            <div className="font-wordmark truncate text-white/96">Sapiens Health</div>
+            <div className="font-wordmark truncate text-white/96">
+              Sapiens Health
+            </div>
           </a>
-          <a href="/" className="inline-flex items-center gap-2 text-sm text-white/68 transition hover:text-white">
+          <a
+            href="/"
+            className="inline-flex items-center gap-2 text-sm text-white/68 transition hover:text-white"
+          >
             <ArrowLeft className="h-4 w-4" />
             Back to home
           </a>
@@ -36,35 +45,59 @@ export default function Terms() {
             Terms for use of this public website.
           </h1>
           <p className="mt-5 max-w-[48rem] text-base leading-8 text-white/68 sm:text-[1.02rem]">
-            These terms describe the intended use of the public Sapiens Health website and its informational materials.
+            These terms describe the intended use of the public Sapiens Health
+            website and its informational materials.
           </p>
 
           <div className="mt-8 space-y-5">
             <article className="rounded-[1.35rem] border border-white/10 bg-white/[0.03] p-5">
-              <h2 className="text-lg font-semibold tracking-[-0.03em] text-white">Informational purpose</h2>
+              <h2 className="text-lg font-semibold tracking-[-0.03em] text-white">
+                Informational purpose
+              </h2>
               <p className="mt-3 text-sm leading-7 text-white/66 sm:text-[0.98rem]">
-                This website is provided for general informational and business inquiry purposes. It is intended to explain Sapiens Health, MedMIX, and related company materials at a high level.
+                This website is provided for general informational and business
+                inquiry purposes. It is intended to explain Sapiens Health,
+                MedMIX, and related company materials at a high level.
               </p>
             </article>
 
             <article className="rounded-[1.35rem] border border-white/10 bg-white/[0.03] p-5">
-              <h2 className="text-lg font-semibold tracking-[-0.03em] text-white">No medical advice</h2>
+              <h2 className="text-lg font-semibold tracking-[-0.03em] text-white">
+                No medical advice
+              </h2>
               <p className="mt-3 text-sm leading-7 text-white/66 sm:text-[0.98rem]">
-                Content on this website is not medical advice, diagnosis, treatment guidance, or emergency instruction. Visitors should not rely on this website as a substitute for professional clinical judgment.
+                Content on this website is not medical advice, diagnosis,
+                treatment guidance, or emergency instruction. Visitors should
+                not rely on this website as a substitute for professional
+                clinical judgment.
               </p>
             </article>
 
             <article className="rounded-[1.35rem] border border-white/10 bg-white/[0.03] p-5">
-              <h2 className="text-lg font-semibold tracking-[-0.03em] text-white">External engagement</h2>
+              <h2 className="text-lg font-semibold tracking-[-0.03em] text-white">
+                External engagement
+              </h2>
               <p className="mt-3 text-sm leading-7 text-white/66 sm:text-[0.98rem]">
-                Submitting an inquiry through public contact links does not, by itself, create a commercial, clinical, or advisory relationship. Any deeper engagement would depend on separate communication and agreement.
+                Submitting an inquiry through public contact links does not, by
+                itself, create a commercial, clinical, or advisory relationship.
+                Any deeper engagement would depend on separate communication and
+                agreement.
               </p>
             </article>
 
             <article className="rounded-[1.35rem] border border-white/10 bg-white/[0.03] p-5">
-              <h2 className="text-lg font-semibold tracking-[-0.03em] text-white">Contact</h2>
+              <h2 className="text-lg font-semibold tracking-[-0.03em] text-white">
+                Contact
+              </h2>
               <p className="mt-3 text-sm leading-7 text-white/66 sm:text-[0.98rem]">
-                Questions about these website terms may be directed to <a className="text-white/88 underline decoration-white/20 underline-offset-4" href="mailto:info@sapienshealth.co?subject=Terms%20inquiry">info@sapienshealth.co</a>.
+                Questions about these website terms may be directed to{" "}
+                <a
+                  className="text-white/88 underline decoration-white/20 underline-offset-4"
+                  href="mailto:info@sapienshealth.co?subject=Terms%20inquiry"
+                >
+                  info@sapienshealth.co
+                </a>
+                .
               </p>
             </article>
           </div>

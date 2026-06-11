@@ -49,14 +49,16 @@ export default function LabTestSearch() {
       </div>
 
       <header className="relative z-20 flex items-center gap-4 px-8 py-5 sm:px-14 lg:px-20">
-        <a href="/patients" className="inline-flex items-center gap-2 text-sm text-white/50 transition hover:text-white">
+        <a
+          href="/patients"
+          className="inline-flex items-center gap-2 text-sm text-white/50 transition hover:text-white"
+        >
           <ArrowLeft className="h-4 w-4" /> Dashboard
         </a>
       </header>
 
       <main className="relative z-10 px-8 pb-28 pt-6 sm:px-14 lg:px-20">
         <div className="mx-auto max-w-[640px]">
-
           <h1 className="font-display text-[2rem] font-semibold tracking-[-0.04em] text-white sm:text-[2.4rem]">
             Lab Test Search
           </h1>
@@ -72,7 +74,7 @@ export default function LabTestSearch() {
                 ref={inputRef}
                 type="text"
                 value={query}
-                onChange={(e) => setQuery(e.target.value)}
+                onChange={e => setQuery(e.target.value)}
                 onKeyDown={handleKey}
                 placeholder="e.g. blood glucose, lipid panel, thyroid..."
                 className="w-full rounded-full border border-white/12 bg-white/[0.05] py-3.5 pl-11 pr-5 text-sm text-white placeholder-white/28 outline-none transition focus:border-[#c8b7ff]/50 focus:bg-white/[0.07]"
@@ -83,7 +85,11 @@ export default function LabTestSearch() {
               disabled={!query.trim() || loading}
               className="inline-flex items-center gap-2 rounded-full bg-[#c8b7ff] px-6 py-3.5 text-sm font-semibold text-[#17120d] transition hover:-translate-y-0.5 hover:bg-[#d6caff] disabled:opacity-50 disabled:translate-y-0"
             >
-              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Search"}
+              {loading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                "Search"
+              )}
             </button>
           </div>
 
@@ -97,7 +103,9 @@ export default function LabTestSearch() {
 
           {!loading && searched && results.length === 0 && (
             <div className="mt-14 text-center">
-              <p className="text-sm text-white/40">No matching lab tests found. Try a different term.</p>
+              <p className="text-sm text-white/40">
+                No matching lab tests found. Try a different term.
+              </p>
             </div>
           )}
 
@@ -114,23 +122,42 @@ export default function LabTestSearch() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2.5">
-                        <span className="text-[0.7rem] font-semibold tracking-widest text-white/28">#{i + 1}</span>
-                        <h3 className="text-[1rem] font-semibold tracking-[-0.02em] text-white">{r.name}</h3>
-                        <span className="rounded-full border border-white/10 px-2.5 py-0.5 text-[0.68rem] font-mono text-white/38">{r.code}</span>
+                        <span className="text-[0.7rem] font-semibold tracking-widest text-white/28">
+                          #{i + 1}
+                        </span>
+                        <h3 className="text-[1rem] font-semibold tracking-[-0.02em] text-white">
+                          {r.name}
+                        </h3>
+                        <span className="rounded-full border border-white/10 px-2.5 py-0.5 text-[0.68rem] font-mono text-white/38">
+                          {r.code}
+                        </span>
                       </div>
-                      <p className="mt-1.5 text-sm leading-6 text-white/54">{r.description}</p>
+                      <p className="mt-1.5 text-sm leading-6 text-white/54">
+                        {r.description}
+                      </p>
                       <p className="mt-1 text-xs text-white/34">
-                        <span className="font-medium text-white/50">Indication:</span> {r.indication}
+                        <span className="font-medium text-white/50">
+                          Indication:
+                        </span>{" "}
+                        {r.indication}
                       </p>
                       <div className="mt-3.5 flex items-center gap-4">
                         <div className="flex flex-col">
-                          <span className="text-[0.65rem] uppercase tracking-wider text-white/30">Est. Price</span>
-                          <span className="text-sm font-semibold text-[#c8b7ff]">{r.price}</span>
+                          <span className="text-[0.65rem] uppercase tracking-wider text-white/30">
+                            Est. Price
+                          </span>
+                          <span className="text-sm font-semibold text-[#c8b7ff]">
+                            {r.price}
+                          </span>
                         </div>
                         <div className="h-6 w-px bg-white/10" />
                         <div className="flex flex-col">
-                          <span className="text-[0.65rem] uppercase tracking-wider text-white/30">Turnaround</span>
-                          <span className="text-sm font-medium text-white/70">{r.turnaround}</span>
+                          <span className="text-[0.65rem] uppercase tracking-wider text-white/30">
+                            Turnaround
+                          </span>
+                          <span className="text-sm font-medium text-white/70">
+                            {r.turnaround}
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -139,7 +166,6 @@ export default function LabTestSearch() {
               ))}
             </div>
           )}
-
         </div>
       </main>
     </div>

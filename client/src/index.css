@@ -132,8 +132,16 @@ section headings, and restrained motion so the page feels polished, spacious, an
     min-height: 100vh;
     font-family: "Manrope", sans-serif;
     background:
-      radial-gradient(circle at 14% 10%, rgba(126, 92, 255, 0.15), transparent 18%),
-      radial-gradient(circle at 84% 16%, rgba(80, 209, 255, 0.08), transparent 16%),
+      radial-gradient(
+        circle at 14% 10%,
+        rgba(126, 92, 255, 0.15),
+        transparent 18%
+      ),
+      radial-gradient(
+        circle at 84% 16%,
+        rgba(80, 209, 255, 0.08),
+        transparent 16%
+      ),
       linear-gradient(180deg, #06050d 0%, #0a0915 48%, #07060e 100%);
     color: var(--foreground);
     text-rendering: optimizeLegibility;
@@ -206,7 +214,9 @@ section headings, and restrained motion so the page feels polished, spacious, an
   }
 
   .hero-stage {
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 50px 120px rgba(0, 0, 0, 0.22);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.04),
+      0 50px 120px rgba(0, 0, 0, 0.22);
   }
 
   .hero-stage::before {
@@ -246,12 +256,36 @@ section headings, and restrained motion so the page feels polished, spacious, an
     border-radius: 2rem;
     animation: heroCutoutFloat 8.5s ease-in-out infinite;
     mask-image:
-      linear-gradient(to right, transparent 0%, black 9%, black 88%, transparent 100%),
-      linear-gradient(to bottom, transparent 0%, black 6%, black 88%, transparent 100%);
+      linear-gradient(
+        to right,
+        transparent 0%,
+        black 9%,
+        black 88%,
+        transparent 100%
+      ),
+      linear-gradient(
+        to bottom,
+        transparent 0%,
+        black 6%,
+        black 88%,
+        transparent 100%
+      );
     mask-composite: intersect;
     -webkit-mask-image:
-      linear-gradient(to right, transparent 0%, black 9%, black 88%, transparent 100%),
-      linear-gradient(to bottom, transparent 0%, black 6%, black 88%, transparent 100%);
+      linear-gradient(
+        to right,
+        transparent 0%,
+        black 9%,
+        black 88%,
+        transparent 100%
+      ),
+      linear-gradient(
+        to bottom,
+        transparent 0%,
+        black 6%,
+        black 88%,
+        transparent 100%
+      );
     -webkit-mask-composite: source-in;
   }
 
@@ -298,7 +332,11 @@ section headings, and restrained motion so the page feels polished, spacious, an
     top: 25%;
     width: 34%;
     height: 28%;
-    background: radial-gradient(circle, rgba(132, 114, 228, 0.22), rgba(132, 114, 228, 0) 72%);
+    background: radial-gradient(
+      circle,
+      rgba(132, 114, 228, 0.22),
+      rgba(132, 114, 228, 0) 72%
+    );
     animation: heroGlowPulse 6.8s ease-in-out infinite;
   }
 
@@ -307,7 +345,11 @@ section headings, and restrained motion so the page feels polished, spacious, an
     bottom: 10%;
     width: 28%;
     height: 24%;
-    background: radial-gradient(circle, rgba(121, 214, 255, 0.12), rgba(121, 214, 255, 0) 72%);
+    background: radial-gradient(
+      circle,
+      rgba(121, 214, 255, 0.12),
+      rgba(121, 214, 255, 0) 72%
+    );
     animation: heroGlowPulse 7.8s ease-in-out infinite reverse;
   }
 
@@ -326,8 +368,14 @@ section headings, and restrained motion so the page feels polished, spacious, an
     min-width: 10.75rem;
     border-radius: 9999px;
     border: 1px solid rgba(255, 255, 255, 0.13);
-    background: linear-gradient(180deg, rgba(244, 240, 255, 0.15), rgba(233, 244, 255, 0.08));
-    box-shadow: 0 18px 50px rgba(3, 2, 10, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+    background: linear-gradient(
+      180deg,
+      rgba(244, 240, 255, 0.15),
+      rgba(233, 244, 255, 0.08)
+    );
+    box-shadow:
+      0 18px 50px rgba(3, 2, 10, 0.28),
+      inset 0 1px 0 rgba(255, 255, 255, 0.18);
     backdrop-filter: blur(16px);
     padding: 0.9rem 1.35rem;
     color: rgba(247, 243, 255, 0.95);
@@ -389,7 +437,9 @@ section headings, and restrained motion so the page feels polished, spacious, an
     background: rgba(200, 183, 255, 0.07);
     padding: 0 0.9rem;
     line-height: 1;
-    box-shadow: 0 0 18px rgba(200, 183, 255, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    box-shadow:
+      0 0 18px rgba(200, 183, 255, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
   }
 
   .section-title {
@@ -418,7 +468,9 @@ section headings, and restrained motion so the page feels polished, spacious, an
   }
 
   .modality-card {
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03), 0 24px 60px rgba(0, 0, 0, 0.2);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.03),
+      0 24px 60px rgba(0, 0, 0, 0.2);
   }
 
   .stage-card {
@@ -426,9 +478,15 @@ section headings, and restrained motion so the page feels polished, spacious, an
     overflow: hidden;
     border-radius: 1.7rem;
     border: 1px solid rgba(255, 255, 255, 0.1);
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.025));
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.05),
+      rgba(255, 255, 255, 0.025)
+    );
     padding: 1.35rem;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03), 0 24px 60px rgba(0, 0, 0, 0.22);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.03),
+      0 24px 60px rgba(0, 0, 0, 0.22);
   }
 
   .stage-label {
@@ -447,14 +505,26 @@ section headings, and restrained motion so the page feels polished, spacious, an
   .input-visual-card {
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 1.1rem;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.02));
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.045),
+      rgba(255, 255, 255, 0.02)
+    );
     padding: 0.65rem;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.025), 0 20px 40px rgba(0, 0, 0, 0.18);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.025),
+      0 20px 40px rgba(0, 0, 0, 0.18);
   }
 
   .framework-rail {
     height: 1px;
-    background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(147, 123, 255, 0.82), rgba(111, 219, 255, 0.82), rgba(255, 255, 255, 0));
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0),
+      rgba(147, 123, 255, 0.82),
+      rgba(111, 219, 255, 0.82),
+      rgba(255, 255, 255, 0)
+    );
     animation: railSweep 3.8s linear infinite;
   }
 
@@ -475,7 +545,11 @@ section headings, and restrained motion so the page feels polished, spacious, an
     position: absolute;
     inset: 23% 19%;
     border-radius: 9999px;
-    background: radial-gradient(circle, rgba(120, 101, 255, 0.32), rgba(120, 101, 255, 0));
+    background: radial-gradient(
+      circle,
+      rgba(120, 101, 255, 0.32),
+      rgba(120, 101, 255, 0)
+    );
     filter: blur(18px);
     animation: corePulse 5s ease-in-out infinite;
   }
@@ -497,7 +571,11 @@ section headings, and restrained motion so the page feels polished, spacious, an
     height: 0.68rem;
     margin-left: -0.34rem;
     border-radius: 9999px;
-    background: linear-gradient(135deg, rgba(214, 188, 255, 1), rgba(116, 220, 255, 1));
+    background: linear-gradient(
+      135deg,
+      rgba(214, 188, 255, 1),
+      rgba(116, 220, 255, 1)
+    );
     box-shadow: 0 0 18px rgba(122, 206, 255, 0.4);
   }
 
@@ -521,7 +599,13 @@ section headings, and restrained motion so the page feels polished, spacious, an
     position: absolute;
     inset: auto -18% 0 -18%;
     height: 1px;
-    background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(154, 134, 255, 0.75), rgba(120, 218, 255, 0.75), rgba(255, 255, 255, 0));
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0),
+      rgba(154, 134, 255, 0.75),
+      rgba(120, 218, 255, 0.75),
+      rgba(255, 255, 255, 0)
+    );
     animation: railSweep 4.2s linear infinite;
   }
 

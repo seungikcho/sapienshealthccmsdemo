@@ -15,8 +15,11 @@ export default function Login() {
 
   useEffect(() => {
     fetch("/api/auth/status")
-      .then((r) => r.json())
-      .then((d) => { if (d.authenticated) setLocation("/patients"); else setChecking(false); })
+      .then(r => r.json())
+      .then(d => {
+        if (d.authenticated) setLocation("/patients");
+        else setChecking(false);
+      })
       .catch(() => setChecking(false));
   }, [setLocation]);
 
@@ -56,10 +59,16 @@ export default function Login() {
 
       <div className="relative z-10 flex min-h-screen flex-col items-center justify-center px-4">
         <div className="w-full max-w-[20rem]">
-
-          <a href="/" className="mb-12 flex items-center justify-center gap-2.5">
+          <a
+            href="/"
+            className="mb-12 flex items-center justify-center gap-2.5"
+          >
             <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[#17120d]">
-              <img src={logoUrl} alt="Sapiens Health" className="h-full w-full object-cover" />
+              <img
+                src={logoUrl}
+                alt="Sapiens Health"
+                className="h-full w-full object-cover"
+              />
             </div>
             <span className="font-wordmark text-white">Sapiens Health</span>
           </a>
@@ -74,7 +83,7 @@ export default function Login() {
               type="text"
               placeholder="Username"
               value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              onChange={e => setUsername(e.target.value)}
               autoComplete="username"
               required
               className="w-full rounded-2xl border border-white/12 bg-white/[0.05] px-4 py-3 text-sm text-white placeholder:text-white/35 outline-none transition focus:border-[#c8b7ff]/40 focus:bg-white/[0.08]"
@@ -83,7 +92,7 @@ export default function Login() {
               type="password"
               placeholder="Password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={e => setPassword(e.target.value)}
               autoComplete="current-password"
               required
               className="w-full rounded-2xl border border-white/12 bg-white/[0.05] px-4 py-3 text-sm text-white placeholder:text-white/35 outline-none transition focus:border-[#c8b7ff]/40 focus:bg-white/[0.08]"
@@ -103,7 +112,9 @@ export default function Login() {
           </form>
 
           <p className="mt-8 text-center text-xs text-white/24">
-            <a href="/" className="transition hover:text-white/50">← Back</a>
+            <a href="/" className="transition hover:text-white/50">
+              ← Back
+            </a>
           </p>
         </div>
       </div>
