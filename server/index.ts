@@ -422,7 +422,7 @@ This note requires provider review and signature before finalizing.`;
     res.sendFile(path.join(staticPath, "index.html"));
   });
 
-  const port = process.env.PORT || process.env.API_PORT || 3000;
+  const port = process.env.PORT || process.env.API_PORT || 3001;
   server.listen(port, () => {
     console.log(`Server running on http://localhost:${port}/`);
   });

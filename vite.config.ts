@@ -231,13 +231,9 @@ export default defineConfig({
       },
     },
     allowedHosts: [
-      ".manuspre.computer",
-      ".manus.computer",
-      ".manus-asia.computer",
-      ".manuscomputer.ai",
-      ".manusvm.computer",
       "localhost",
       "127.0.0.1",
+      "sapienshealth.co",
     ],
     fs: {
       strict: true,
