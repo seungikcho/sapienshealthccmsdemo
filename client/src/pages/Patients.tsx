@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useLocation } from "wouter";
 import {
   LogOut,
@@ -7,6 +7,7 @@ import {
   FileText,
   BookOpen,
 } from "lucide-react";
+import { getSessionEmail, logout } from "@/lib/auth";
 
 const tools = [
   {
@@ -38,20 +39,12 @@ const tools = [
 
 export default function Patients() {
   const [, setLocation] = useLocation();
-  const [email, setEmail] = useState<string | null>(null);
+  const [loggingOut, setLoggingOut] = useState(false);
+  const email = getSessionEmail();
 
-  useEffect(() => {
-    fetch("/api/auth/status")
-      .then(r => r.json())
-      .then(d => {
-        if (!d.authenticated) setLocation("/login");
-        else setEmail(d.email ?? null);
-      })
-      .catch(() => setLocation("/login"));
-  }, [setLocation]);
-
-  async function logout() {
-    await fetch("/api/auth/logout", { method: "POST" });
+  async function handleLogout() {
+    setLoggingOut(true);
+    await logout();
     setLocation("/login");
   }
 
@@ -74,11 +67,12 @@ export default function Patients() {
             </span>
           )}
           <button
-            onClick={logout}
+            onClick={handleLogout}
+            disabled={loggingOut}
             className="inline-flex items-center gap-1.5 rounded-full border border-white/12 bg-white/[0.05] px-4 py-2 text-sm text-white/60 transition hover:bg-white/[0.1] hover:text-white"
           >
             <LogOut className="h-3.5 w-3.5" />
-            Log out
+            {loggingOut ? "Logging out" : "Log out"}
           </button>
         </div>
       </header>

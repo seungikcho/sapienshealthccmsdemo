@@ -85,7 +85,7 @@ function SiteFooter() {
           <a href="/privacy" className="transition hover:text-white">
             Privacy
           </a>
-          <a href="/patients" className="transition hover:text-white">
+          <a href="/login" className="transition hover:text-white">
             Sign In
           </a>
           <a href="#contact" className="transition hover:text-white">
