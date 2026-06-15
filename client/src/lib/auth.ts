@@ -1,4 +1,5 @@
-const DEFAULT_API_BASE_URL = "http://localhost:5000";
+import { apiUrl } from "@/lib/api";
+
 const ACCESS_TOKEN_STORAGE_KEY = "sapienshealth.accessToken";
 const EMAIL_STORAGE_KEY = "sapienshealth.email";
 
@@ -16,15 +17,6 @@ type FastApiValidationError = {
   detail?: string | Array<{ msg?: string }> | unknown;
   message?: string;
 };
-
-function getAuthApiBaseUrl() {
-  const configuredBaseUrl = import.meta.env.VITE_API_BASE_URL?.replace(
-    /\/+$/,
-    ""
-  );
-
-  return configuredBaseUrl || DEFAULT_API_BASE_URL;
-}
 
 function getStorageItem(key: string) {
   if (typeof window === "undefined") return null;
@@ -152,7 +144,7 @@ async function requestJson<T>(
     headers.set("Content-Type", "application/json");
   }
 
-  const response = await fetch(`${getAuthApiBaseUrl()}${path}`, {
+  const response = await fetch(apiUrl(path), {
     ...init,
     headers,
     body: hasJsonBody ? JSON.stringify(init.body) : undefined,
@@ -191,7 +183,7 @@ export async function logout() {
   const headers = getAuthorizationHeader();
 
   try {
-    await fetch(`${getAuthApiBaseUrl()}/auth/logout`, {
+    await fetch(apiUrl("/auth/logout"), {
       method: "POST",
       headers,
     });

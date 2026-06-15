@@ -9,6 +9,8 @@ import {
   Loader2,
   RotateCcw,
 } from "lucide-react";
+import { apiUrl } from "@/lib/api";
+import { getAuthorizationHeader } from "@/lib/auth";
 
 type Step = "idle" | "recording" | "recorded" | "generating" | "done";
 
@@ -126,8 +128,9 @@ export default function MeetingNoteGenerator() {
     typeof WebSocket !== "undefined";
 
   async function getAccessToken(): Promise<TokenResponse> {
-    const res = await fetch("/note/token", {
+    const res = await fetch(apiUrl("/note/token"), {
       method: "POST",
+      headers: getAuthorizationHeader(),
     });
     return res.json() as Promise<TokenResponse>;
   }
