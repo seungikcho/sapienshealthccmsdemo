@@ -1,12 +1,3 @@
-/**
- * Patient Profile — the canonical shape shared between the React client and the
- * Express backend (Corti extraction layer).
- *
- * Each of the seven clinical fields maps 1:1 to a custom Corti template section.
- * A `null` (or empty-array) value means Corti could not resolve that field from
- * the email thread yet — these drive the human-in-the-loop follow-up draft step.
- */
-
 export type ProfileContext =
   | "intro_call"
   | "personal_symptoms"
@@ -15,7 +6,7 @@ export type ProfileContext =
   | "other";
 
 export interface PatientProfile {
-  /** Stable id — Corti interactionId today, DB primary key later. */
+  /** Stable patient profile id from the API or local demo data. */
   id: string;
   /** Field 1 — Patient Name. */
   patientName: string | null;
@@ -67,12 +58,12 @@ export function missingFields(profile: PatientProfile): string[] {
   );
 }
 
-/** True when all seven fields are satisfied (loop terminates → thank-you draft). */
+/** True when all seven fields are satisfied. */
 export function isProfileComplete(profile: PatientProfile): boolean {
   return missingFields(profile).length === 0;
 }
 
-/** Deterministic id slug from a patient name — shared by the store and the client. */
+/** Deterministic id slug from a patient name. */
 export function profileIdFromName(name: string): string {
   return name
     .trim()
@@ -97,10 +88,6 @@ export function createEmptyProfile(name: string): PatientProfile {
   };
 }
 
-/**
- * Mock profiles for UI development. Replaced by `GET /api/profiles` (Corti-backed)
- * in a later prompt — the shape will not change.
- */
 export const MOCK_PROFILES: PatientProfile[] = [
   {
     id: "emily-parker",

@@ -14,7 +14,7 @@ import {
   type ProfileContext,
   isProfileComplete,
   missingFields,
-} from "@shared/patient-profile";
+} from "@/lib/patient-profile";
 
 const CONTEXT_LABEL: Record<ProfileContext, string> = {
   intro_call: "Intro Call",

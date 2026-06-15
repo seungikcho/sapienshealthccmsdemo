@@ -221,7 +221,6 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(import.meta.dirname, "client", "src"),
-      "@shared": path.resolve(import.meta.dirname, "shared"),
       "@assets": path.resolve(import.meta.dirname, "attached_assets"),
     },
   },
@@ -235,13 +234,6 @@ export default defineConfig({
     port: 3000,
     strictPort: false, // Will find next available port if 3000 is busy
     host: true,
-    proxy: {
-      // Forward API calls to the Express server in development.
-      "/api": {
-        target: "http://localhost:3001",
-        changeOrigin: true,
-      },
-    },
     allowedHosts: ["localhost", "127.0.0.1", "sapienshealth.co"],
     fs: {
       strict: true,
