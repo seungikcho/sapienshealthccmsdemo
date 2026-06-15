@@ -6,6 +6,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import multer from "multer";
 import type { Auth } from "googleapis";
+import { CortiAuth } from "@corti/sdk";
 import { COOKIE_NAME } from "../shared/const";
 import { profileIdFromName } from "../shared/patient-profile";
 import {
@@ -22,6 +23,7 @@ import {
   buildProfileFromSearch,
   simulatePatientReply,
 } from "./db";
+import { PanelTopInactive } from "lucide-react";
 
 declare module "express-session" {
   interface SessionData {
@@ -552,6 +554,22 @@ startxref
   });
 
   // ─── Meeting Note Generator ────────────────────────────────────────────────
+  app.post("/api/notes/token", async (req, res) => {
+    const auth = new CortiAuth({
+      environment: process.env.CORTI_ENVIRONMENT,
+      tenantName: process.env.CORTI_TENANT_NAME,
+    });
+
+    const token = await auth.getToken({
+      clientId: process.env.CORTI_CLIENT_ID,
+      clientSecret: process.env.CORTI_CLIENT_SECRET,
+    });
+
+    res.json({
+      token: token.accessToken,
+    });
+  });
+
   app.post("/api/notes/generate", (req, res) => {
     const { patientName, transcript } = req.body ?? {};
     if (!patientName || !transcript) {
