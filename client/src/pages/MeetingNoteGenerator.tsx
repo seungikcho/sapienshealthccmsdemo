@@ -126,7 +126,7 @@ export default function MeetingNoteGenerator() {
     typeof WebSocket !== "undefined";
 
   async function getAccessToken(): Promise<TokenResponse> {
-    const res = await fetch("/api/notes/token", {
+    const res = await fetch("/note/token", {
       method: "POST",
     });
     return res.json() as Promise<TokenResponse>;
