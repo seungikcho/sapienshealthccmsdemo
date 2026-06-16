@@ -1,46 +1,206 @@
-import { useState, useRef } from "react";
-import { ArrowLeft, Search, Loader2, FlaskConical } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  ArrowLeft,
+  Search,
+  Loader2,
+  FlaskConical,
+  Star,
+  Plus,
+  Check,
+  X,
+  Trash2,
+  Bookmark,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
+import { toast } from "sonner";
+import { apiUrl } from "@/lib/api";
+import { getAuthorizationHeader } from "@/lib/auth";
 
-type LabResult = {
+type LabTest = {
+  id: string;
+  catalog: string;
   name: string;
-  code: string;
-  description: string;
-  indication: string;
-  price: string;
-  turnaround: string;
+  cpt: string;
+  company: string;
+  favorite: boolean;
+  price: number;
+  markup: number;
 };
 
-export default function LabTestSearch() {
-  const [query, setQuery] = useState("");
-  const [results, setResults] = useState<LabResult[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [searched, setSearched] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
+type LabTestSet = {
+  id: string;
+  name: string;
+  testIds: string[];
+  tests: LabTest[];
+};
 
-  async function search() {
-    const q = query.trim();
-    if (!q) return;
+const PAGE_SIZE = 50;
+const COMPANIES = ["All", "Labcorp", "PathGroup"] as const;
+
+function money(n: number) {
+  return n.toLocaleString("en-US", { style: "currency", currency: "USD" });
+}
+
+export default function LabTestSearch() {
+  // search state
+  const [query, setQuery] = useState("");
+  const [company, setCompany] = useState<(typeof COMPANIES)[number]>("All");
+  const [favOnly, setFavOnly] = useState(false);
+  const [page, setPage] = useState(1);
+  const [reloadKey, setReloadKey] = useState(0);
+  const [results, setResults] = useState<LabTest[]>([]);
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  // selection + saved sets
+  const [selected, setSelected] = useState<Record<string, LabTest>>({});
+  const [sets, setSets] = useState<LabTestSet[]>([]);
+  const [setName, setSetName] = useState("");
+  const [savingSet, setSavingSet] = useState(false);
+
+  const requestSeq = useRef(0);
+
+  // Debounced catalog search — refetches whenever query/filters/page change.
+  useEffect(() => {
+    const seq = ++requestSeq.current;
     setLoading(true);
-    setSearched(false);
+    const timer = setTimeout(async () => {
+      try {
+        const params = new URLSearchParams({
+          q: query.trim(),
+          page: String(page),
+          pageSize: String(PAGE_SIZE),
+        });
+        if (company !== "All") params.set("company", company);
+        if (favOnly) params.set("favorites", "1");
+        const res = await fetch(apiUrl(`/lab-tests/search?${params}`), {
+          headers: getAuthorizationHeader(),
+        });
+        const data = await res.json();
+        if (seq !== requestSeq.current) return; // stale response
+        setResults(data.results ?? []);
+        setTotal(data.total ?? 0);
+      } catch {
+        if (seq === requestSeq.current) {
+          setResults([]);
+          setTotal(0);
+        }
+      } finally {
+        if (seq === requestSeq.current) setLoading(false);
+      }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [query, company, favOnly, page, reloadKey]);
+
+  useEffect(() => {
+    refreshSets();
+  }, []);
+
+  async function refreshSets() {
     try {
-      const res = await fetch("/api/lab-test/search", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: q }),
+      const res = await fetch(apiUrl("/lab-sets/"), {
+        headers: getAuthorizationHeader(),
       });
       const data = await res.json();
-      setResults(data.results ?? []);
+      setSets(data.sets ?? []);
     } catch {
-      setResults([]);
-    } finally {
-      setLoading(false);
-      setSearched(true);
+      /* leave existing list */
     }
   }
 
-  function handleKey(e: React.KeyboardEvent) {
-    if (e.key === "Enter") search();
+  function changeFilter(update: () => void) {
+    update();
+    setPage(1);
   }
+
+  async function toggleFavorite(t: LabTest) {
+    const next = !t.favorite;
+    // Optimistic: flip the star now. If the Favorites filter is on and we just
+    // unfavorited, drop the row from view. Keep any selected-panel copy in sync.
+    setResults(prev =>
+      favOnly && !next
+        ? prev.filter(x => x.id !== t.id)
+        : prev.map(x => (x.id === t.id ? { ...x, favorite: next } : x))
+    );
+    setSelected(prev =>
+      prev[t.id] ? { ...prev, [t.id]: { ...prev[t.id], favorite: next } } : prev
+    );
+    try {
+      const res = await fetch(apiUrl(`/lab-tests/${t.id}/favorite`), {
+        method: "POST",
+        headers: { ...getAuthorizationHeader(), "Content-Type": "application/json" },
+        body: JSON.stringify({ favorite: next }),
+      });
+      if (!res.ok) throw new Error("Failed to update favorite");
+    } catch (err) {
+      toast.error((err as Error).message);
+      setReloadKey(k => k + 1); // re-sync from the server
+    }
+  }
+
+  function toggleTest(t: LabTest) {
+    setSelected(prev => {
+      const next = { ...prev };
+      if (next[t.id]) delete next[t.id];
+      else next[t.id] = t;
+      return next;
+    });
+  }
+
+  const selectedList = useMemo(() => Object.values(selected), [selected]);
+  const totals = useMemo(() => {
+    const price = selectedList.reduce((s, t) => s + t.price, 0);
+    const markup = selectedList.reduce((s, t) => s + t.markup, 0);
+    return { price, markup, profit: markup - price };
+  }, [selectedList]);
+
+  async function saveCurrentSet() {
+    const name = setName.trim();
+    if (!name || selectedList.length === 0) return;
+    setSavingSet(true);
+    try {
+      const res = await fetch(apiUrl("/lab-sets/"), {
+        method: "POST",
+        headers: { ...getAuthorizationHeader(), "Content-Type": "application/json" },
+        body: JSON.stringify({ name, testIds: selectedList.map(t => t.id) }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail ?? "Failed to save set");
+      toast.success(
+        data.replaced ? `Updated set “${name}”` : `Saved set “${name}”`
+      );
+      setSetName("");
+      refreshSets();
+    } catch (err) {
+      toast.error((err as Error).message);
+    } finally {
+      setSavingSet(false);
+    }
+  }
+
+  function loadSet(s: LabTestSet) {
+    setSelected(Object.fromEntries(s.tests.map(t => [t.id, t])));
+    toast.success(`Loaded “${s.name}” (${s.tests.length} tests)`);
+  }
+
+  async function removeSet(s: LabTestSet) {
+    try {
+      const res = await fetch(apiUrl(`/lab-sets/${s.id}`), {
+        method: "DELETE",
+        headers: getAuthorizationHeader(),
+      });
+      if (!res.ok) throw new Error("Failed to delete set");
+      toast.success(`Deleted “${s.name}”`);
+      setSets(prev => prev.filter(x => x.id !== s.id));
+    } catch (err) {
+      toast.error((err as Error).message);
+    }
+  }
+
+  const lastPage = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const rangeStart = total === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
+  const rangeEnd = Math.min(total, page * PAGE_SIZE);
 
   return (
     <div className="min-h-screen bg-[linear-gradient(180deg,#110d1d_0%,#151124_52%,#0f0b19_100%)] text-foreground">
@@ -58,114 +218,365 @@ export default function LabTestSearch() {
       </header>
 
       <main className="relative z-10 px-8 pb-28 pt-6 sm:px-14 lg:px-20">
-        <div className="mx-auto max-w-[640px]">
+        <div className="mx-auto max-w-[1200px]">
           <h1 className="font-display text-[2rem] font-semibold tracking-[-0.04em] text-white sm:text-[2.4rem]">
             Lab Test Search
           </h1>
           <p className="mt-2 text-sm text-white/44">
-            What lab test do you need?
+            Search the Archway lab price list, build a panel, and see your
+            combined pricing.
           </p>
 
-          {/* Search input */}
-          <div className="mt-8 flex gap-3">
-            <div className="relative flex-1">
-              <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/30" />
-              <input
-                ref={inputRef}
-                type="text"
-                value={query}
-                onChange={e => setQuery(e.target.value)}
-                onKeyDown={handleKey}
-                placeholder="e.g. blood glucose, lipid panel, thyroid..."
-                className="w-full rounded-full border border-white/12 bg-white/[0.05] py-3.5 pl-11 pr-5 text-sm text-white placeholder-white/28 outline-none transition focus:border-[#c8b7ff]/50 focus:bg-white/[0.07]"
-              />
-            </div>
-            <button
-              onClick={search}
-              disabled={!query.trim() || loading}
-              className="inline-flex items-center gap-2 rounded-full bg-[#c8b7ff] px-6 py-3.5 text-sm font-semibold text-[#17120d] transition hover:-translate-y-0.5 hover:bg-[#d6caff] disabled:opacity-50 disabled:translate-y-0"
-            >
-              {loading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                "Search"
-              )}
-            </button>
-          </div>
-
-          {/* Results */}
-          {loading && (
-            <div className="mt-16 flex flex-col items-center gap-3 text-center">
-              <Loader2 className="h-7 w-7 animate-spin text-[#c8b7ff]" />
-              <p className="text-sm text-white/50">Searching lab tests…</p>
-            </div>
-          )}
-
-          {!loading && searched && results.length === 0 && (
-            <div className="mt-14 text-center">
-              <p className="text-sm text-white/40">
-                No matching lab tests found. Try a different term.
-              </p>
-            </div>
-          )}
-
-          {!loading && results.length > 0 && (
-            <div className="mt-8 flex flex-col gap-4">
-              {results.map((r, i) => (
-                <div
-                  key={r.code}
-                  className="rounded-[1.4rem] border border-white/10 bg-white/[0.04] p-5 transition hover:border-[#c8b7ff]/20 hover:bg-white/[0.06]"
-                >
-                  <div className="flex items-start gap-4">
-                    <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-[#c8b7ff]/10 text-[#c8b7ff]">
-                      <FlaskConical className="h-4 w-4" strokeWidth={1.6} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2.5">
-                        <span className="text-[0.7rem] font-semibold tracking-widest text-white/28">
-                          #{i + 1}
-                        </span>
-                        <h3 className="text-[1rem] font-semibold tracking-[-0.02em] text-white">
-                          {r.name}
-                        </h3>
-                        <span className="rounded-full border border-white/10 px-2.5 py-0.5 text-[0.68rem] font-mono text-white/38">
-                          {r.code}
-                        </span>
-                      </div>
-                      <p className="mt-1.5 text-sm leading-6 text-white/54">
-                        {r.description}
-                      </p>
-                      <p className="mt-1 text-xs text-white/34">
-                        <span className="font-medium text-white/50">
-                          Indication:
-                        </span>{" "}
-                        {r.indication}
-                      </p>
-                      <div className="mt-3.5 flex items-center gap-4">
-                        <div className="flex flex-col">
-                          <span className="text-[0.65rem] uppercase tracking-wider text-white/30">
-                            Est. Price
-                          </span>
-                          <span className="text-sm font-semibold text-[#c8b7ff]">
-                            {r.price}
-                          </span>
-                        </div>
-                        <div className="h-6 w-px bg-white/10" />
-                        <div className="flex flex-col">
-                          <span className="text-[0.65rem] uppercase tracking-wider text-white/30">
-                            Turnaround
-                          </span>
-                          <span className="text-sm font-medium text-white/70">
-                            {r.turnaround}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+          <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
+            {/* ── Left: search + results ─────────────────────────────────── */}
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="relative min-w-[240px] flex-1">
+                  <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/30" />
+                  <input
+                    type="text"
+                    value={query}
+                    onChange={e => changeFilter(() => setQuery(e.target.value))}
+                    placeholder="Search by test name, CPT code, or catalog #…"
+                    className="w-full rounded-full border border-white/12 bg-white/[0.05] py-3.5 pl-11 pr-5 text-sm text-white placeholder-white/28 outline-none transition focus:border-[#c8b7ff]/50 focus:bg-white/[0.07]"
+                  />
                 </div>
-              ))}
+              </div>
+
+              <div className="mt-4 flex flex-wrap items-center gap-2">
+                {COMPANIES.map(c => (
+                  <button
+                    key={c}
+                    onClick={() => changeFilter(() => setCompany(c))}
+                    className={`rounded-full border px-4 py-1.5 text-xs font-medium transition ${
+                      company === c
+                        ? "border-[#c8b7ff]/60 bg-[#c8b7ff]/15 text-[#d6caff]"
+                        : "border-white/12 bg-white/[0.04] text-white/50 hover:text-white"
+                    }`}
+                  >
+                    {c}
+                  </button>
+                ))}
+                <button
+                  onClick={() => changeFilter(() => setFavOnly(v => !v))}
+                  className={`inline-flex items-center gap-1.5 rounded-full border px-4 py-1.5 text-xs font-medium transition ${
+                    favOnly
+                      ? "border-[#ffd27a]/50 bg-[#ffd27a]/12 text-[#ffd27a]"
+                      : "border-white/12 bg-white/[0.04] text-white/50 hover:text-white"
+                  }`}
+                >
+                  <Star
+                    className="h-3.5 w-3.5"
+                    fill={favOnly ? "currentColor" : "none"}
+                  />
+                  Favorites
+                </button>
+                <span className="ml-auto text-xs text-white/35">
+                  {loading
+                    ? "Searching…"
+                    : `Showing ${rangeStart}–${rangeEnd} of ${total.toLocaleString()} tests`}
+                </span>
+              </div>
+
+              {/* Results list */}
+              <div className="mt-5 overflow-hidden rounded-[1.4rem] border border-white/10 bg-white/[0.03]">
+                <div className="hidden grid-cols-[2.75rem_minmax(0,1fr)_6.5rem_6.5rem] items-center gap-3 border-b border-white/10 px-5 py-3 text-[0.65rem] uppercase tracking-wider text-white/35 sm:grid">
+                  <span />
+                  <span>Test</span>
+                  <span className="text-right">Price</span>
+                  <span className="text-right">Markup</span>
+                </div>
+
+                {loading && (
+                  <div className="flex flex-col items-center gap-3 py-16 text-center">
+                    <Loader2 className="h-7 w-7 animate-spin text-[#c8b7ff]" />
+                    <p className="text-sm text-white/50">
+                      Searching lab tests…
+                    </p>
+                  </div>
+                )}
+
+                {!loading && results.length === 0 && (
+                  <div className="py-14 text-center">
+                    <p className="text-sm text-white/40">
+                      No matching lab tests found. Try a different term.
+                    </p>
+                  </div>
+                )}
+
+                {!loading &&
+                  results.map(t => {
+                    const isSelected = Boolean(selected[t.id]);
+                    return (
+                      <div
+                        key={t.id}
+                        onClick={() => toggleTest(t)}
+                        className={`grid cursor-pointer grid-cols-[2.75rem_minmax(0,1fr)] items-center gap-3 border-b border-white/[0.06] px-5 py-3 transition last:border-b-0 sm:grid-cols-[2.75rem_minmax(0,1fr)_6.5rem_6.5rem] ${
+                          isSelected
+                            ? "bg-[#c8b7ff]/[0.08] hover:bg-[#c8b7ff]/[0.12]"
+                            : "hover:bg-white/[0.04]"
+                        }`}
+                      >
+                        <button
+                          aria-label={
+                            isSelected ? "Remove from panel" : "Add to panel"
+                          }
+                          className={`flex h-7 w-7 items-center justify-center rounded-full border transition ${
+                            isSelected
+                              ? "border-[#c8b7ff] bg-[#c8b7ff] text-[#17120d]"
+                              : "border-white/20 text-white/50 hover:border-[#c8b7ff]/60 hover:text-[#c8b7ff]"
+                          }`}
+                        >
+                          {isSelected ? (
+                            <Check className="h-4 w-4" />
+                          ) : (
+                            <Plus className="h-4 w-4" />
+                          )}
+                        </button>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={e => {
+                                e.stopPropagation();
+                                toggleFavorite(t);
+                              }}
+                              aria-label={
+                                t.favorite
+                                  ? "Remove from favorites"
+                                  : "Add to favorites"
+                              }
+                              className={`shrink-0 transition ${
+                                t.favorite
+                                  ? "text-[#ffd27a] hover:text-[#ffba47]"
+                                  : "text-white/25 hover:text-[#ffd27a]"
+                              }`}
+                            >
+                              <Star
+                                className="h-3.5 w-3.5"
+                                fill={t.favorite ? "currentColor" : "none"}
+                              />
+                            </button>
+                            <span className="truncate text-sm font-medium text-white">
+                              {t.name}
+                            </span>
+                          </div>
+                          <div className="mt-0.5 flex items-center gap-2 text-[0.68rem] text-white/38">
+                            <span className="rounded-full border border-white/10 px-2 py-0.5 font-mono">
+                              {t.company} · {t.catalog}
+                            </span>
+                            {t.cpt && (
+                              <span className="truncate font-mono">
+                                CPT {t.cpt}
+                              </span>
+                            )}
+                          </div>
+                          {/* Mobile prices */}
+                          <div className="mt-1 flex gap-4 text-xs sm:hidden">
+                            <span className="text-white/60">
+                              Price {money(t.price)}
+                            </span>
+                            <span className="text-[#c8b7ff]">
+                              Markup {money(t.markup)}
+                            </span>
+                          </div>
+                        </div>
+                        <span className="hidden text-right text-sm text-white/70 sm:block">
+                          {money(t.price)}
+                        </span>
+                        <span className="hidden text-right text-sm font-semibold text-[#c8b7ff] sm:block">
+                          {money(t.markup)}
+                        </span>
+                      </div>
+                    );
+                  })}
+              </div>
+
+              {/* Pagination */}
+              {total > PAGE_SIZE && (
+                <div className="mt-4 flex items-center justify-center gap-4">
+                  <button
+                    onClick={() => setPage(p => Math.max(1, p - 1))}
+                    disabled={page <= 1 || loading}
+                    className="inline-flex items-center gap-1 rounded-full border border-white/12 bg-white/[0.04] px-4 py-2 text-xs text-white/60 transition hover:text-white disabled:opacity-40"
+                  >
+                    <ChevronLeft className="h-3.5 w-3.5" /> Prev
+                  </button>
+                  <span className="text-xs text-white/40">
+                    Page {page} of {lastPage.toLocaleString()}
+                  </span>
+                  <button
+                    onClick={() => setPage(p => Math.min(lastPage, p + 1))}
+                    disabled={page >= lastPage || loading}
+                    className="inline-flex items-center gap-1 rounded-full border border-white/12 bg-white/[0.04] px-4 py-2 text-xs text-white/60 transition hover:text-white disabled:opacity-40"
+                  >
+                    Next <ChevronRight className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              )}
             </div>
-          )}
+
+            {/* ── Right: selected panel + saved sets ─────────────────────── */}
+            <div className="lg:sticky lg:top-6 lg:self-start">
+              <div className="rounded-[1.4rem] border border-white/10 bg-white/[0.04] p-5">
+                <div className="flex items-center justify-between">
+                  <h2 className="inline-flex items-center gap-2 text-sm font-semibold text-white">
+                    <FlaskConical className="h-4 w-4 text-[#c8b7ff]" />
+                    Selected Tests
+                    <span className="rounded-full bg-white/10 px-2 py-0.5 text-[0.68rem] text-white/60">
+                      {selectedList.length}
+                    </span>
+                  </h2>
+                  {selectedList.length > 0 && (
+                    <button
+                      onClick={() => setSelected({})}
+                      className="text-xs text-white/40 transition hover:text-white"
+                    >
+                      Clear all
+                    </button>
+                  )}
+                </div>
+
+                {selectedList.length === 0 ? (
+                  <p className="mt-4 text-xs leading-5 text-white/38">
+                    Click tests on the left to build a panel. Combined price,
+                    markup, and profit show up here.
+                  </p>
+                ) : (
+                  <>
+                    <div className="mt-4 flex max-h-[18rem] flex-col gap-1.5 overflow-y-auto pr-1">
+                      {selectedList.map(t => (
+                        <div
+                          key={t.id}
+                          className="flex items-center gap-2 rounded-xl bg-white/[0.04] px-3 py-2"
+                        >
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-xs font-medium text-white/85">
+                              {t.name}
+                            </p>
+                            <p className="text-[0.65rem] text-white/35">
+                              {money(t.price)} → {money(t.markup)}
+                            </p>
+                          </div>
+                          <button
+                            onClick={() => toggleTest(t)}
+                            aria-label={`Remove ${t.name}`}
+                            className="text-white/30 transition hover:text-white"
+                          >
+                            <X className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Totals */}
+                    <div className="mt-4 space-y-2 border-t border-white/10 pt-4 text-sm">
+                      <div className="flex items-center justify-between text-white/60">
+                        <span>Total Price (your cost)</span>
+                        <span>{money(totals.price)}</span>
+                      </div>
+                      <div className="flex items-center justify-between text-white/60">
+                        <span>Total Markup (charge)</span>
+                        <span className="font-semibold text-[#c8b7ff]">
+                          {money(totals.markup)}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between text-white">
+                        <span className="font-semibold">Profit</span>
+                        <span className="font-semibold text-emerald-400">
+                          {money(totals.profit)}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Save as set */}
+                    <div className="mt-4 flex gap-2 border-t border-white/10 pt-4">
+                      <input
+                        type="text"
+                        value={setName}
+                        onChange={e => setSetName(e.target.value)}
+                        onKeyDown={e => {
+                          if (e.key === "Enter") saveCurrentSet();
+                        }}
+                        placeholder="Set name (e.g. Annual Physical)"
+                        className="min-w-0 flex-1 rounded-full border border-white/12 bg-white/[0.05] px-4 py-2 text-xs text-white placeholder-white/28 outline-none transition focus:border-[#c8b7ff]/50"
+                      />
+                      <button
+                        onClick={saveCurrentSet}
+                        disabled={!setName.trim() || savingSet}
+                        className="inline-flex items-center gap-1.5 rounded-full bg-[#c8b7ff] px-4 py-2 text-xs font-semibold text-[#17120d] transition hover:bg-[#d6caff] disabled:opacity-50"
+                      >
+                        {savingSet ? (
+                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        ) : (
+                          <Bookmark className="h-3.5 w-3.5" />
+                        )}
+                        Save
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {/* Saved sets */}
+              <div className="mt-5 rounded-[1.4rem] border border-white/10 bg-white/[0.04] p-5">
+                <h2 className="inline-flex items-center gap-2 text-sm font-semibold text-white">
+                  <Bookmark className="h-4 w-4 text-[#c8b7ff]" />
+                  Saved Sets
+                </h2>
+                {sets.length === 0 ? (
+                  <p className="mt-3 text-xs leading-5 text-white/38">
+                    No saved sets yet. Select tests and save them as a named
+                    set to reuse later.
+                  </p>
+                ) : (
+                  <div className="mt-3 flex flex-col gap-2">
+                    {sets.map(s => {
+                      const setPrice = s.tests.reduce(
+                        (sum, t) => sum + t.price,
+                        0
+                      );
+                      const setMarkup = s.tests.reduce(
+                        (sum, t) => sum + t.markup,
+                        0
+                      );
+                      return (
+                        <div
+                          key={s.id}
+                          className="rounded-xl border border-white/[0.07] bg-white/[0.03] px-3.5 py-2.5"
+                        >
+                          <div className="flex items-center gap-2">
+                            <p className="min-w-0 flex-1 truncate text-xs font-semibold text-white/90">
+                              {s.name}
+                            </p>
+                            <button
+                              onClick={() => loadSet(s)}
+                              className="rounded-full border border-[#c8b7ff]/40 px-3 py-1 text-[0.65rem] font-medium text-[#c8b7ff] transition hover:bg-[#c8b7ff]/10"
+                            >
+                              Load
+                            </button>
+                            <button
+                              onClick={() => removeSet(s)}
+                              aria-label={`Delete ${s.name}`}
+                              className="text-white/30 transition hover:text-red-400"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </button>
+                          </div>
+                          <p className="mt-1 text-[0.65rem] text-white/40">
+                            {s.tests.length} tests · {money(setPrice)} →{" "}
+                            {money(setMarkup)} ·{" "}
+                            <span className="text-emerald-400/80">
+                              +{money(setMarkup - setPrice)}
+                            </span>
+                          </p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
       </main>
     </div>
