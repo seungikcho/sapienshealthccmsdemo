@@ -18,6 +18,14 @@ interface TokenResponse {
   token: string;
 }
 
+type CreateNoteResponse = {
+  id: string;
+};
+
+type GenerateSoapResponse = {
+  soap_text: string;
+};
+
 type CortiMessage = {
   type?: string;
   data?: {
@@ -37,6 +45,7 @@ type CortiMessage = {
   credits?: number;
 };
 
+// FIXME: This shouldn't be in the FE.
 const CORTI_ENVIRONMENT = "us";
 const CORTI_TENANT_NAME = "base";
 
@@ -83,14 +92,14 @@ function getTodayDateInputValue() {
   return localDate.toISOString().slice(0, 10);
 }
 
-function getCurrentDateTimeLabel() {
+function getCurrentDateTimeLabel(date = new Date()) {
   return new Intl.DateTimeFormat(undefined, {
     year: "numeric",
     month: "short",
     day: "numeric",
     hour: "numeric",
     minute: "2-digit",
-  }).format(new Date());
+  }).format(date);
 }
 
 export default function MeetingNoteGenerator() {
@@ -105,6 +114,7 @@ export default function MeetingNoteGenerator() {
   const [copiedTranscript, setCopiedTranscript] = useState(false);
   const [error, setError] = useState("");
   const [token, setToken] = useState("");
+  const [noteId, setNoteId] = useState("");
 
   const wsRef = useRef<WebSocket | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -113,6 +123,7 @@ export default function MeetingNoteGenerator() {
   const isStartingRef = useRef(false);
   const configAcceptedRef = useRef(false);
   const shouldSendEndOnRecorderStopRef = useRef(false);
+  const noteIdRef = useRef("");
 
   // const recognitionRef = useRef<SpeechRecognition | null>(null);
   // const isRecordingRef = useRef(false);
@@ -133,6 +144,81 @@ export default function MeetingNoteGenerator() {
       headers: getAuthorizationHeader(),
     });
     return res.json() as Promise<TokenResponse>;
+  }
+
+  async function createNote({
+    cortiToken,
+    startedAt,
+  }: {
+    cortiToken: string;
+    startedAt: string;
+  }): Promise<CreateNoteResponse> {
+    const res = await fetch(apiUrl("/note/"), {
+      method: "POST",
+      headers: {
+        ...getAuthorizationHeader(),
+        "Content-Type": "application/json",
+        "X-Corti-Authentication": `Bearer ${cortiToken}`,
+      },
+      body: JSON.stringify({
+        patient_name: patientName.trim(),
+        date: visitDate,
+        provider: null,
+        recording_start_time: startedAt,
+        transcript: null,
+        soap_document: null,
+      }),
+    });
+
+    if (!res.ok) {
+      throw new Error(`Failed to create note (${res.status}).`);
+    }
+
+    return res.json() as Promise<CreateNoteResponse>;
+  }
+
+  async function updateNoteTranscript(noteId: string, transcript: string) {
+    const res = await fetch(apiUrl(`/note/${noteId}`), {
+      method: "PATCH",
+      headers: {
+        ...getAuthorizationHeader(),
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ transcript }),
+    });
+
+    if (!res.ok) {
+      throw new Error(`Failed to update note transcript (${res.status}).`);
+    }
+  }
+
+  async function generateSoapDocument({
+    cortiToken,
+    noteId,
+    transcript,
+  }: {
+    cortiToken: string;
+    noteId: string;
+    transcript: string;
+  }): Promise<GenerateSoapResponse> {
+    const res = await fetch(apiUrl(`/note/${noteId}/soap`), {
+      method: "POST",
+      headers: {
+        ...getAuthorizationHeader(),
+        "Content-Type": "application/json",
+        "Tenant-Name": CORTI_TENANT_NAME,
+        "X-Corti-Authorization": `Bearer ${cortiToken}`,
+      },
+      body: JSON.stringify({
+        transcript,
+      }),
+    });
+
+    if (!res.ok) {
+      throw new Error(`Failed to generate SOAP note (${res.status}).`);
+    }
+
+    return res.json() as Promise<GenerateSoapResponse>;
   }
 
   function stopMicrophoneTracks() {
@@ -268,12 +354,23 @@ export default function MeetingNoteGenerator() {
       return;
     }
 
+    if (!patientName.trim()) {
+      setError("Enter a patient name before starting the recording.");
+      return;
+    }
+
+    const recordingStartedAtDate = new Date();
+    const recordingStartedAtIso = recordingStartedAtDate.toISOString();
+
     isStartingRef.current = true;
     shouldSendEndOnRecorderStopRef.current = false;
     configAcceptedRef.current = false;
 
-    setRecordingStartedAt(getCurrentDateTimeLabel());
+    setRecordingStartedAt(getCurrentDateTimeLabel(recordingStartedAtDate));
     setError("");
+    setToken("");
+    setNoteId("");
+    noteIdRef.current = "";
     setTranscript("");
     finalRef.current = "";
     interimRef.current = "";
@@ -300,6 +397,13 @@ export default function MeetingNoteGenerator() {
 
       const { token } = await getAccessToken();
       setToken(token);
+
+      const createdNote = await createNote({
+        cortiToken: token,
+        startedAt: recordingStartedAtIso,
+      });
+      setNoteId(createdNote.id);
+      noteIdRef.current = createdNote.id;
 
       const wsUrl =
         `wss://api.${CORTI_ENVIRONMENT}.corti.app/audio-bridge/v2/transcribe` +
@@ -430,36 +534,54 @@ export default function MeetingNoteGenerator() {
       cleanupRecordingSession();
       setStep("idle");
       setRecordingStartedAt("");
+      setToken("");
+      setNoteId("");
+      noteIdRef.current = "";
       setError(getErrorMessage(err));
     } finally {
       isStartingRef.current = false;
     }
   }
 
-  function stopRecording() {
+  async function stopRecording() {
     if (step !== "recording") {
       return;
     }
 
-    setStep("recorded");
-
     const recorder = mediaRecorderRef.current;
+    const currentTranscript =
+      joinTranscriptParts(finalRef.current, interimRef.current) || transcript;
+
+    setTranscript(currentTranscript);
+    setStep("recorded");
 
     shouldSendEndOnRecorderStopRef.current = true;
 
     if (!recorder || recorder.state === "inactive") {
       sendEndToCorti();
       stopMicrophoneTracks();
+    } else {
+      try {
+        recorder.requestData();
+      } catch {
+        // Some browsers throw if requestData is called too close to stop().
+      }
+
+      recorder.stop();
+    }
+
+    const currentNoteId = noteIdRef.current || noteId;
+
+    if (!currentNoteId) {
+      setError("Unable to save transcript because the note was not created.");
       return;
     }
 
     try {
-      recorder.requestData();
-    } catch {
-      // Some browsers throw if requestData is called too close to stop().
+      await updateNoteTranscript(currentNoteId, currentTranscript);
+    } catch (err) {
+      setError(getErrorMessage(err));
     }
-
-    recorder.stop();
   }
 
   useEffect(() => {
@@ -469,11 +591,35 @@ export default function MeetingNoteGenerator() {
   }, []);
 
   async function generateNote() {
+    const currentNoteId = noteIdRef.current || noteId;
+
+    if (!currentNoteId) {
+      setError("Unable to generate note because the note is missing.");
+      return;
+    }
+
+    if (!token) {
+      setError("Unable to generate note because the Corti token is missing.");
+      return;
+    }
+
     setStep("generating");
-    setNote(transcript);
-    const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
-    await delay(2000);
-    setStep("done");
+    setError("");
+
+    try {
+      const responseBody = await generateSoapDocument({
+        cortiToken: token,
+        noteId: currentNoteId,
+        transcript,
+      });
+
+      console.log(responseBody);
+      setNote(responseBody.soap_text);
+      setStep("done");
+    } catch (err) {
+      setStep("recorded");
+      setError(getErrorMessage(err));
+    }
   }
 
   function reset() {
@@ -486,6 +632,9 @@ export default function MeetingNoteGenerator() {
     setTranscript("");
     setNote("");
     setError("");
+    setToken("");
+    setNoteId("");
+    noteIdRef.current = "";
     setPatientName("");
     setVisitDate(getTodayDateInputValue());
     setRecordingStartedAt("");
@@ -598,7 +747,7 @@ export default function MeetingNoteGenerator() {
                         <button
                           onClick={() => {
                             if (step === "recording") {
-                              stopRecording();
+                              void stopRecording();
                             } else {
                               void startRecording();
                             }
@@ -666,6 +815,9 @@ export default function MeetingNoteGenerator() {
                           setStep("idle");
                           setTranscript("");
                           setRecordingStartedAt("");
+                          setToken("");
+                          setNoteId("");
+                          noteIdRef.current = "";
                           finalRef.current = "";
                           interimRef.current = "";
                         }}
