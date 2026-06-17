@@ -180,6 +180,7 @@ export default function MeetingNoteGenerator() {
   // captures everything spoken — final + any interim not yet finalized
   const finalRef = useRef("");
   const interimRef = useRef("");
+  const transcriptLockedRef = useRef(false);
 
   const canRecord =
     typeof window !== "undefined" &&
@@ -271,6 +272,7 @@ export default function MeetingNoteGenerator() {
 
       finalRef.current = savedTranscript;
       interimRef.current = "";
+      transcriptLockedRef.current = true;
       noteIdRef.current = savedNote.id;
 
       setComposerOpen(true);
@@ -424,6 +426,10 @@ export default function MeetingNoteGenerator() {
   function handleCortiMessage(msg: CortiMessage) {
     switch (msg.type) {
       case "transcript": {
+        if (transcriptLockedRef.current) {
+          return;
+        }
+
         const text = msg.data?.text?.trim();
 
         if (!text) {
@@ -522,6 +528,7 @@ export default function MeetingNoteGenerator() {
     setTranscript("");
     finalRef.current = "";
     interimRef.current = "";
+    transcriptLockedRef.current = false;
 
     try {
       const mimeType = getBestSupportedMimeType();
@@ -777,6 +784,10 @@ export default function MeetingNoteGenerator() {
 
     setStep("generating");
     setError("");
+    finalRef.current = currentTranscript;
+    interimRef.current = "";
+    transcriptLockedRef.current = true;
+    setTranscript(currentTranscript);
 
     try {
       let cortiToken = token;
@@ -807,6 +818,7 @@ export default function MeetingNoteGenerator() {
 
     finalRef.current = "";
     interimRef.current = "";
+    transcriptLockedRef.current = true;
 
     setStep("idle");
     setTranscript("");
@@ -1006,6 +1018,7 @@ export default function MeetingNoteGenerator() {
                           setLoadingSavedNoteId("");
                           finalRef.current = "";
                           interimRef.current = "";
+                          transcriptLockedRef.current = true;
                         }}
                         className="inline-flex items-center gap-1.5 rounded-full border border-white/14 px-3 py-1.5 text-xs text-white/50 transition hover:bg-white/[0.06] hover:text-white"
                       >
@@ -1064,7 +1077,13 @@ export default function MeetingNoteGenerator() {
                       </div>
                       <textarea
                         value={transcript}
-                        onChange={e => setTranscript(e.target.value)}
+                        onChange={e => {
+                          const nextTranscript = e.target.value;
+                          transcriptLockedRef.current = true;
+                          finalRef.current = nextTranscript;
+                          interimRef.current = "";
+                          setTranscript(nextTranscript);
+                        }}
                         rows={6}
                         className="rounded-[1.1rem] border border-white/10 bg-white/[0.03] p-4 text-sm leading-7 text-white/70 outline-none transition resize-none focus:border-[#c8b7ff]/40 focus:bg-white/[0.05]"
                         placeholder="No transcript captured — type manually if needed."
