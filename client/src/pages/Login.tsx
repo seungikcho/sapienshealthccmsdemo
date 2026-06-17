@@ -17,8 +17,12 @@ export default function Login() {
   const [mode, setMode] = useState<AuthMode>(() => getInitialMode(location));
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [organizationName, setOrganizationName] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const firstNameRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
 
   const isSignup = mode === "signup";
@@ -32,6 +36,11 @@ export default function Login() {
   }, [location]);
 
   useEffect(() => {
+    if (mode === "signup") {
+      firstNameRef.current?.focus();
+      return;
+    }
+
     emailRef.current?.focus();
   }, [mode]);
 
@@ -57,7 +66,24 @@ export default function Login() {
 
     try {
       if (isSignup) {
-        await signup(credentials);
+        const signupDetails = {
+          first_name: firstName.trim(),
+          last_name: lastName.trim(),
+          organization_name: organizationName.trim(),
+        };
+
+        if (
+          !signupDetails.first_name ||
+          !signupDetails.last_name ||
+          !signupDetails.organization_name
+        ) {
+          throw new Error("Please enter your name and organization.");
+        }
+
+        await signup({
+          ...credentials,
+          ...signupDetails,
+        });
       }
 
       await login(credentials);
@@ -135,6 +161,41 @@ export default function Login() {
           </h1>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+            {isSignup && (
+              <>
+                <input
+                  ref={firstNameRef}
+                  type="text"
+                  placeholder="First name"
+                  value={firstName}
+                  onChange={e => setFirstName(e.target.value)}
+                  autoComplete="given-name"
+                  required
+                  maxLength={128}
+                  className="w-full rounded-2xl border border-white/12 bg-white/[0.05] px-4 py-3 text-sm text-white placeholder:text-white/35 outline-none transition focus:border-[#c8b7ff]/40 focus:bg-white/[0.08]"
+                />
+                <input
+                  type="text"
+                  placeholder="Last name"
+                  value={lastName}
+                  onChange={e => setLastName(e.target.value)}
+                  autoComplete="family-name"
+                  required
+                  maxLength={128}
+                  className="w-full rounded-2xl border border-white/12 bg-white/[0.05] px-4 py-3 text-sm text-white placeholder:text-white/35 outline-none transition focus:border-[#c8b7ff]/40 focus:bg-white/[0.08]"
+                />
+                <input
+                  type="text"
+                  placeholder="Organization name"
+                  value={organizationName}
+                  onChange={e => setOrganizationName(e.target.value)}
+                  autoComplete="organization"
+                  required
+                  maxLength={256}
+                  className="w-full rounded-2xl border border-white/12 bg-white/[0.05] px-4 py-3 text-sm text-white placeholder:text-white/35 outline-none transition focus:border-[#c8b7ff]/40 focus:bg-white/[0.08]"
+                />
+              </>
+            )}
             <input
               ref={emailRef}
               type="email"

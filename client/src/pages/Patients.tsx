@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import {
   LogOut,
@@ -7,7 +7,7 @@ import {
   FileText,
   BookOpen,
 } from "lucide-react";
-import { getSessionEmail, logout } from "@/lib/auth";
+import { getCurrentUser, logout } from "@/lib/auth";
 
 const tools = [
   {
@@ -40,7 +40,36 @@ const tools = [
 export default function Patients() {
   const [, setLocation] = useLocation();
   const [loggingOut, setLoggingOut] = useState(false);
-  const email = getSessionEmail();
+  const [displayName, setDisplayName] = useState("");
+  const [organizationName, setOrganizationName] = useState("");
+
+  useEffect(() => {
+    let ignore = false;
+
+    async function loadCurrentUser() {
+      try {
+        const user = await getCurrentUser();
+        const fullName = `${user.first_name} ${user.last_name}`.trim();
+        const organization = user.organization_name?.trim() ?? "";
+
+        if (!ignore) {
+          setDisplayName(fullName);
+          setOrganizationName(organization);
+        }
+      } catch {
+        if (!ignore) {
+          setDisplayName("");
+          setOrganizationName("");
+        }
+      }
+    }
+
+    void loadCurrentUser();
+
+    return () => {
+      ignore = true;
+    };
+  }, []);
 
   async function handleLogout() {
     setLoggingOut(true);
@@ -61,9 +90,9 @@ export default function Patients() {
           Sapiens Health
         </a>
         <div className="flex items-center gap-4">
-          {email && (
-            <span className="hidden text-xs text-white/40 sm:inline">
-              {email}
+          {displayName && (
+            <span className="hidden text-xs text-white sm:inline">
+              {displayName}
             </span>
           )}
           <button
@@ -81,10 +110,10 @@ export default function Patients() {
       <main className="relative z-10 px-8 pb-28 pt-16 sm:px-14 lg:px-20">
         <div className="mx-auto max-w-[860px]">
           {/* Welcome heading */}
-          <h1 className="font-display text-[2.2rem] font-semibold leading-[1.08] tracking-[-0.05em] sm:text-[2.8rem] lg:text-[3.2rem]">
+          <h1 className="font-display text-[1.85rem] font-semibold leading-[1.12] sm:text-[2.25rem] lg:text-[2.55rem]">
             <span className="text-white">Welcome,</span>
             <br />
-            <span className="text-[#c8b7ff]">Archway Family Medicine</span>
+            <span className="text-[#c8b7ff]">{organizationName}</span>
           </h1>
 
           {/* Tool cards */}

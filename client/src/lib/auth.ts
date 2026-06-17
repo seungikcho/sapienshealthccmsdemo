@@ -1,16 +1,28 @@
 import { apiUrl } from "@/lib/api";
 
 const ACCESS_TOKEN_STORAGE_KEY = "sapienshealth.accessToken";
-const EMAIL_STORAGE_KEY = "sapienshealth.email";
 
 export type AuthCredentials = {
   email: string;
   password: string;
 };
 
+export type SignupCredentials = AuthCredentials & {
+  first_name: string;
+  last_name: string;
+  organization_name: string;
+};
+
 type AuthLoginResponse = {
   access_token: string;
   token_type?: string;
+};
+
+export type CurrentUser = {
+  email: string;
+  first_name: string;
+  last_name: string;
+  organization_name?: string;
 };
 
 type FastApiValidationError = {
@@ -68,14 +80,12 @@ function isTokenExpired(token: string) {
     : false;
 }
 
-function saveAuthSession(accessToken: string, email: string) {
+function saveAuthSession(accessToken: string) {
   setStorageItem(ACCESS_TOKEN_STORAGE_KEY, accessToken);
-  setStorageItem(EMAIL_STORAGE_KEY, email);
 }
 
 export function clearAuthSession() {
   removeStorageItem(ACCESS_TOKEN_STORAGE_KEY);
-  removeStorageItem(EMAIL_STORAGE_KEY);
 }
 
 export function getAuthToken() {
@@ -88,14 +98,6 @@ export function getAuthToken() {
   }
 
   return token;
-}
-
-export function getSessionEmail() {
-  // TODO: This is sloppy, investigate.
-  const token = getAuthToken();
-  if (!token) return null;
-
-  return getStorageItem(EMAIL_STORAGE_KEY);
 }
 
 export function isAuthenticated() {
@@ -158,7 +160,7 @@ async function requestJson<T>(
   return (responseText ? JSON.parse(responseText) : {}) as T;
 }
 
-export async function signup(credentials: AuthCredentials) {
+export async function signup(credentials: SignupCredentials) {
   return requestJson<Record<string, boolean>>("/auth/signup", {
     method: "POST",
     body: credentials,
@@ -175,8 +177,15 @@ export async function login(credentials: AuthCredentials) {
     throw new Error("Login response did not include an access token.");
   }
 
-  saveAuthSession(response.access_token, credentials.email);
+  saveAuthSession(response.access_token);
   return response;
+}
+
+export async function getCurrentUser() {
+  return requestJson<CurrentUser>("/auth/me", {
+    method: "GET",
+    headers: getAuthorizationHeader(),
+  });
 }
 
 export async function logout() {
