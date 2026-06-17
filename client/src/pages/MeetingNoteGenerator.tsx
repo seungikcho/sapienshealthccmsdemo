@@ -301,7 +301,7 @@ export default function MeetingNoteGenerator() {
     cortiToken: string;
     startedAt: string;
   }): Promise<CreateNoteResponse> {
-    const res = await fetch(apiUrl("/note/"), {
+    const res = await fetch(apiUrl("/note"), {
       method: "POST",
       headers: {
         ...getAuthorizationHeader(),
