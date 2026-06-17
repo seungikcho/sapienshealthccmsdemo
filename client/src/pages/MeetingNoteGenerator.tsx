@@ -26,6 +26,22 @@ type GenerateSoapResponse = {
   soap_text: string;
 };
 
+type SavedNote = {
+  id: string;
+  patient_name: string;
+  date: string;
+};
+
+type SavedNoteDetails = SavedNote & {
+  provider: string | null;
+  corti_interaction_id: string | null;
+  recording_start_time: string | null;
+  transcript: string | null;
+  soap_document: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
 type CortiMessage = {
   type?: string;
   data?: {
@@ -35,12 +51,12 @@ type CortiMessage = {
     [key: string]: unknown;
   };
   error?:
-  | string
-  | {
-    title?: string;
-    details?: string;
-    status?: number;
-  };
+    | string
+    | {
+        title?: string;
+        details?: string;
+        status?: number;
+      };
   reason?: string;
   credits?: number;
 };
@@ -102,6 +118,34 @@ function getCurrentDateTimeLabel(date = new Date()) {
   }).format(date);
 }
 
+function formatRecordingStartTime(dateValue: string | null) {
+  if (!dateValue) {
+    return "";
+  }
+
+  const date = new Date(dateValue);
+
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+
+  return getCurrentDateTimeLabel(date);
+}
+
+function formatSavedNoteDate(dateValue: string) {
+  const [year, month, day] = dateValue.split("-").map(Number);
+
+  if (!year || !month || !day) {
+    return dateValue;
+  }
+
+  return new Intl.DateTimeFormat(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  }).format(new Date(year, month - 1, day));
+}
+
 export default function MeetingNoteGenerator() {
   const [patientName, setPatientName] = useState("");
   const [visitDate, setVisitDate] = useState(() => getTodayDateInputValue());
@@ -115,6 +159,12 @@ export default function MeetingNoteGenerator() {
   const [error, setError] = useState("");
   const [token, setToken] = useState("");
   const [noteId, setNoteId] = useState("");
+  const [savedNotes, setSavedNotes] = useState<SavedNote[]>([]);
+  const [savedNotesLoading, setSavedNotesLoading] = useState(true);
+  const [savedNotesError, setSavedNotesError] = useState("");
+  const [selectedSavedNoteId, setSelectedSavedNoteId] = useState("");
+  const [loadingSavedNoteId, setLoadingSavedNoteId] = useState("");
+  const [savedNoteOpenError, setSavedNoteOpenError] = useState("");
 
   const wsRef = useRef<WebSocket | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -144,6 +194,104 @@ export default function MeetingNoteGenerator() {
       headers: getAuthorizationHeader(),
     });
     return res.json() as Promise<TokenResponse>;
+  }
+
+  async function getSavedNotes(): Promise<SavedNote[]> {
+    const res = await fetch(apiUrl("/note"), {
+      headers: getAuthorizationHeader(),
+    });
+
+    if (!res.ok) {
+      throw new Error(`Failed to load saved notes (${res.status}).`);
+    }
+
+    const notes = (await res.json()) as SavedNote[];
+    return Array.isArray(notes) ? notes : [];
+  }
+
+  async function getSavedNote(noteId: string): Promise<SavedNoteDetails> {
+    const res = await fetch(apiUrl(`/note/${noteId}`), {
+      headers: getAuthorizationHeader(),
+    });
+
+    if (!res.ok) {
+      throw new Error(`Failed to load saved note (${res.status}).`);
+    }
+
+    return res.json() as Promise<SavedNoteDetails>;
+  }
+
+  async function loadSavedNotes({
+    showLoading = true,
+    isActive = () => true,
+  }: {
+    showLoading?: boolean;
+    isActive?: () => boolean;
+  } = {}) {
+    if (showLoading) {
+      setSavedNotesLoading(true);
+    }
+
+    if (showLoading) {
+      setSavedNotesError("");
+      setSavedNoteOpenError("");
+    }
+
+    try {
+      const notes = await getSavedNotes();
+
+      if (isActive()) {
+        setSavedNotes(notes);
+      }
+    } catch (err) {
+      if (showLoading && isActive()) {
+        setSavedNotesError(getErrorMessage(err));
+      }
+    } finally {
+      if (showLoading && isActive()) {
+        setSavedNotesLoading(false);
+      }
+    }
+  }
+
+  async function openSavedNote(savedNoteId: string) {
+    if (step === "recording" || step === "generating") {
+      return;
+    }
+
+    cleanupRecordingSession();
+    setLoadingSavedNoteId(savedNoteId);
+    setError("");
+    setSavedNoteOpenError("");
+
+    try {
+      const savedNote = await getSavedNote(savedNoteId);
+      const savedTranscript = savedNote.transcript ?? "";
+      const savedSoapDocument = savedNote.soap_document ?? "";
+
+      finalRef.current = savedTranscript;
+      interimRef.current = "";
+      noteIdRef.current = savedNote.id;
+
+      setComposerOpen(true);
+      setPatientName(savedNote.patient_name);
+      setVisitDate(savedNote.date);
+      setRecordingStartedAt(
+        formatRecordingStartTime(savedNote.recording_start_time)
+      );
+      setTranscript(savedTranscript);
+      setNote(savedSoapDocument);
+      setToken("");
+      setNoteId(savedNote.id);
+      setSelectedSavedNoteId(savedNote.id);
+      setCopied(false);
+      setCopiedTranscript(false);
+      setStep(savedSoapDocument.trim() ? "done" : "recorded");
+    } catch (err) {
+      setSavedNoteOpenError(getErrorMessage(err));
+    } finally {
+      setLoadingSavedNoteId("");
+    }
   }
 
   async function createNote({
@@ -300,8 +448,8 @@ export default function MeetingNoteGenerator() {
           typeof msg.error === "string"
             ? msg.error
             : msg.error?.details ||
-            msg.error?.title ||
-            "Corti returned an error.";
+              msg.error?.title ||
+              "Corti returned an error.";
 
         setError(errorMessage);
         return;
@@ -404,6 +552,15 @@ export default function MeetingNoteGenerator() {
       });
       setNoteId(createdNote.id);
       noteIdRef.current = createdNote.id;
+      setSavedNotes(currentNotes => [
+        {
+          id: createdNote.id,
+          patient_name: patientName.trim(),
+          date: visitDate,
+        },
+        ...currentNotes,
+      ]);
+      void loadSavedNotes({ showLoading: false });
 
       const wsUrl =
         `wss://api.${CORTI_ENVIRONMENT}.corti.app/audio-bridge/v2/transcribe` +
@@ -530,6 +687,7 @@ export default function MeetingNoteGenerator() {
       recorder.start(500);
 
       setStep("recording");
+      setSelectedSavedNoteId(createdNote.id);
     } catch (err) {
       cleanupRecordingSession();
       setStep("idle");
@@ -590,6 +748,18 @@ export default function MeetingNoteGenerator() {
     };
   }, []);
 
+  useEffect(() => {
+    let active = true;
+
+    void loadSavedNotes({
+      isActive: () => active,
+    });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
   async function generateNote() {
     const currentNoteId = noteIdRef.current || noteId;
 
@@ -598,8 +768,10 @@ export default function MeetingNoteGenerator() {
       return;
     }
 
-    if (!token) {
-      setError("Unable to generate note because the Corti token is missing.");
+    const currentTranscript = transcript.trim();
+
+    if (!currentTranscript) {
+      setError("Add a transcript before generating the note.");
       return;
     }
 
@@ -607,10 +779,18 @@ export default function MeetingNoteGenerator() {
     setError("");
 
     try {
+      let cortiToken = token;
+
+      if (!cortiToken) {
+        const tokenResponse = await getAccessToken();
+        cortiToken = tokenResponse.token;
+        setToken(cortiToken);
+      }
+
       const responseBody = await generateSoapDocument({
-        cortiToken: token,
+        cortiToken,
         noteId: currentNoteId,
-        transcript,
+        transcript: currentTranscript,
       });
 
       console.log(responseBody);
@@ -638,6 +818,9 @@ export default function MeetingNoteGenerator() {
     setPatientName("");
     setVisitDate(getTodayDateInputValue());
     setRecordingStartedAt("");
+    setSelectedSavedNoteId("");
+    setLoadingSavedNoteId("");
+    setSavedNoteOpenError("");
   }
 
   async function copyNote() {
@@ -677,7 +860,7 @@ export default function MeetingNoteGenerator() {
       </header>
 
       <main className="relative z-10 px-8 pb-28 pt-6 sm:px-14 lg:px-20">
-        <div className="mx-auto max-w-[720px]">
+        <div className="mx-auto grid max-w-[1120px] gap-10 lg:grid-cols-[minmax(0,720px)_280px] lg:items-start lg:justify-center">
           <div className="min-h-[62vh]">
             <div className="pt-12">
               <h1 className="font-display text-[2rem] font-semibold tracking-[-0.04em] text-white sm:text-[2.4rem]">
@@ -753,10 +936,11 @@ export default function MeetingNoteGenerator() {
                             }
                           }}
                           disabled={!canRecord}
-                          className={`inline-flex items-center gap-2.5 rounded-full px-6 py-3 text-sm font-semibold transition duration-200 disabled:opacity-40 ${step === "recording"
-                            ? "bg-rose-500/20 border border-rose-500/40 text-rose-300 hover:bg-rose-500/30"
-                            : "bg-[#c8b7ff]/14 border border-[#c8b7ff]/30 text-[#c8b7ff] hover:bg-[#c8b7ff]/22"
-                            }`}
+                          className={`inline-flex items-center gap-2.5 rounded-full px-6 py-3 text-sm font-semibold transition duration-200 disabled:opacity-40 ${
+                            step === "recording"
+                              ? "bg-rose-500/20 border border-rose-500/40 text-rose-300 hover:bg-rose-500/30"
+                              : "bg-[#c8b7ff]/14 border border-[#c8b7ff]/30 text-[#c8b7ff] hover:bg-[#c8b7ff]/22"
+                          }`}
                         >
                           {step === "recording" ? (
                             <>
@@ -818,6 +1002,8 @@ export default function MeetingNoteGenerator() {
                           setToken("");
                           setNoteId("");
                           noteIdRef.current = "";
+                          setSelectedSavedNoteId("");
+                          setLoadingSavedNoteId("");
                           finalRef.current = "";
                           interimRef.current = "";
                         }}
@@ -866,7 +1052,8 @@ export default function MeetingNoteGenerator() {
                         >
                           {copiedTranscript ? (
                             <>
-                              <Check className="h-3 w-3 text-green-400" /> Copied
+                              <Check className="h-3 w-3 text-green-400" />{" "}
+                              Copied
                             </>
                           ) : (
                             <>
@@ -903,7 +1090,9 @@ export default function MeetingNoteGenerator() {
                 {step === "generating" && (
                   <div className="flex flex-col items-center gap-4 py-16 text-center">
                     <Loader2 className="h-8 w-8 animate-spin text-[#c8b7ff]" />
-                    <p className="text-sm text-white/60">Generating SOAP note…</p>
+                    <p className="text-sm text-white/60">
+                      Generating SOAP note…
+                    </p>
                   </div>
                 )}
 
@@ -935,7 +1124,8 @@ export default function MeetingNoteGenerator() {
                           >
                             {copiedTranscript ? (
                               <>
-                                <Check className="h-3 w-3 text-green-400" /> Copied
+                                <Check className="h-3 w-3 text-green-400" />{" "}
+                                Copied
                               </>
                             ) : (
                               <>
@@ -963,7 +1153,8 @@ export default function MeetingNoteGenerator() {
                           >
                             {copied ? (
                               <>
-                                <Check className="h-3 w-3 text-green-400" /> Copied
+                                <Check className="h-3 w-3 text-green-400" />{" "}
+                                Copied
                               </>
                             ) : (
                               <>
@@ -984,6 +1175,96 @@ export default function MeetingNoteGenerator() {
               </div>
             )}
           </div>
+
+          <aside className="lg:sticky lg:top-8">
+            <div className="rounded-[1.1rem] border border-white/10 bg-white/[0.035] p-3">
+              <div className="flex items-center justify-between gap-3 px-2 py-2">
+                <h2 className="text-sm font-semibold text-white">
+                  Saved Notes
+                </h2>
+                <button
+                  type="button"
+                  onClick={() => void loadSavedNotes()}
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/12 text-white/45 transition hover:bg-white/[0.06] hover:text-white disabled:opacity-40"
+                  disabled={savedNotesLoading}
+                  aria-label="Refresh saved notes"
+                  title="Refresh saved notes"
+                >
+                  <RotateCcw
+                    className={`h-3.5 w-3.5 ${
+                      savedNotesLoading ? "animate-spin" : ""
+                    }`}
+                  />
+                </button>
+              </div>
+
+              {savedNoteOpenError && (
+                <p className="mx-2 mb-2 rounded-xl border border-rose-500/20 bg-rose-500/10 px-3 py-2 text-xs leading-5 text-rose-200/80">
+                  {savedNoteOpenError}
+                </p>
+              )}
+
+              {savedNotesLoading ? (
+                <div className="flex items-center gap-2 px-2 py-4 text-xs text-white/40">
+                  <Loader2 className="h-3.5 w-3.5 animate-spin text-[#c8b7ff]" />
+                  Loading notes
+                </div>
+              ) : savedNotesError ? (
+                <div className="px-2 py-4">
+                  <p className="text-xs leading-5 text-rose-300/80">
+                    {savedNotesError}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => void loadSavedNotes()}
+                    className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-white/14 px-3 py-1.5 text-xs text-white/55 transition hover:bg-white/[0.06] hover:text-white"
+                  >
+                    <RotateCcw className="h-3 w-3" /> Retry
+                  </button>
+                </div>
+              ) : savedNotes.length > 0 ? (
+                <ul className="max-h-[calc(100vh-13rem)] space-y-1 overflow-y-auto pr-1">
+                  {savedNotes.map(savedNote => (
+                    <li key={savedNote.id} className="rounded-xl">
+                      <button
+                        type="button"
+                        onClick={() => void openSavedNote(savedNote.id)}
+                        disabled={
+                          step === "recording" ||
+                          step === "generating" ||
+                          Boolean(loadingSavedNoteId)
+                        }
+                        className={`w-full rounded-xl px-3 py-2.5 text-left transition disabled:cursor-not-allowed disabled:opacity-45 ${
+                          selectedSavedNoteId === savedNote.id
+                            ? "bg-[#c8b7ff]/12"
+                            : "hover:bg-white/[0.055]"
+                        }`}
+                      >
+                        <span className="flex items-center justify-between gap-2">
+                          <span className="truncate text-sm font-medium text-white/78">
+                            {savedNote.patient_name}
+                          </span>
+                          {loadingSavedNoteId === savedNote.id && (
+                            <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin text-[#c8b7ff]" />
+                          )}
+                        </span>
+                        <time
+                          dateTime={savedNote.date}
+                          className="mt-1 block text-xs text-white/38"
+                        >
+                          {formatSavedNoteDate(savedNote.date)}
+                        </time>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div className="px-2 py-4 text-xs text-white/35">
+                  No notes yet.
+                </div>
+              )}
+            </div>
+          </aside>
         </div>
       </main>
     </div>
