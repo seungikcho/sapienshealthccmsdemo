@@ -1,6 +1,0 @@
-2026-04-30 real data tiles review
-The hero graphics were replaced with a six-tile gallery using equal-sized cards.
-The white bordered futuristic modality visuals are no longer present.
-A real chest X-ray tile and a real pathology tile are visible in both the hero and platform sections.
-The remaining tiles now read as sober data panels rather than futuristic illustrations.
-After allowing the headline to wrap naturally, the hero title no longer collides with the tile grid.

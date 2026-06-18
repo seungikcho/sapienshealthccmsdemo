@@ -1,5 +1,0 @@
-2026-04-30 hero density review
-The new middle intelligence-layer column fills the previous empty center gap and makes the hero feel denser on large screens.
-The middle card is now visually legible enough after widening the column and shortening the labels.
-The overall hero reads as a three-part composition: headline, intelligence layer, and 3x2 output block.
-Next verification step: confirm that both Request evaluation links resolve to mailto:info@sapienshealth.co with the request-evaluation subject line.

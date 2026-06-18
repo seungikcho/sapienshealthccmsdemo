@@ -1,8 +1,0 @@
-Preview review after typography and asset refresh:
-- Hero eyebrow text has been removed.
-- Wordmark and section headings are using the new sharper display typography and read more prominently.
-- Hero uses the new unified fusion image and the three floating modality cards now share a cleaner visual language.
-- About section modality cards are cleaner, with clutter removed and descriptions shortened.
-- MEDMIX input column now includes compact visual thumbnails for imaging, pathology, and clinical data.
-- Output descriptions are shorter and more scannable, though the output column appears vertically dense and may benefit from a slightly wider layout or smaller text balance if needed.
-- Overall page remains visually coherent with the dark deep-tech direction.

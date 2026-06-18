@@ -1,7 +1,0 @@
-Digital Health rewrite review notes:
-
-The homepage now fits the Digital Health framing much more directly. The hero headline, navigation, and supporting copy are fully centered on incomplete multimodal clinical data, and the previous manufacturing narrative has been removed. The right-side clinical image works well with the new message and keeps the top section visually grounded.
-
-The Digital Health section clearly explains that hospitals rarely have complete ECG, imaging, EHR, pathology, and notes at the same time. The prediction-to-insight section is also reading in the intended direction: prediction tasks are no longer presented as isolated scores, but as workflow-ready insight for care teams.
-
-A likely next refinement is density balancing. The hero is visually stronger than before, but the input tiles and insight cards could still be tightened slightly if the user wants a more editorial, compressed feel. Functionally and positionally, however, the rewrite is coherent and aligned with the Nebius Digital Health category.

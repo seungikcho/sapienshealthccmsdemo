@@ -1,7 +1,0 @@
-Five-section rebuild review notes:
-- Hero copy is updated correctly to 'Predict outcomes from incomplete data.' with the new supporting line.
-- Hero currently feels very clean, but there is substantial empty space on the right because the composition is fully text-led.
-- Clinical Intelligence section is using a single clinical image and the new institutional copy as requested.
-- Bioprocess Intelligence section is using a single manufacturing image and the new CDMO-focused copy as requested.
-- The two vertical sections feel more unified than before because each uses one large image and one text block.
-- Framework and contact sections still need final visual confirmation below the current viewport, but the visible portions of the rebuild are coherent.

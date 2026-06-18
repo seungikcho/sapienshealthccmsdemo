@@ -1,5 +1,0 @@
-2026-06-07 preview validation notes
-
-- Preview URL https://3000-id99f48palqm6o9zcsj2o-1125c197.us2.manus.computer showed 'This page is currently unavailable' on repeated checks.
-- Browser navigation and browser view both failed to render the homepage, so browser-based visual confirmation is temporarily blocked.
-- Next step: verify the local dev server directly and recover preview access if needed.
