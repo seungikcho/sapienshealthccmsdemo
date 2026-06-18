@@ -157,7 +157,6 @@ export default function MeetingNoteGenerator() {
   const [copied, setCopied] = useState(false);
   const [copiedTranscript, setCopiedTranscript] = useState(false);
   const [error, setError] = useState("");
-  const [token, setToken] = useState("");
   const [noteId, setNoteId] = useState("");
   const [savedNotes, setSavedNotes] = useState<SavedNote[]>([]);
   const [savedNotesLoading, setSavedNotesLoading] = useState(true);
@@ -283,7 +282,6 @@ export default function MeetingNoteGenerator() {
       );
       setTranscript(savedTranscript);
       setNote(savedSoapDocument);
-      setToken("");
       setNoteId(savedNote.id);
       setSelectedSavedNoteId(savedNote.id);
       setCopied(false);
@@ -297,10 +295,8 @@ export default function MeetingNoteGenerator() {
   }
 
   async function createNote({
-    cortiToken,
     startedAt,
   }: {
-    cortiToken: string;
     startedAt: string;
   }): Promise<CreateNoteResponse> {
     const res = await fetch(apiUrl("/note"), {
@@ -308,7 +304,6 @@ export default function MeetingNoteGenerator() {
       headers: {
         ...getAuthorizationHeader(),
         "Content-Type": "application/json",
-        "X-Corti-Authentication": `Bearer ${cortiToken}`,
       },
       body: JSON.stringify({
         patient_name: patientName.trim(),
@@ -343,11 +338,9 @@ export default function MeetingNoteGenerator() {
   }
 
   async function generateSoapDocument({
-    cortiToken,
     noteId,
     transcript,
   }: {
-    cortiToken: string;
     noteId: string;
     transcript: string;
   }): Promise<GenerateSoapResponse> {
@@ -356,8 +349,6 @@ export default function MeetingNoteGenerator() {
       headers: {
         ...getAuthorizationHeader(),
         "Content-Type": "application/json",
-        "Tenant-Name": CORTI_TENANT_NAME,
-        "X-Corti-Authorization": `Bearer ${cortiToken}`,
       },
       body: JSON.stringify({
         transcript,
@@ -522,7 +513,6 @@ export default function MeetingNoteGenerator() {
 
     setRecordingStartedAt(getCurrentDateTimeLabel(recordingStartedAtDate));
     setError("");
-    setToken("");
     setNoteId("");
     noteIdRef.current = "";
     setTranscript("");
@@ -551,10 +541,8 @@ export default function MeetingNoteGenerator() {
       mediaRecorderRef.current = recorder;
 
       const { token } = await getAccessToken();
-      setToken(token);
 
       const createdNote = await createNote({
-        cortiToken: token,
         startedAt: recordingStartedAtIso,
       });
       setNoteId(createdNote.id);
@@ -699,7 +687,6 @@ export default function MeetingNoteGenerator() {
       cleanupRecordingSession();
       setStep("idle");
       setRecordingStartedAt("");
-      setToken("");
       setNoteId("");
       noteIdRef.current = "";
       setError(getErrorMessage(err));
@@ -790,16 +777,7 @@ export default function MeetingNoteGenerator() {
     setTranscript(currentTranscript);
 
     try {
-      let cortiToken = token;
-
-      if (!cortiToken) {
-        const tokenResponse = await getAccessToken();
-        cortiToken = tokenResponse.token;
-        setToken(cortiToken);
-      }
-
       const responseBody = await generateSoapDocument({
-        cortiToken,
         noteId: currentNoteId,
         transcript: currentTranscript,
       });
@@ -824,7 +802,6 @@ export default function MeetingNoteGenerator() {
     setTranscript("");
     setNote("");
     setError("");
-    setToken("");
     setNoteId("");
     noteIdRef.current = "";
     setPatientName("");
@@ -1011,7 +988,6 @@ export default function MeetingNoteGenerator() {
                           setStep("idle");
                           setTranscript("");
                           setRecordingStartedAt("");
-                          setToken("");
                           setNoteId("");
                           noteIdRef.current = "";
                           setSelectedSavedNoteId("");
