@@ -177,11 +177,6 @@ export default function Home() {
                     label: "Healthcare-Specific",
                     value: "AI Reasoning",
                   },
-                  {
-                    Icon: ShieldCheck,
-                    label: "Privacy & Compliance",
-                    value: "HIPAA · GDPR",
-                  },
                 ].map(({ Icon, label, value }) => (
                   <div
                     key={value}
