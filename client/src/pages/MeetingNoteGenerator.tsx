@@ -54,6 +54,7 @@ type SavedNoteDetails = SavedNote & {
   corti_interaction_id: string | null;
   recording_start_time: string | null;
   transcript: string | null;
+  comments?: string | null;
   soap_document: string | null;
   created_at: string;
   updated_at: string;
@@ -170,6 +171,7 @@ export default function MeetingNoteGenerator() {
   const [step, setStep] = useState<Step>("idle");
   const [composerOpen, setComposerOpen] = useState(false);
   const [transcript, setTranscript] = useState("");
+  const [comments, setComments] = useState("");
   const [note, setNote] = useState("");
   const [copied, setCopied] = useState(false);
   const [copiedTranscript, setCopiedTranscript] = useState(false);
@@ -295,6 +297,7 @@ export default function MeetingNoteGenerator() {
     try {
       const savedNote = await getSavedNote(savedNoteId);
       const savedTranscript = savedNote.transcript ?? "";
+      const savedComments = savedNote.comments ?? "";
       const savedSoapDocument = savedNote.soap_document ?? "";
 
       finalRef.current = savedTranscript;
@@ -309,6 +312,7 @@ export default function MeetingNoteGenerator() {
         formatRecordingStartTime(savedNote.recording_start_time)
       );
       setTranscript(savedTranscript);
+      setComments(savedComments);
       setNote(savedSoapDocument);
       setNoteId(savedNote.id);
       setSelectedSavedNoteId(savedNote.id);
@@ -492,9 +496,11 @@ export default function MeetingNoteGenerator() {
   async function generateSoapDocument({
     noteId,
     transcript,
+    comments,
   }: {
     noteId: string;
     transcript: string;
+    comments: string;
   }): Promise<GenerateSoapResponse> {
     const res = await fetch(apiUrl(`/note/${noteId}/soap`), {
       method: "POST",
@@ -504,6 +510,7 @@ export default function MeetingNoteGenerator() {
       },
       body: JSON.stringify({
         transcript,
+        comments,
       }),
     });
 
@@ -668,6 +675,7 @@ export default function MeetingNoteGenerator() {
     setNoteId("");
     noteIdRef.current = "";
     setTranscript("");
+    setComments("");
     finalRef.current = "";
     interimRef.current = "";
     transcriptLockedRef.current = false;
@@ -915,6 +923,7 @@ export default function MeetingNoteGenerator() {
     }
 
     const currentTranscript = transcript.trim();
+    const currentComments = comments.trim();
 
     if (!currentTranscript) {
       setError("Add a transcript before generating the note.");
@@ -932,6 +941,7 @@ export default function MeetingNoteGenerator() {
       const responseBody = await generateSoapDocument({
         noteId: currentNoteId,
         transcript: currentTranscript,
+        comments: currentComments,
       });
 
       console.log(responseBody);
@@ -952,6 +962,7 @@ export default function MeetingNoteGenerator() {
 
     setStep("idle");
     setTranscript("");
+    setComments("");
     setNote("");
     setError("");
     setNoteId("");
@@ -1124,6 +1135,21 @@ export default function MeetingNoteGenerator() {
                           </p>
                         </div>
                       )}
+
+                      {step === "recording" && (
+                        <div className="flex flex-col gap-2">
+                          <label className="text-sm font-medium text-white/70">
+                            Comments
+                          </label>
+                          <textarea
+                            value={comments}
+                            onChange={e => setComments(e.target.value)}
+                            rows={3}
+                            className="rounded-[1.1rem] border border-white/10 bg-white/[0.03] p-4 text-sm leading-6 text-white/70 outline-none transition resize-none focus:border-[#c8b7ff]/40 focus:bg-white/[0.05]"
+                            placeholder="Add any context or comments while recording."
+                          />
+                        </div>
+                      )}
                     </div>
                   </>
                 )}
@@ -1139,6 +1165,7 @@ export default function MeetingNoteGenerator() {
                         onClick={() => {
                           setStep("idle");
                           setTranscript("");
+                          setComments("");
                           setRecordingStartedAt("");
                           setNoteId("");
                           noteIdRef.current = "";
@@ -1219,6 +1246,19 @@ export default function MeetingNoteGenerator() {
                       <p className="text-xs text-white/28">
                         You can edit the transcript before generating.
                       </p>
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                      <label className="text-sm font-medium text-white/70">
+                        Comments
+                      </label>
+                      <textarea
+                        value={comments}
+                        onChange={e => setComments(e.target.value)}
+                        rows={4}
+                        className="rounded-[1.1rem] border border-white/10 bg-white/[0.03] p-4 text-sm leading-6 text-white/70 outline-none transition resize-none focus:border-[#c8b7ff]/40 focus:bg-white/[0.05]"
+                        placeholder="Add any additional context before generating."
+                      />
                     </div>
 
                     {error && <p className="text-sm text-rose-400">{error}</p>}
