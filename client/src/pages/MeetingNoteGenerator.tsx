@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, type FormEvent } from "react";
 import {
   ArrowLeft,
   Mic,
@@ -6,11 +6,28 @@ import {
   FileText,
   Copy,
   Check,
+  Ellipsis,
   Loader2,
+  Pencil,
   RotateCcw,
+  Trash2,
 } from "lucide-react";
 import { apiUrl } from "@/lib/api";
 import { getAuthorizationHeader } from "@/lib/auth";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 type Step = "idle" | "recording" | "recorded" | "generating" | "done";
 
@@ -164,6 +181,17 @@ export default function MeetingNoteGenerator() {
   const [selectedSavedNoteId, setSelectedSavedNoteId] = useState("");
   const [loadingSavedNoteId, setLoadingSavedNoteId] = useState("");
   const [savedNoteOpenError, setSavedNoteOpenError] = useState("");
+  const [editingSavedNote, setEditingSavedNote] = useState<SavedNote | null>(
+    null
+  );
+  const [editedNoteTitle, setEditedNoteTitle] = useState("");
+  const [editTitleError, setEditTitleError] = useState("");
+  const [savingSavedNoteTitle, setSavingSavedNoteTitle] = useState(false);
+  const [deletingSavedNote, setDeletingSavedNote] = useState<SavedNote | null>(
+    null
+  );
+  const [deleteError, setDeleteError] = useState("");
+  const [deletingSavedNoteId, setDeletingSavedNoteId] = useState("");
 
   const wsRef = useRef<WebSocket | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -334,6 +362,130 @@ export default function MeetingNoteGenerator() {
 
     if (!res.ok) {
       throw new Error(`Failed to update note transcript (${res.status}).`);
+    }
+  }
+
+  async function updateSavedNoteTitle(noteId: string, patientName: string) {
+    const res = await fetch(apiUrl(`/note/${noteId}`), {
+      method: "PATCH",
+      headers: {
+        ...getAuthorizationHeader(),
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ patient_name: patientName }),
+    });
+
+    if (!res.ok) {
+      throw new Error(`Failed to update note title (${res.status}).`);
+    }
+  }
+
+  async function deleteSavedNote(noteId: string) {
+    const res = await fetch(apiUrl(`/note/${noteId}`), {
+      method: "DELETE",
+      headers: getAuthorizationHeader(),
+    });
+
+    if (!res.ok) {
+      throw new Error(`Failed to delete note (${res.status}).`);
+    }
+  }
+
+  function startEditingSavedNote(savedNote: SavedNote) {
+    setEditingSavedNote(savedNote);
+    setEditedNoteTitle(savedNote.patient_name);
+    setEditTitleError("");
+  }
+
+  function closeEditTitleDialog() {
+    if (savingSavedNoteTitle) {
+      return;
+    }
+
+    setEditingSavedNote(null);
+    setEditedNoteTitle("");
+    setEditTitleError("");
+  }
+
+  async function saveSavedNoteTitle(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    if (!editingSavedNote) {
+      return;
+    }
+
+    const patientName = editedNoteTitle.trim();
+
+    if (!patientName) {
+      setEditTitleError("Enter a note title.");
+      return;
+    }
+
+    setSavingSavedNoteTitle(true);
+    setEditTitleError("");
+
+    try {
+      await updateSavedNoteTitle(editingSavedNote.id, patientName);
+      setSavedNotes(currentNotes =>
+        currentNotes.map(savedNote =>
+          savedNote.id === editingSavedNote.id
+            ? { ...savedNote, patient_name: patientName }
+            : savedNote
+        )
+      );
+
+      if (selectedSavedNoteId === editingSavedNote.id) {
+        setPatientName(patientName);
+      }
+
+      setEditingSavedNote(null);
+      setEditedNoteTitle("");
+    } catch (err) {
+      setEditTitleError(getErrorMessage(err));
+    } finally {
+      setSavingSavedNoteTitle(false);
+    }
+  }
+
+  function startDeletingSavedNote(savedNote: SavedNote) {
+    setDeletingSavedNote(savedNote);
+    setDeleteError("");
+  }
+
+  function closeDeleteDialog() {
+    if (deletingSavedNoteId) {
+      return;
+    }
+
+    setDeletingSavedNote(null);
+    setDeleteError("");
+  }
+
+  async function confirmDeleteSavedNote() {
+    if (!deletingSavedNote) {
+      return;
+    }
+
+    const savedNoteId = deletingSavedNote.id;
+    setDeletingSavedNoteId(savedNoteId);
+    setDeleteError("");
+
+    try {
+      await deleteSavedNote(savedNoteId);
+      setSavedNotes(currentNotes =>
+        currentNotes.filter(savedNote => savedNote.id !== savedNoteId)
+      );
+
+      if (selectedSavedNoteId === savedNoteId) {
+        reset();
+        setComposerOpen(false);
+      }
+
+      setDeletingSavedNote(null);
+    } catch (err) {
+      setDeleteError(getErrorMessage(err));
+    } finally {
+      setDeletingSavedNoteId("");
     }
   }
 
@@ -1220,7 +1372,10 @@ export default function MeetingNoteGenerator() {
               ) : savedNotes.length > 0 ? (
                 <ul className="max-h-[calc(100vh-13rem)] space-y-1 overflow-y-auto pr-1">
                   {savedNotes.map(savedNote => (
-                    <li key={savedNote.id} className="rounded-xl">
+                    <li
+                      key={savedNote.id}
+                      className="group relative rounded-xl"
+                    >
                       <button
                         type="button"
                         onClick={() => void openSavedNote(savedNote.id)}
@@ -1229,7 +1384,7 @@ export default function MeetingNoteGenerator() {
                           step === "generating" ||
                           Boolean(loadingSavedNoteId)
                         }
-                        className={`w-full rounded-xl px-3 py-2.5 text-left transition disabled:cursor-not-allowed disabled:opacity-45 ${
+                        className={`w-full rounded-xl px-3 py-2.5 pr-11 text-left transition disabled:cursor-not-allowed disabled:opacity-45 ${
                           selectedSavedNoteId === savedNote.id
                             ? "bg-[#c8b7ff]/12"
                             : "hover:bg-white/[0.055]"
@@ -1250,6 +1405,38 @@ export default function MeetingNoteGenerator() {
                           {formatSavedNoteDate(savedNote.date)}
                         </time>
                       </button>
+
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button
+                            type="button"
+                            className="pointer-events-none absolute right-2 top-2.5 inline-flex h-7 w-7 items-center justify-center rounded-md text-white/45 opacity-0 transition hover:bg-white/[0.09] hover:text-white focus:pointer-events-auto focus:bg-white/[0.09] focus:text-white focus:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100"
+                            aria-label={`Actions for ${savedNote.patient_name}`}
+                            title="Note actions"
+                          >
+                            <Ellipsis className="h-4 w-4" />
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent
+                          align="end"
+                          className="min-w-32 border-white/10 bg-[#211b31] text-white shadow-xl"
+                        >
+                          <DropdownMenuItem
+                            onSelect={() => startEditingSavedNote(savedNote)}
+                            className="cursor-pointer text-white/85 focus:bg-white/[0.1] focus:text-white"
+                          >
+                            <Pencil className="h-3.5 w-3.5" /> Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            variant="destructive"
+                            onSelect={() => startDeletingSavedNote(savedNote)}
+                            className="cursor-pointer text-rose-400 focus:bg-rose-500/10 focus:text-rose-300"
+                          >
+                            <Trash2 className="h-3.5 w-3.5 text-rose-400" />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </li>
                   ))}
                 </ul>
@@ -1262,6 +1449,102 @@ export default function MeetingNoteGenerator() {
           </aside>
         </div>
       </main>
+
+      <Dialog
+        open={Boolean(editingSavedNote)}
+        onOpenChange={open => {
+          if (!open) {
+            closeEditTitleDialog();
+          }
+        }}
+      >
+        <DialogContent className="border-white/10 bg-[#211b31] text-white sm:max-w-md">
+          <form onSubmit={saveSavedNoteTitle}>
+            <DialogHeader>
+              <DialogTitle>Edit note title</DialogTitle>
+              <DialogDescription className="text-white/55">
+                Update the patient name used for this note.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="mt-5">
+              <label
+                htmlFor="saved-note-title"
+                className="mb-2 block text-sm font-medium text-white/70"
+              >
+                Note title
+              </label>
+              <input
+                id="saved-note-title"
+                type="text"
+                value={editedNoteTitle}
+                onChange={event => setEditedNoteTitle(event.target.value)}
+                autoFocus
+                disabled={savingSavedNoteTitle}
+                className="w-full rounded-xl border border-white/12 bg-white/[0.05] px-3 py-2.5 text-sm text-white outline-none transition placeholder:text-white/30 focus:border-[#c8b7ff]/50 focus:bg-white/[0.07] disabled:opacity-50"
+              />
+              {editTitleError && (
+                <p className="mt-2 text-sm text-rose-300">{editTitleError}</p>
+              )}
+            </div>
+            <DialogFooter className="mt-6">
+              <button
+                type="button"
+                onClick={closeEditTitleDialog}
+                disabled={savingSavedNoteTitle}
+                className="rounded-full border border-white/15 px-4 py-2 text-sm font-medium text-white/70 transition hover:bg-white/[0.07] hover:text-white disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={savingSavedNoteTitle}
+                className="rounded-full bg-[#c8b7ff] px-4 py-2 text-sm font-semibold text-[#17120d] transition hover:bg-[#d6caff] disabled:opacity-50"
+              >
+                {savingSavedNoteTitle ? "Saving…" : "Save"}
+              </button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={Boolean(deletingSavedNote)}
+        onOpenChange={open => {
+          if (!open) {
+            closeDeleteDialog();
+          }
+        }}
+      >
+        <DialogContent className="border-white/10 bg-[#211b31] text-white sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Delete {deletingSavedNote?.patient_name}?</DialogTitle>
+            <DialogDescription className="text-white/55">
+              This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          {deleteError && (
+            <p className="text-sm text-rose-300">{deleteError}</p>
+          )}
+          <DialogFooter className="mt-2">
+            <button
+              type="button"
+              onClick={closeDeleteDialog}
+              disabled={Boolean(deletingSavedNoteId)}
+              className="rounded-full border border-white/15 px-4 py-2 text-sm font-medium text-white/70 transition hover:bg-white/[0.07] hover:text-white disabled:opacity-50"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={() => void confirmDeleteSavedNote()}
+              disabled={Boolean(deletingSavedNoteId)}
+              className="rounded-full bg-rose-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-rose-400 disabled:opacity-50"
+            >
+              {deletingSavedNoteId ? "Deleting…" : "Delete"}
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
