@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import {
   ArrowLeft,
   Search,
@@ -9,6 +9,8 @@ import {
   Check,
   X,
   Trash2,
+  Ellipsis,
+  Pencil,
   Bookmark,
   ChevronLeft,
   ChevronRight,
@@ -16,6 +18,20 @@ import {
 import { toast } from "sonner";
 import { apiUrl } from "@/lib/api";
 import { getAuthorizationHeader } from "@/lib/auth";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 type LabTest = {
   id: string;
@@ -58,6 +74,17 @@ export default function LabTestSearch() {
   const [sets, setSets] = useState<LabTestSet[]>([]);
   const [setName, setSetName] = useState("");
   const [savingSet, setSavingSet] = useState(false);
+  const [editingSet, setEditingSet] = useState<LabTestSet | null>(null);
+  const [editedSetName, setEditedSetName] = useState("");
+  const [editSetError, setEditSetError] = useState("");
+  const [savingSetName, setSavingSetName] = useState(false);
+  const [deletingSet, setDeletingSet] = useState<LabTestSet | null>(null);
+  const [deleteSetError, setDeleteSetError] = useState("");
+  const [deletingSetId, setDeletingSetId] = useState("");
+  const [editingLabTest, setEditingLabTest] = useState<LabTest | null>(null);
+  const [editedLabTestName, setEditedLabTestName] = useState("");
+  const [editLabTestError, setEditLabTestError] = useState("");
+  const [savingLabTestName, setSavingLabTestName] = useState(false);
 
   const requestSeq = useRef(0);
 
@@ -129,7 +156,10 @@ export default function LabTestSearch() {
     try {
       const res = await fetch(apiUrl(`/lab-tests/${t.id}/favorite`), {
         method: "POST",
-        headers: { ...getAuthorizationHeader(), "Content-Type": "application/json" },
+        headers: {
+          ...getAuthorizationHeader(),
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({ favorite: next }),
       });
       if (!res.ok) throw new Error("Failed to update favorite");
@@ -148,6 +178,81 @@ export default function LabTestSearch() {
     });
   }
 
+  async function updateLabTestName(testId: string, name: string) {
+    const res = await fetch(apiUrl(`/lab-tests/${testId}`), {
+      method: "PATCH",
+      headers: {
+        ...getAuthorizationHeader(),
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ name }),
+    });
+
+    if (!res.ok) throw new Error("Failed to update test name");
+  }
+
+  function startEditingLabTest(test: LabTest) {
+    setEditingLabTest(test);
+    setEditedLabTestName(test.name);
+    setEditLabTestError("");
+  }
+
+  function closeEditLabTestDialog() {
+    if (savingLabTestName) return;
+
+    setEditingLabTest(null);
+    setEditedLabTestName("");
+    setEditLabTestError("");
+  }
+
+  async function saveLabTestName(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    if (!editingLabTest) return;
+
+    const name = editedLabTestName.trim();
+
+    if (!name) {
+      setEditLabTestError("Enter a test name.");
+      return;
+    }
+
+    setSavingLabTestName(true);
+    setEditLabTestError("");
+
+    try {
+      await updateLabTestName(editingLabTest.id, name);
+      setResults(prev =>
+        prev.map(test =>
+          test.id === editingLabTest.id ? { ...test, name } : test
+        )
+      );
+      setSelected(prev =>
+        prev[editingLabTest.id]
+          ? {
+            ...prev,
+            [editingLabTest.id]: { ...prev[editingLabTest.id], name },
+          }
+          : prev
+      );
+      setSets(prev =>
+        prev.map(set => ({
+          ...set,
+          tests: set.tests.map(test =>
+            test.id === editingLabTest.id ? { ...test, name } : test
+          ),
+        }))
+      );
+      toast.success(`Renamed test to “${name}”`);
+      setEditingLabTest(null);
+      setEditedLabTestName("");
+    } catch (err) {
+      setEditLabTestError((err as Error).message);
+    } finally {
+      setSavingLabTestName(false);
+    }
+  }
+
   const selectedList = useMemo(() => Object.values(selected), [selected]);
   const totals = useMemo(() => {
     const price = selectedList.reduce((s, t) => s + t.price, 0);
@@ -162,7 +267,10 @@ export default function LabTestSearch() {
     try {
       const res = await fetch(apiUrl("/lab-sets/"), {
         method: "POST",
-        headers: { ...getAuthorizationHeader(), "Content-Type": "application/json" },
+        headers: {
+          ...getAuthorizationHeader(),
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({ name, testIds: selectedList.map(t => t.id) }),
       });
       const data = await res.json();
@@ -184,17 +292,100 @@ export default function LabTestSearch() {
     toast.success(`Loaded “${s.name}” (${s.tests.length} tests)`);
   }
 
-  async function removeSet(s: LabTestSet) {
+  async function updateSetName(setId: string, name: string) {
+    const res = await fetch(apiUrl(`/lab-sets/${setId}`), {
+      method: "PATCH",
+      headers: {
+        ...getAuthorizationHeader(),
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ name }),
+    });
+
+    if (!res.ok) throw new Error("Failed to update set name");
+  }
+
+  async function deleteSet(setId: string) {
+    const res = await fetch(apiUrl(`/lab-sets/${setId}`), {
+      method: "DELETE",
+      headers: getAuthorizationHeader(),
+    });
+
+    if (!res.ok) throw new Error("Failed to delete set");
+  }
+
+  function startEditingSet(s: LabTestSet) {
+    setEditingSet(s);
+    setEditedSetName(s.name);
+    setEditSetError("");
+  }
+
+  function closeEditSetDialog() {
+    if (savingSetName) return;
+
+    setEditingSet(null);
+    setEditedSetName("");
+    setEditSetError("");
+  }
+
+  async function saveSetName(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    if (!editingSet) return;
+
+    const name = editedSetName.trim();
+
+    if (!name) {
+      setEditSetError("Enter a set name.");
+      return;
+    }
+
+    setSavingSetName(true);
+    setEditSetError("");
+
     try {
-      const res = await fetch(apiUrl(`/lab-sets/${s.id}`), {
-        method: "DELETE",
-        headers: getAuthorizationHeader(),
-      });
-      if (!res.ok) throw new Error("Failed to delete set");
-      toast.success(`Deleted “${s.name}”`);
-      setSets(prev => prev.filter(x => x.id !== s.id));
+      await updateSetName(editingSet.id, name);
+      setSets(prev =>
+        prev.map(s => (s.id === editingSet.id ? { ...s, name } : s))
+      );
+      toast.success(`Renamed set to “${name}”`);
+      setEditingSet(null);
+      setEditedSetName("");
     } catch (err) {
-      toast.error((err as Error).message);
+      setEditSetError((err as Error).message);
+    } finally {
+      setSavingSetName(false);
+    }
+  }
+
+  function startDeletingSet(s: LabTestSet) {
+    setDeletingSet(s);
+    setDeleteSetError("");
+  }
+
+  function closeDeleteSetDialog() {
+    if (deletingSetId) return;
+
+    setDeletingSet(null);
+    setDeleteSetError("");
+  }
+
+  async function confirmDeleteSet() {
+    if (!deletingSet) return;
+
+    const setId = deletingSet.id;
+    setDeletingSetId(setId);
+    setDeleteSetError("");
+
+    try {
+      await deleteSet(setId);
+      toast.success(`Deleted “${deletingSet.name}”`);
+      setSets(prev => prev.filter(s => s.id !== setId));
+      setDeletingSet(null);
+    } catch (err) {
+      setDeleteSetError((err as Error).message);
+    } finally {
+      setDeletingSetId("");
     }
   }
 
@@ -248,22 +439,20 @@ export default function LabTestSearch() {
                   <button
                     key={c}
                     onClick={() => changeFilter(() => setCompany(c))}
-                    className={`rounded-full border px-4 py-1.5 text-xs font-medium transition ${
-                      company === c
+                    className={`rounded-full border px-4 py-1.5 text-xs font-medium transition ${company === c
                         ? "border-[#c8b7ff]/60 bg-[#c8b7ff]/15 text-[#d6caff]"
                         : "border-white/12 bg-white/[0.04] text-white/50 hover:text-white"
-                    }`}
+                      }`}
                   >
                     {c}
                   </button>
                 ))}
                 <button
                   onClick={() => changeFilter(() => setFavOnly(v => !v))}
-                  className={`inline-flex items-center gap-1.5 rounded-full border px-4 py-1.5 text-xs font-medium transition ${
-                    favOnly
+                  className={`inline-flex items-center gap-1.5 rounded-full border px-4 py-1.5 text-xs font-medium transition ${favOnly
                       ? "border-[#ffd27a]/50 bg-[#ffd27a]/12 text-[#ffd27a]"
                       : "border-white/12 bg-white/[0.04] text-white/50 hover:text-white"
-                  }`}
+                    }`}
                 >
                   <Star
                     className="h-3.5 w-3.5"
@@ -280,11 +469,14 @@ export default function LabTestSearch() {
 
               {/* Results list */}
               <div className="mt-5 overflow-hidden rounded-[1.4rem] border border-white/10 bg-white/[0.03]">
-                <div className="hidden grid-cols-[2.75rem_minmax(0,1fr)_6.5rem_6.5rem] items-center gap-3 border-b border-white/10 px-5 py-3 text-[0.65rem] uppercase tracking-wider text-white/35 sm:grid">
+                <div className="hidden grid-cols-[2.75rem_minmax(0,1fr)_13rem_5rem] items-center gap-3 border-b border-white/10 px-5 py-3 text-[0.65rem] uppercase tracking-wider text-white/35 sm:grid">
                   <span />
                   <span>Test</span>
-                  <span className="text-right">Price</span>
-                  <span className="text-right">Markup</span>
+                  <div className="grid grid-cols-2 gap-x-1">
+                    <span className="text-right">Price</span>
+                    <span className="text-right">Markup</span>
+                  </div>
+                  <span />
                 </div>
 
                 {loading && (
@@ -311,21 +503,19 @@ export default function LabTestSearch() {
                       <div
                         key={t.id}
                         onClick={() => toggleTest(t)}
-                        className={`grid cursor-pointer grid-cols-[2.75rem_minmax(0,1fr)] items-center gap-3 border-b border-white/[0.06] px-5 py-3 transition last:border-b-0 sm:grid-cols-[2.75rem_minmax(0,1fr)_6.5rem_6.5rem] ${
-                          isSelected
+                        className={`group grid cursor-pointer grid-cols-[2.75rem_minmax(0,1fr)_2rem] items-center gap-3 border-b border-white/[0.06] px-5 py-3 transition last:border-b-0 sm:grid-cols-[2.75rem_minmax(0,1fr)_13rem_5rem] ${isSelected
                             ? "bg-[#c8b7ff]/[0.08] hover:bg-[#c8b7ff]/[0.12]"
                             : "hover:bg-white/[0.04]"
-                        }`}
+                          }`}
                       >
                         <button
                           aria-label={
                             isSelected ? "Remove from panel" : "Add to panel"
                           }
-                          className={`flex h-7 w-7 items-center justify-center rounded-full border transition ${
-                            isSelected
+                          className={`flex h-7 w-7 items-center justify-center rounded-full border transition ${isSelected
                               ? "border-[#c8b7ff] bg-[#c8b7ff] text-[#17120d]"
                               : "border-white/20 text-white/50 hover:border-[#c8b7ff]/60 hover:text-[#c8b7ff]"
-                          }`}
+                            }`}
                         >
                           {isSelected ? (
                             <Check className="h-4 w-4" />
@@ -345,11 +535,10 @@ export default function LabTestSearch() {
                                   ? "Remove from favorites"
                                   : "Add to favorites"
                               }
-                              className={`shrink-0 transition ${
-                                t.favorite
+                              className={`shrink-0 transition ${t.favorite
                                   ? "text-[#ffd27a] hover:text-[#ffba47]"
                                   : "text-white/25 hover:text-[#ffd27a]"
-                              }`}
+                                }`}
                             >
                               <Star
                                 className="h-3.5 w-3.5"
@@ -380,12 +569,42 @@ export default function LabTestSearch() {
                             </span>
                           </div>
                         </div>
-                        <span className="hidden text-right text-sm text-white/70 sm:block">
-                          {money(t.price)}
-                        </span>
-                        <span className="hidden text-right text-sm font-semibold text-[#c8b7ff] sm:block">
-                          {money(t.markup)}
-                        </span>
+                        <div className="hidden grid-cols-2 gap-x-1 sm:grid">
+                          <span className="text-right text-sm text-white/70">
+                            {money(t.price)}
+                          </span>
+                          <span className="text-right text-sm font-semibold text-[#c8b7ff]">
+                            {money(t.markup)}
+                          </span>
+                        </div>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <button
+                              type="button"
+                              onClick={event => event.stopPropagation()}
+                              className="inline-flex h-7 w-7 justify-self-end items-center justify-center rounded-md text-white/45 transition hover:bg-white/[0.09] hover:text-white focus:bg-white/[0.09] focus:text-white focus:opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
+                              aria-label={`Actions for ${t.name}`}
+                              title="Test actions"
+                            >
+                              <Ellipsis className="h-4 w-4" />
+                            </button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent
+                            align="end"
+                            onClick={event => event.stopPropagation()}
+                            className="min-w-32 border-white/10 bg-[#211b31] text-white shadow-xl"
+                          >
+                            <DropdownMenuItem
+                              onSelect={event => {
+                                event.stopPropagation();
+                                startEditingLabTest(t);
+                              }}
+                              className="cursor-pointer text-white/85 focus:bg-white/[0.1] focus:text-white"
+                            >
+                              <Pencil className="h-3.5 w-3.5" /> Edit
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
                     );
                   })}
@@ -525,8 +744,8 @@ export default function LabTestSearch() {
                 </h2>
                 {sets.length === 0 ? (
                   <p className="mt-3 text-xs leading-5 text-white/38">
-                    No saved sets yet. Select tests and save them as a named
-                    set to reuse later.
+                    No saved sets yet. Select tests and save them as a named set
+                    to reuse later.
                   </p>
                 ) : (
                   <div className="mt-3 flex flex-col gap-2">
@@ -542,9 +761,9 @@ export default function LabTestSearch() {
                       return (
                         <div
                           key={s.id}
-                          className="rounded-xl border border-white/[0.07] bg-white/[0.03] px-3.5 py-2.5"
+                          className="group relative rounded-xl border border-white/[0.07] bg-white/[0.03] px-3.5 py-2.5"
                         >
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 pr-7">
                             <p className="min-w-0 flex-1 truncate text-xs font-semibold text-white/90">
                               {s.name}
                             </p>
@@ -554,14 +773,38 @@ export default function LabTestSearch() {
                             >
                               Load
                             </button>
-                            <button
-                              onClick={() => removeSet(s)}
-                              aria-label={`Delete ${s.name}`}
-                              className="text-white/30 transition hover:text-red-400"
-                            >
-                              <Trash2 className="h-3.5 w-3.5" />
-                            </button>
                           </div>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <button
+                                type="button"
+                                className="pointer-events-none absolute right-2.5 top-2.5 inline-flex h-7 w-7 items-center justify-center rounded-md text-white/45 opacity-0 transition hover:bg-white/[0.09] hover:text-white focus:pointer-events-auto focus:bg-white/[0.09] focus:text-white focus:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100"
+                                aria-label={`Actions for ${s.name}`}
+                                title="Set actions"
+                              >
+                                <Ellipsis className="h-4 w-4" />
+                              </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent
+                              align="end"
+                              className="min-w-32 border-white/10 bg-[#211b31] text-white shadow-xl"
+                            >
+                              <DropdownMenuItem
+                                onSelect={() => startEditingSet(s)}
+                                className="cursor-pointer text-white/85 focus:bg-white/[0.1] focus:text-white"
+                              >
+                                <Pencil className="h-3.5 w-3.5" /> Edit
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                variant="destructive"
+                                onSelect={() => startDeletingSet(s)}
+                                className="cursor-pointer text-rose-400 focus:bg-rose-500/10 focus:text-rose-300"
+                              >
+                                <Trash2 className="h-3.5 w-3.5 text-rose-400" />
+                                Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                           <p className="mt-1 text-[0.65rem] text-white/40">
                             {s.tests.length} tests · {money(setPrice)} →{" "}
                             {money(setMarkup)} ·{" "}
@@ -579,6 +822,153 @@ export default function LabTestSearch() {
           </div>
         </div>
       </main>
+
+      <Dialog
+        open={Boolean(editingSet)}
+        onOpenChange={open => {
+          if (!open) closeEditSetDialog();
+        }}
+      >
+        <DialogContent className="border-white/10 bg-[#211b31] text-white sm:max-w-md">
+          <form onSubmit={saveSetName}>
+            <DialogHeader>
+              <DialogTitle>Edit set name</DialogTitle>
+              <DialogDescription className="text-white/55">
+                Choose a new name for this saved lab set.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="mt-5">
+              <label
+                htmlFor="saved-set-name"
+                className="mb-2 block text-sm font-medium text-white/70"
+              >
+                Set name
+              </label>
+              <input
+                id="saved-set-name"
+                type="text"
+                value={editedSetName}
+                onChange={event => setEditedSetName(event.target.value)}
+                autoFocus
+                disabled={savingSetName}
+                className="w-full rounded-xl border border-white/12 bg-white/[0.05] px-3 py-2.5 text-sm text-white outline-none transition placeholder:text-white/30 focus:border-[#c8b7ff]/50 focus:bg-white/[0.07] disabled:opacity-50"
+              />
+              {editSetError && (
+                <p className="mt-2 text-sm text-rose-300">{editSetError}</p>
+              )}
+            </div>
+            <DialogFooter className="mt-6">
+              <button
+                type="button"
+                onClick={closeEditSetDialog}
+                disabled={savingSetName}
+                className="rounded-full border border-white/15 px-4 py-2 text-sm font-medium text-white/70 transition hover:bg-white/[0.07] hover:text-white disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={savingSetName}
+                className="rounded-full bg-[#c8b7ff] px-4 py-2 text-sm font-semibold text-[#17120d] transition hover:bg-[#d6caff] disabled:opacity-50"
+              >
+                {savingSetName ? "Saving…" : "Save"}
+              </button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={Boolean(editingLabTest)}
+        onOpenChange={open => {
+          if (!open) closeEditLabTestDialog();
+        }}
+      >
+        <DialogContent className="border-white/10 bg-[#211b31] text-white sm:max-w-md">
+          <form onSubmit={saveLabTestName}>
+            <DialogHeader>
+              <DialogTitle>Edit test name</DialogTitle>
+              <DialogDescription className="text-white/55">
+                Choose a new name for this lab test.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="mt-5">
+              <label
+                htmlFor="lab-test-name"
+                className="mb-2 block text-sm font-medium text-white/70"
+              >
+                Test name
+              </label>
+              <input
+                id="lab-test-name"
+                type="text"
+                value={editedLabTestName}
+                onChange={event => setEditedLabTestName(event.target.value)}
+                autoFocus
+                disabled={savingLabTestName}
+                className="w-full rounded-xl border border-white/12 bg-white/[0.05] px-3 py-2.5 text-sm text-white outline-none transition placeholder:text-white/30 focus:border-[#c8b7ff]/50 focus:bg-white/[0.07] disabled:opacity-50"
+              />
+              {editLabTestError && (
+                <p className="mt-2 text-sm text-rose-300">{editLabTestError}</p>
+              )}
+            </div>
+            <DialogFooter className="mt-6">
+              <button
+                type="button"
+                onClick={closeEditLabTestDialog}
+                disabled={savingLabTestName}
+                className="rounded-full border border-white/15 px-4 py-2 text-sm font-medium text-white/70 transition hover:bg-white/[0.07] hover:text-white disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={savingLabTestName}
+                className="rounded-full bg-[#c8b7ff] px-4 py-2 text-sm font-semibold text-[#17120d] transition hover:bg-[#d6caff] disabled:opacity-50"
+              >
+                {savingLabTestName ? "Saving…" : "Save"}
+              </button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={Boolean(deletingSet)}
+        onOpenChange={open => {
+          if (!open) closeDeleteSetDialog();
+        }}
+      >
+        <DialogContent className="border-white/10 bg-[#211b31] text-white sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Delete {deletingSet?.name}?</DialogTitle>
+            <DialogDescription className="text-white/55">
+              This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          {deleteSetError && (
+            <p className="text-sm text-rose-300">{deleteSetError}</p>
+          )}
+          <DialogFooter className="mt-2">
+            <button
+              type="button"
+              onClick={closeDeleteSetDialog}
+              disabled={Boolean(deletingSetId)}
+              className="rounded-full border border-white/15 px-4 py-2 text-sm font-medium text-white/70 transition hover:bg-white/[0.07] hover:text-white disabled:opacity-50"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={() => void confirmDeleteSet()}
+              disabled={Boolean(deletingSetId)}
+              className="rounded-full bg-rose-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-rose-400 disabled:opacity-50"
+            >
+              {deletingSetId ? "Deleting…" : "Delete"}
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
