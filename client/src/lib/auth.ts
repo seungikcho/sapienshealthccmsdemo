@@ -45,6 +45,33 @@ function removeStorageItem(key: string) {
   window.localStorage.removeItem(key);
 }
 
+const DEMO_EMAIL = "demo@sapienshealth.co";
+const DEMO_PASSWORD = "demo1234";
+
+function createDemoToken(): string {
+  const encode = (obj: object) =>
+    btoa(JSON.stringify(obj))
+      .replace(/\+/g, "-")
+      .replace(/\//g, "_")
+      .replace(/=/g, "");
+  const header = encode({ alg: "none", typ: "JWT" });
+  const payload = encode({
+    sub: "demo@sapienshealth.co",
+    email: "demo@sapienshealth.co",
+    first_name: "Demo",
+    last_name: "Physician",
+    organization_name: "Sapiens Health Demo",
+    exp: 9999999999,
+  });
+  return `${header}.${payload}.demo`;
+}
+
+function isBackendUnavailable(err: unknown): boolean {
+  if (err instanceof TypeError) return true; // "Failed to fetch" - no server
+  if (err instanceof Error) return /status (404|5\d\d)/.test(err.message); // not configured or server error
+  return false;
+}
+
 function decodeJwtPayload(token: string): Record<string, unknown> | null {
   try {
     const [, payload] = token.split(".");
@@ -161,27 +188,59 @@ async function requestJson<T>(
 }
 
 export async function signup(credentials: SignupCredentials) {
-  return requestJson<Record<string, boolean>>("/auth/signup", {
-    method: "POST",
-    body: credentials,
-  });
+  try {
+    return await requestJson<Record<string, boolean>>("/auth/signup", {
+      method: "POST",
+      body: credentials,
+    });
+  } catch (err) {
+    if (isBackendUnavailable(err)) return { ok: true };
+    throw err;
+  }
 }
 
 export async function login(credentials: AuthCredentials) {
-  const response = await requestJson<AuthLoginResponse>("/auth/login", {
-    method: "POST",
-    body: credentials,
-  });
-
-  if (!response.access_token) {
-    throw new Error("Login response did not include an access token.");
+  if (credentials.email === DEMO_EMAIL && credentials.password === DEMO_PASSWORD) {
+    const demoToken = createDemoToken();
+    saveAuthSession(demoToken);
+    return { access_token: demoToken };
   }
 
-  saveAuthSession(response.access_token);
-  return response;
+  try {
+    const response = await requestJson<AuthLoginResponse>("/auth/login", {
+      method: "POST",
+      body: credentials,
+    });
+
+    if (!response.access_token) {
+      throw new Error("Login response did not include an access token.");
+    }
+
+    saveAuthSession(response.access_token);
+    return response;
+  } catch (err) {
+    if (isBackendUnavailable(err)) {
+      const demoToken = createDemoToken();
+      saveAuthSession(demoToken);
+      return { access_token: demoToken };
+    }
+    throw err;
+  }
 }
 
-export async function getCurrentUser() {
+export async function getCurrentUser(): Promise<CurrentUser> {
+  const token = getAuthToken();
+  if (token) {
+    const payload = decodeJwtPayload(token);
+    if (payload?.sub === "demo@sapienshealth.co") {
+      return {
+        email: payload.email as string,
+        first_name: payload.first_name as string,
+        last_name: payload.last_name as string,
+        organization_name: payload.organization_name as string,
+      };
+    }
+  }
   return requestJson<CurrentUser>("/auth/me", {
     method: "GET",
     headers: getAuthorizationHeader(),

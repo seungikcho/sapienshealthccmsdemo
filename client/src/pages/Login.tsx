@@ -26,9 +26,6 @@ export default function Login() {
   const emailRef = useRef<HTMLInputElement>(null);
 
   const isSignup = mode === "signup";
-  const title = isSignup ? "Create account" : "Sign in";
-  const submitLabel = isSignup ? "Create account" : "Sign in";
-  const loadingLabel = isSignup ? "Creating account..." : "Signing in...";
 
   useEffect(() => {
     setMode(getInitialMode(location));
@@ -40,7 +37,6 @@ export default function Login() {
       firstNameRef.current?.focus();
       return;
     }
-
     emailRef.current?.focus();
   }, [mode]);
 
@@ -59,10 +55,7 @@ export default function Login() {
     setError("");
     setLoading(true);
 
-    const credentials = {
-      email: email.trim(),
-      password,
-    };
+    const credentials = { email: email.trim(), password };
 
     try {
       if (isSignup) {
@@ -72,27 +65,18 @@ export default function Login() {
           organization_name: organizationName.trim(),
         };
 
-        if (
-          !signupDetails.first_name ||
-          !signupDetails.last_name ||
-          !signupDetails.organization_name
-        ) {
+        if (!signupDetails.first_name || !signupDetails.last_name || !signupDetails.organization_name) {
           throw new Error("Please enter your name and organization.");
         }
 
-        await signup({
-          ...credentials,
-          ...signupDetails,
-        });
+        await signup({ ...credentials, ...signupDetails });
       }
 
       await login(credentials);
       setLocation("/patients");
     } catch (err) {
       setError(
-        err instanceof Error
-          ? err.message
-          : "Something went wrong. Please try again."
+        err instanceof Error ? err.message : "Something went wrong. Please try again."
       );
     } finally {
       setLoading(false);
@@ -100,41 +84,70 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen bg-[linear-gradient(180deg,#110d1d_0%,#151124_52%,#0f0b19_100%)] text-foreground">
-      <div className="pointer-events-none fixed inset-0">
-        <div className="absolute left-1/2 top-1/2 h-[40rem] w-[40rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#a88dff]/8 blur-3xl" />
+    <div
+      className="min-h-screen overflow-x-hidden text-[#0d1b4d]"
+      style={{ background: "linear-gradient(150deg, #f2eefb 0%, #ece6f8 50%, #eee9f9 100%)" }}
+    >
+      {/* Decorative blobs */}
+      <div className="pointer-events-none fixed inset-0 overflow-hidden">
+        <div
+          className="absolute -left-40 -top-40 h-[36rem] w-[36rem] rounded-full opacity-40"
+          style={{ background: "radial-gradient(circle, #c4aff5 0%, transparent 70%)" }}
+        />
+        <div
+          className="absolute -bottom-32 -right-32 h-[28rem] w-[28rem] rounded-full opacity-30"
+          style={{ background: "radial-gradient(circle, #a78de8 0%, transparent 70%)" }}
+        />
       </div>
 
-      <div className="relative z-10 flex min-h-screen flex-col items-center justify-center px-4 py-10">
-        <div className="w-full max-w-[21rem]">
+      {/* Header */}
+      <header className="relative z-10 py-5">
+        <div className="mx-auto flex max-w-[1480px] items-center justify-between px-10 sm:px-20 lg:px-40">
+          <a href="/" className="flex items-center gap-3">
+            <div className="h-11 w-11 shrink-0 overflow-hidden rounded-2xl shadow-md">
+              <img src={logoUrl} alt="Sapiens Health logo" className="h-full w-full object-cover" />
+            </div>
+            <span
+              className="text-[#0d1b4d]"
+              style={{
+                fontFamily: '"Instrument Sans", "Manrope", sans-serif',
+                fontSize: "1.18rem",
+                fontWeight: 700,
+                letterSpacing: "-0.035em",
+                lineHeight: 1,
+              }}
+            >
+              Sapiens Health
+            </span>
+          </a>
           <a
             href="/"
-            className="mb-10 flex items-center justify-center gap-2.5"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-[#0d1b4d]/50 transition hover:text-[#0d1b4d]"
           >
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[#17120d]">
-              <img
-                src={logoUrl}
-                alt="Sapiens Health"
-                className="h-full w-full object-cover"
-              />
-            </div>
-            <span className="font-wordmark text-white">Sapiens Health</span>
+            <ArrowLeft className="h-4 w-4" />
+            Back to home
           </a>
+        </div>
+      </header>
 
+      {/* Main */}
+      <div className="relative z-10 flex min-h-[calc(100vh-80px)] items-center justify-center px-4 py-12">
+        <div className="w-full max-w-[22rem]">
+
+          {/* Tab switcher */}
           <div
-            className="mb-7 grid grid-cols-2 rounded-full border border-white/12 bg-white/[0.04] p-1"
+            className="mb-8 grid grid-cols-2 rounded-2xl border border-[#0d1b4d]/10 bg-white/60 p-1 shadow-sm backdrop-blur-sm"
             role="tablist"
-            aria-label="Authentication mode"
           >
             <button
               type="button"
               role="tab"
               aria-selected={!isSignup}
               onClick={() => switchMode("login")}
-              className={`inline-flex items-center justify-center gap-2 rounded-full px-3 py-2 text-sm font-semibold transition ${
+              className={`inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold transition ${
                 !isSignup
-                  ? "bg-[#c8b7ff] text-[#17120d]"
-                  : "text-white/48 hover:text-white"
+                  ? "bg-[#0d1b4d] text-white shadow-sm"
+                  : "text-[#0d1b4d]/45 hover:text-[#0d1b4d]"
               }`}
             >
               <LogIn className="h-4 w-4" />
@@ -145,10 +158,10 @@ export default function Login() {
               role="tab"
               aria-selected={isSignup}
               onClick={() => switchMode("signup")}
-              className={`inline-flex items-center justify-center gap-2 rounded-full px-3 py-2 text-sm font-semibold transition ${
+              className={`inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold transition ${
                 isSignup
-                  ? "bg-[#c8b7ff] text-[#17120d]"
-                  : "text-white/48 hover:text-white"
+                  ? "bg-[#0d1b4d] text-white shadow-sm"
+                  : "text-[#0d1b4d]/45 hover:text-[#0d1b4d]"
               }`}
             >
               <UserPlus className="h-4 w-4" />
@@ -156,107 +169,98 @@ export default function Login() {
             </button>
           </div>
 
-          <h1 className="mb-7 text-center font-display text-[1.5rem] font-semibold text-white">
-            {title}
-          </h1>
-
-          <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-            {isSignup && (
-              <>
-                <input
-                  ref={firstNameRef}
-                  type="text"
-                  placeholder="First name"
-                  value={firstName}
-                  onChange={e => setFirstName(e.target.value)}
-                  autoComplete="given-name"
-                  required
-                  maxLength={128}
-                  className="w-full rounded-2xl border border-white/12 bg-white/[0.05] px-4 py-3 text-sm text-white placeholder:text-white/35 outline-none transition focus:border-[#c8b7ff]/40 focus:bg-white/[0.08]"
-                />
-                <input
-                  type="text"
-                  placeholder="Last name"
-                  value={lastName}
-                  onChange={e => setLastName(e.target.value)}
-                  autoComplete="family-name"
-                  required
-                  maxLength={128}
-                  className="w-full rounded-2xl border border-white/12 bg-white/[0.05] px-4 py-3 text-sm text-white placeholder:text-white/35 outline-none transition focus:border-[#c8b7ff]/40 focus:bg-white/[0.08]"
-                />
-                <input
-                  type="text"
-                  placeholder="Organization name"
-                  value={organizationName}
-                  onChange={e => setOrganizationName(e.target.value)}
-                  autoComplete="organization"
-                  required
-                  maxLength={256}
-                  className="w-full rounded-2xl border border-white/12 bg-white/[0.05] px-4 py-3 text-sm text-white placeholder:text-white/35 outline-none transition focus:border-[#c8b7ff]/40 focus:bg-white/[0.08]"
-                />
-              </>
-            )}
-            <input
-              ref={emailRef}
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              autoComplete="email"
-              required
-              maxLength={320}
-              className="w-full rounded-2xl border border-white/12 bg-white/[0.05] px-4 py-3 text-sm text-white placeholder:text-white/35 outline-none transition focus:border-[#c8b7ff]/40 focus:bg-white/[0.08]"
-            />
-            <input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              autoComplete={isSignup ? "new-password" : "current-password"}
-              required
-              maxLength={1024}
-              className="w-full rounded-2xl border border-white/12 bg-white/[0.05] px-4 py-3 text-sm text-white placeholder:text-white/35 outline-none transition focus:border-[#c8b7ff]/40 focus:bg-white/[0.08]"
-            />
-
-            {error && (
-              <p className="text-center text-xs leading-5 text-rose-400">
-                {error}
-              </p>
-            )}
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="mt-1 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#c8b7ff] py-3 text-sm font-semibold text-[#17120d] transition duration-200 hover:-translate-y-0.5 hover:bg-[#d6caff] disabled:translate-y-0 disabled:opacity-60"
-            >
-              {isSignup ? (
-                <UserPlus className="h-4 w-4" />
-              ) : (
-                <LogIn className="h-4 w-4" />
+          {/* Card */}
+          <div className="rounded-3xl border border-[#0d1b4d]/10 bg-white/70 px-8 py-9 shadow-[0_8px_40px_rgba(13,27,77,0.10)] backdrop-blur-sm">
+            <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+              {isSignup && (
+                <>
+                  <div className="grid grid-cols-2 gap-3">
+                    <input
+                      ref={firstNameRef}
+                      type="text"
+                      placeholder="First name"
+                      value={firstName}
+                      onChange={e => setFirstName(e.target.value)}
+                      autoComplete="given-name"
+                      required
+                      maxLength={128}
+                      className="w-full rounded-xl border border-[#0d1b4d]/12 bg-[#0d1b4d]/[0.03] px-4 py-3 text-sm text-[#0d1b4d] placeholder:text-[#0d1b4d]/35 outline-none transition focus:border-[#5b3fa0]/40 focus:bg-white"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Last name"
+                      value={lastName}
+                      onChange={e => setLastName(e.target.value)}
+                      autoComplete="family-name"
+                      required
+                      maxLength={128}
+                      className="w-full rounded-xl border border-[#0d1b4d]/12 bg-[#0d1b4d]/[0.03] px-4 py-3 text-sm text-[#0d1b4d] placeholder:text-[#0d1b4d]/35 outline-none transition focus:border-[#5b3fa0]/40 focus:bg-white"
+                    />
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Organization name"
+                    value={organizationName}
+                    onChange={e => setOrganizationName(e.target.value)}
+                    autoComplete="organization"
+                    required
+                    maxLength={256}
+                    className="w-full rounded-xl border border-[#0d1b4d]/12 bg-[#0d1b4d]/[0.03] px-4 py-3 text-sm text-[#0d1b4d] placeholder:text-[#0d1b4d]/35 outline-none transition focus:border-[#5b3fa0]/40 focus:bg-white"
+                  />
+                </>
               )}
-              {loading ? loadingLabel : submitLabel}
-            </button>
-          </form>
 
-          <div className="mt-7 flex items-center justify-center gap-2 text-xs text-white/35">
-            <button
-              type="button"
-              onClick={() => switchMode(isSignup ? "login" : "signup")}
-              className="font-medium text-white/56 transition hover:text-white"
-            >
-              {isSignup ? "Use an existing account" : "Create an account"}
-            </button>
+              <input
+                ref={emailRef}
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                autoComplete="email"
+                required
+                maxLength={320}
+                className="w-full rounded-xl border border-[#0d1b4d]/12 bg-[#0d1b4d]/[0.03] px-4 py-3 text-sm text-[#0d1b4d] placeholder:text-[#0d1b4d]/35 outline-none transition focus:border-[#5b3fa0]/40 focus:bg-white"
+              />
+              <input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                autoComplete={isSignup ? "new-password" : "current-password"}
+                required
+                maxLength={1024}
+                className="w-full rounded-xl border border-[#0d1b4d]/12 bg-[#0d1b4d]/[0.03] px-4 py-3 text-sm text-[#0d1b4d] placeholder:text-[#0d1b4d]/35 outline-none transition focus:border-[#5b3fa0]/40 focus:bg-white"
+              />
+
+              {error && (
+                <p className="text-center text-xs leading-5 text-rose-500">{error}</p>
+              )}
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#0d1b4d] py-3.5 text-sm font-semibold text-white transition hover:bg-[#1a2d6b] disabled:opacity-60"
+              >
+                {isSignup ? <UserPlus className="h-4 w-4" /> : <LogIn className="h-4 w-4" />}
+                {loading
+                  ? isSignup ? "Creating account..." : "Signing in..."
+                  : isSignup ? "Create account" : "Sign in"
+                }
+              </button>
+            </form>
+
+            <p className="mt-6 text-center text-xs text-[#0d1b4d]/40">
+              {isSignup ? "Already have an account? " : "Don't have an account? "}
+              <button
+                type="button"
+                onClick={() => switchMode(isSignup ? "login" : "signup")}
+                className="font-semibold text-[#5b3fa0] transition hover:text-[#4a2f8a]"
+              >
+                {isSignup ? "Sign in" : "Sign up"}
+              </button>
+            </p>
           </div>
 
-          <p className="mt-8 text-center text-xs text-white/24">
-            <a
-              href="/"
-              className="inline-flex items-center gap-1.5 transition hover:text-white/50"
-            >
-              <ArrowLeft className="h-3.5 w-3.5" />
-              Back
-            </a>
-          </p>
         </div>
       </div>
     </div>

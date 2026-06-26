@@ -1,23 +1,19 @@
-/*
-Design philosophy for this page: A stripped-down healthcare AI landing page inspired by Beacon-style clarity.
-This file should use fewer words, keep only the product core, and rely on one strong hospital graphic plus
-simple workflow cards to explain the product.
-*/
-import {
-  FileStack,
-  ListTodo,
-  LogIn,
-  Mail,
-  Sparkles,
-  BrainCircuit,
-  ShieldCheck,
-  FlaskConical,
-} from "lucide-react";
+import { useState, useEffect, Fragment } from "react";
+import { FileStack, ListTodo, LogIn, Sparkles } from "lucide-react";
 
 const logoUrl =
   "https://d36hbw14aib5lz.cloudfront.net/310519663318202729/TdsfYCSbV9xhvU4DsPP84j/sapienslabs-logo-delta-s-ZjHQetHDXzKos43yZtYjhG.webp?Expires=1807943486&Signature=bfdsDHdM6VbnOCGdixbHpPYBMIrYD2Iaoli5PD2tmAlSbGwChYR7nNxUJIRSQ2Pliwgd7Vz3RvRDPXKLq87uJM5lNGBrieObDqPDN~gGsfmBUgMg-mB-7KN3h~BkL14M12o3i9aw89YHbu2KvJHqdAQPvU~X3MIYpnWR2DSTuKXoNitY490GJbM5LmyBIL2FezT~o04fHDRaALkBcifH7eKRlLab7boYuNTC3G4WEPXTyIyBDoPUZrPps1lyVnu~71IYflncNFZkMiadkvu7DAO5Vs1LfO7qBrII9lx8MzsA4lyPZmJugxjgK8DJ2Dtf1YNTCctpMCNZBxrDmNg8Lw__&Key-Pair-Id=K1MP89RTKNH4J";
 
-const heroTransparentGraphic = "/hero-clean.png";
+const heroGraphic = "/hero-cropped.png";
+
+const notifications = [
+  { tag: "Referral", text: "Referral for Sarah K. is ready for your review, Dr. Chen." },
+  { tag: "Completed", text: "Visit summary for John M. has been completed and filed." },
+  { tag: "Lab Results", text: "Lab results for Patient #2847 flagged — lipid panel elevated." },
+  { tag: "Follow-up", text: "Follow-up plan for Maria L. sent via SMS successfully." },
+  { tag: "Auth", text: "Prior authorization for Dr. Park's patient approved." },
+  { tag: "Intake", text: "New call intake for Robert S. organized into workflow." },
+];
 
 const steps = [
   {
@@ -43,54 +39,103 @@ const steps = [
   },
 ];
 
+const stats = [
+  { label: "AI Trained On", value: "Clinical Reality" },
+  { label: "Built For", value: "Clinic's Workflow" },
+  { label: "Connected To", value: "Any EMR/EHR" },
+  { label: "Security", value: "HIPAA Compliant" },
+];
+
 const demoHref = "mailto:info@sapienshealth.co?subject=Demo%20request";
-const inquiryHref = "mailto:info@sapienshealth.co?subject=General%20inquiry";
+
+function NotificationCard() {
+  const [idx, setIdx] = useState(0);
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setVisible(false);
+      setTimeout(() => {
+        setIdx(i => (i + 1) % notifications.length);
+        setVisible(true);
+      }, 350);
+    }, 3200);
+    return () => clearInterval(timer);
+  }, []);
+
+  const n = notifications[idx];
+
+  return (
+    <div className="rounded-b-2xl border border-t-0 border-[#0d1b4d]/12 bg-white px-5 py-4 shadow-[0_8px_24px_rgba(13,27,77,0.08)]">
+      <div className="mb-1.5 flex items-center justify-between">
+        <span className="text-sm font-bold text-[#0d1b4d]">Sapiens Health</span>
+        <span
+          style={{
+            opacity: visible ? 1 : 0,
+            transition: "opacity 0.35s ease",
+          }}
+          className="rounded-full bg-[#5b3fa0]/10 px-2 py-0.5 text-[0.65rem] font-semibold uppercase tracking-widest text-[#5b3fa0]"
+        >
+          {n.tag}
+        </span>
+      </div>
+      <p
+        className="text-sm text-[#0d1b4d]/60"
+        style={{
+          opacity: visible ? 1 : 0,
+          transform: visible ? "translateY(0)" : "translateY(4px)",
+          transition: "opacity 0.35s ease, transform 0.35s ease",
+        }}
+      >
+        {n.text}
+      </p>
+    </div>
+  );
+}
 
 function SiteWordmark() {
   return (
-    <a href="/" className="flex min-w-0 items-center gap-3">
-      <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-[#17120d] shadow-[0_10px_22px_rgba(25,16,8,0.12)]">
-        <img
-          src={logoUrl}
-          alt="Sapiens Health logo"
-          className="h-full w-full object-cover"
-        />
+    <a href="/" className="flex items-center gap-3">
+      <div className="h-11 w-11 shrink-0 overflow-hidden rounded-2xl shadow-md">
+        <img src={logoUrl} alt="Sapiens Health logo" className="h-full w-full object-cover" />
       </div>
-      <div className="font-wordmark truncate text-white">Sapiens Health</div>
+      <span
+        className="text-[#0d1b4d]"
+        style={{
+          fontFamily: '"Instrument Sans", "Manrope", sans-serif',
+          fontSize: "1.18rem",
+          fontWeight: 700,
+          letterSpacing: "-0.035em",
+          lineHeight: 1,
+        }}
+      >
+        Sapiens Health
+      </span>
     </a>
   );
 }
 
 function SiteFooter() {
   return (
-    <footer className="border-t border-white/10 py-10 sm:py-12">
+    <footer className="border-t border-[#0d1b4d]/10 py-10">
       <div className="flex flex-col items-center gap-5 text-center">
         <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[#17120d] shadow-[0_10px_24px_rgba(0,0,0,0.4)]">
-            <img
-              src={logoUrl}
-              alt="Sapiens Health logo"
-              className="h-full w-full object-cover"
-            />
+          <div className="h-9 w-9 shrink-0 overflow-hidden rounded-xl shadow-md">
+            <img src={logoUrl} alt="Sapiens Health logo" className="h-full w-full object-cover" />
           </div>
-          <span className="font-wordmark text-white">Sapiens Health</span>
+          <span
+            className="text-[#0d1b4d]"
+            style={{ fontFamily: '"Instrument Sans", "Manrope", sans-serif', fontWeight: 700 }}
+          >
+            Sapiens Health
+          </span>
         </div>
-        <p className="text-sm text-white/38">
-          © 2026 Sapiens Health. All rights reserved.
-        </p>
-        <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-white/55">
-          <a href="/terms" className="transition hover:text-white">
-            Terms
-          </a>
-          <a href="/privacy" className="transition hover:text-white">
-            Privacy
-          </a>
-          <a href="/login" className="transition hover:text-white">
-            Sign In
-          </a>
-          <a href="#contact" className="transition hover:text-white">
-            Contact
-          </a>
+        <p className="text-sm text-[#0d1b4d]/40">© 2026 Sapiens Health. All rights reserved.</p>
+        <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-[#0d1b4d]/55">
+          <a href="/terms" className="transition hover:text-[#0d1b4d]">Terms</a>
+          <a href="/privacy" className="transition hover:text-[#0d1b4d]">Privacy</a>
+          <a href="/login" className="transition hover:text-[#0d1b4d]">Sign In</a>
+          <a href="#contact" className="transition hover:text-[#0d1b4d]">Contact</a>
         </div>
       </div>
     </footer>
@@ -99,152 +144,132 @@ function SiteFooter() {
 
 export default function Home() {
   return (
-    <div className="min-h-screen overflow-x-hidden bg-background text-foreground">
-      <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_14%_16%,rgba(189,166,255,0.18),transparent_24%),linear-gradient(180deg,#110d1d_0%,#151124_52%,#0f0b19_100%)]" />
-        <div className="absolute left-[-8rem] top-[14rem] h-[30rem] w-[30rem] rounded-full bg-[#a88dff]/12 blur-3xl" />
-      </div>
-
-      <header className="relative z-30 px-8 pb-14 pt-5 sm:px-14 lg:px-24">
-        <div className="mx-auto flex w-full max-w-[1480px] items-center justify-between px-0 py-1 sm:px-1">
+    <div
+      className="min-h-screen overflow-x-hidden text-[#0d1b4d]"
+      style={{ background: "linear-gradient(150deg, #f2eefb 0%, #ece6f8 50%, #eee9f9 100%)" }}
+    >
+      {/* ── Header ─────────────────────────────────────────── */}
+      <header className="py-5">
+        <div className="mx-auto flex max-w-[1480px] items-center justify-between px-10 sm:px-20 lg:px-40">
           <SiteWordmark />
-
-          <div className="hidden items-center gap-8 md:flex">
-            <nav className="flex items-center gap-8 text-sm text-white/70">
-              <a href="#how-it-works" className="transition hover:text-white">
-                How it works
-              </a>
-              <a href="#use-cases" className="transition hover:text-white">
-                Use Cases
-              </a>
-              <a href="#contact" className="transition hover:text-white">
-                Contact
-              </a>
-            </nav>
-            <a
-              href="/login"
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-[#c8b7ff] px-4 py-2 text-sm font-semibold text-[#17120d] transition hover:-translate-y-0.5 hover:bg-[#d6caff]"
-            >
-              <LogIn className="h-4 w-4" />
-              Login
-            </a>
-          </div>
+          <a
+            href="/login"
+            className="inline-flex items-center gap-2 rounded-xl bg-[#0d1b4d] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#1a2d6b]"
+          >
+            <LogIn className="h-4 w-4" />
+            Login
+          </a>
         </div>
       </header>
 
-      <main className="relative z-10 px-8 pb-24 sm:px-14 lg:px-24">
-        <section className="mx-auto w-full max-w-[1480px] pb-6 pt-9 sm:pb-8 sm:pt-12 lg:pb-10 lg:pt-16">
-          <div className="grid gap-10 lg:grid-cols-[minmax(0,1.02fr)_minmax(420px,0.98fr)] lg:items-stretch lg:gap-8">
-            <div className="flex max-w-[40rem] flex-col">
-              <h1 className="max-w-[15ch] font-display text-[1.8rem] font-semibold leading-[1.01] tracking-[-0.05em] text-white sm:max-w-[18ch] sm:text-[2.28rem] lg:max-w-[21ch] lg:text-[2.74rem]">
-                <span className="block sm:whitespace-nowrap">
-                  AI-Native{" "}
-                  <span className="text-[#c8b7ff]">Medical Assistant</span>
-                </span>
-                <span className="mt-1 block">for Primary Care</span>
-              </h1>
-
-              <p className="mt-6 max-w-[34rem] text-[1.04rem] leading-8 text-white/66 sm:text-[1.1rem]">
-                Sapiens Health builds AI-native medical assistants that connect
-                fragmented data, organize into workflow, and execute tasks.
-              </p>
-
-              <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-                <a
-                  href={demoHref}
-                  className="inline-flex items-center justify-center rounded-full border border-[#6a58a7] bg-[#4e3f7c] px-6 py-3 text-base font-medium text-white transition duration-300 hover:-translate-y-0.5 hover:bg-[#423468]"
+      <main>
+        {/* ── Hero ───────────────────────────────────────────── */}
+        <section className="pb-20 pt-12 lg:pt-[67px]">
+          <div className="mx-auto w-full max-w-[1480px] px-10 sm:px-20 lg:px-40">
+            <div className="grid gap-4 lg:grid-cols-[2fr_1.4fr] lg:items-stretch">
+              {/* Left — vertically centered against hero image */}
+              <div className="flex h-full flex-col justify-center">
+                <h1
+                  className="font-bold leading-[1.04] tracking-[-0.03em] text-[#0d1b4d]"
+                  style={{
+                    fontFamily: '"Instrument Sans", "Manrope", sans-serif',
+                    fontSize: "clamp(1.8rem, 2.9vw, 3.24rem)",
+                  }}
                 >
-                  Demo →
-                </a>
-                <a
-                  href="#how-it-works"
-                  className="inline-flex items-center justify-center rounded-full border border-[#53437e] bg-transparent px-6 py-3 text-base font-medium text-white/82 transition duration-300 hover:border-[#6a58a7] hover:bg-white/5 hover:text-white"
-                >
-                  Learn More
-                </a>
-              </div>
+                  AI-Native
+                  <br />
+                  <span className="text-[#5b3fa0]">Medical Assistant</span>
+                  <br />
+                  for Primary Care.
+                </h1>
 
-              {/* Trust pills */}
-              <div className="mt-6 flex flex-wrap gap-2.5">
-                {[
-                  {
-                    Icon: FlaskConical,
-                    label: "Trained on",
-                    value: "Clinical Reality",
-                  },
-                  {
-                    Icon: BrainCircuit,
-                    label: "Healthcare-Specific",
-                    value: "AI Reasoning",
-                  },
-                ].map(({ Icon, label, value }) => (
-                  <div
-                    key={value}
-                    className="flex items-center gap-2.5 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2.5 backdrop-blur-sm"
+                <p className="mt-6 max-w-[34rem] text-[1.05rem] leading-[1.75] text-[#0d1b4d]/58">
+                  Sapiens Health builds AI-native medical assistants that connect
+                  fragmented data, organize into workflow, and execute tasks.
+                </p>
+
+                <div className="mt-8">
+                  <a
+                    href={demoHref}
+                    className="inline-flex items-center gap-2 rounded-xl bg-[#0d1b4d] px-7 py-4 text-base font-semibold text-white transition hover:bg-[#1a2d6b]"
                   >
-                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white/[0.07] text-[#c8b7ff]">
-                      <Icon className="h-3.5 w-3.5" strokeWidth={1.6} />
-                    </div>
-                    <div className="leading-tight">
-                      <div className="text-[0.62rem] font-medium tracking-wide text-white/38 uppercase">
-                        {label}
-                      </div>
-                      <div className="text-[0.8rem] font-semibold text-white/80">
-                        {value}
-                      </div>
-                    </div>
-                  </div>
-                ))}
+                    Book a Demo →
+                  </a>
+                </div>
               </div>
-            </div>
 
-            <div
-              className="relative flex lg:justify-self-end"
-              style={{ alignSelf: "stretch" }}
-            >
-              <div className="hero-bubble-shell relative w-full h-full">
-                <div className="hero-cutout-glow hero-cutout-glow-a" />
-                <div className="hero-cutout-glow hero-cutout-glow-b" />
-                <div className="hero-bubble-frame">
+              {/* Right: image + animated notification */}
+              <div className="flex flex-col">
+                <div className="overflow-hidden rounded-2xl border border-[#0d1b4d]/12 shadow-[0_8px_40px_rgba(13,27,77,0.12)]">
                   <img
-                    src={heroTransparentGraphic}
-                    alt="Doctor using Sapiens Health care execution interface"
-                    className="hero-bubble-image"
+                    src={heroGraphic}
+                    alt="Doctor using Sapiens Health AI assistant"
+                    className="block w-full object-cover"
                   />
                 </div>
+                <NotificationCard />
               </div>
             </div>
           </div>
         </section>
 
+        {/* ── Stats bar ──────────────────────────────────────── */}
+        <div className="border-t border-[#0d1b4d]/10">
+          <div className="mx-auto max-w-[1480px] px-10 sm:px-20 lg:px-40">
+            <div className="flex items-center">
+              {stats.map((stat, i) => (
+                <Fragment key={stat.label}>
+                  <div className="flex-1 py-9 text-center">
+                    <div className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-[#0d1b4d]/40">
+                      {stat.label}
+                    </div>
+                    <div
+                      className="mt-1.5 font-bold text-[#0d1b4d]"
+                      style={{
+                        fontFamily: '"Instrument Sans", "Manrope", sans-serif',
+                        fontSize: "clamp(0.95rem, 1.6vw, 1.4rem)",
+                      }}
+                    >
+                      {stat.value}
+                    </div>
+                  </div>
+                  {i < stats.length - 1 && (
+                    <div className="h-9 w-px shrink-0 bg-[#0d1b4d]/15" />
+                  )}
+                </Fragment>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* ── How It Works ───────────────────────────────────── */}
         <section
           id="how-it-works"
-          className="mx-auto mt-10 w-full max-w-[1480px] px-0 py-6 sm:py-8 lg:py-10"
+          className="mx-auto mt-6 w-full max-w-[1480px] px-10 py-10 sm:px-20 lg:px-40"
         >
-          <div className="max-w-[68rem]">
-            <h2 className="section-title">How It Works</h2>
-          </div>
-
+          <h2 className="text-[0.78rem] font-bold uppercase tracking-[0.18em] text-[#0d1b4d]/45">
+            How It Works
+          </h2>
           <div className="mt-10 space-y-0">
             {steps.map(step => {
               const { Icon } = step;
               return (
                 <article
                   key={step.number}
-                  className="flex items-center gap-6 border-t border-white/10 py-7 lg:gap-10"
+                  className="flex items-center gap-6 border-t border-[#0d1b4d]/10 py-7 lg:gap-10"
                 >
-                  <div className="text-sm font-semibold tracking-[0.24em] text-white/38 shrink-0 w-8">
+                  <div className="w-8 shrink-0 text-sm font-semibold tracking-[0.24em] text-[#0d1b4d]/30">
                     {step.number}
                   </div>
-                  <div className="rounded-xl border border-white/10 bg-white/[0.03] p-2.5 text-white/76 shrink-0">
+                  <div className="shrink-0 rounded-xl border border-[#0d1b4d]/10 bg-[#0d1b4d]/[0.04] p-2.5 text-[#0d1b4d]/55">
                     <Icon className="h-5 w-5" strokeWidth={1.6} />
                   </div>
                   <div className="flex flex-col gap-2">
-                    <h3 className="text-[1.35rem] font-semibold tracking-[-0.04em] text-white sm:text-[1.55rem]">
-                      <span className="text-[#c8b7ff]">{step.colored}</span>
+                    <h3 className="text-[1.35rem] font-semibold tracking-[-0.03em] text-[#0d1b4d] sm:text-[1.55rem]">
+                      <span className="text-[#5b3fa0]">{step.colored}</span>
                       {step.rest}
                     </h3>
-                    <p className="max-w-[42rem] text-[0.93rem] leading-7 text-white/44">
+                    <p className="max-w-[42rem] text-[0.93rem] leading-7 text-[#0d1b4d]/50">
                       {step.desc}
                     </p>
                   </div>
@@ -254,12 +279,15 @@ export default function Home() {
           </div>
         </section>
 
+        {/* ── Use Cases ──────────────────────────────────────── */}
         <section
           id="use-cases"
-          className="mx-auto w-full max-w-[1480px] px-0 py-6 sm:py-8"
+          className="mx-auto w-full max-w-[1480px] px-10 py-6 sm:px-20 lg:px-40"
         >
           <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
-            <h2 className="section-title shrink-0">Use Cases</h2>
+            <h2 className="shrink-0 text-[0.78rem] font-bold uppercase tracking-[0.18em] text-[#0d1b4d]/45">
+              Use Cases
+            </h2>
             <div className="flex flex-wrap gap-3">
               {[
                 "Lab Tests",
@@ -271,7 +299,7 @@ export default function Home() {
               ].map(label => (
                 <button
                   key={label}
-                  className="rounded-full border border-white/14 bg-white/[0.05] px-5 py-2 text-sm font-medium text-white/80 transition hover:border-white/26 hover:bg-white/[0.1] hover:text-white"
+                  className="rounded-full border border-[#0d1b4d]/14 bg-[#0d1b4d]/[0.04] px-5 py-2 text-sm font-medium text-[#0d1b4d]/65 transition hover:border-[#0d1b4d]/25 hover:bg-[#0d1b4d]/[0.08] hover:text-[#0d1b4d]"
                 >
                   {label}
                 </button>
@@ -280,24 +308,30 @@ export default function Home() {
           </div>
         </section>
 
+        {/* ── Contact ────────────────────────────────────────── */}
         <section
           id="contact"
-          className="mx-auto mt-14 w-full max-w-[1480px] px-0 pb-10 pt-8 sm:pb-12 sm:pt-10 lg:pb-16"
+          className="mx-auto mt-14 w-full max-w-[1480px] px-10 pb-10 pt-8 sm:px-20 lg:px-40"
         >
-          <div>
-            <h2 className="section-title">Contact</h2>
-            <p className="mt-5 max-w-[18ch] font-display text-[1.8rem] font-semibold leading-[1.05] tracking-[-0.05em] text-white sm:text-[2.28rem] lg:text-[2.74rem]">
-              Try out <span className="text-[#c8b7ff]">Sapiens Health</span>
-              <span className="block">on your clinic.</span>
-            </p>
-            <a
-              href={demoHref}
-              className="mt-7 inline-flex items-center justify-center rounded-full bg-[#c8b7ff] px-7 py-3 text-base font-semibold text-[#17120d] transition duration-300 hover:-translate-y-0.5 hover:bg-[#d6caff]"
-            >
-              Book a demo
-            </a>
-          </div>
-
+          <h2 className="text-[0.78rem] font-bold uppercase tracking-[0.18em] text-[#0d1b4d]/45">
+            Contact
+          </h2>
+          <p
+            className="mt-5 max-w-[18ch] font-bold leading-[1.05] tracking-[-0.04em] text-[#0d1b4d]"
+            style={{
+              fontFamily: '"Instrument Sans", "Manrope", sans-serif',
+              fontSize: "clamp(1.8rem, 3vw, 2.74rem)",
+            }}
+          >
+            Try out <span className="text-[#5b3fa0]">Sapiens Health</span>
+            <span className="block">on your clinic.</span>
+          </p>
+          <a
+            href={demoHref}
+            className="mt-7 inline-flex items-center justify-center rounded-xl bg-[#0d1b4d] px-7 py-3.5 text-base font-semibold text-white transition hover:bg-[#1a2d6b]"
+          >
+            Book a demo
+          </a>
           <div className="mt-16 sm:mt-20">
             <SiteFooter />
           </div>
