@@ -15,6 +15,14 @@ const S = {
   notePatient: '', noteDate: '', noteComment: '', noteStartedAt: null,
   docOpen: false, docStep: 'upload', docFileName: '', docDragOver: false,
   refOpen: false, refStep: 'compose', refSpecialist: '', refReason: '', refPatient: '', refDocs: [],
+  memTab: 'templates',
+  templateOpen: false, templateId: null,
+  addTmplOpen: false, addTmplType: 'note', addTmplLabel: '', addTmplContent: '',
+  userTemplates: [],
+  labWf: false, labWfStep: 0,
+  dbView: null,
+  addWfOpen: false, addWfType: 'lab', addWfLabel: '', addWfSteps: [''],
+  userWorkflows: [],
 };
 
 // ── Data ─────────────────────────────────────────────────────────────────
@@ -121,7 +129,15 @@ function taskCard(t){
 
 // ── Sidebar ───────────────────────────────────────────────────────────────
 function renderSidebar(ma,isDark){
-  const nb=(key)=>`background:${S.view===key||(key==='patients'&&(S.view==='patients'||S.view==='patient'))||(key===S.capType&&S.view==='cap')?'var(--accent-soft)':'transparent'};color:${S.view===key||(key==='patients'&&(S.view==='patients'||S.view==='patient'))||(key===S.capType&&S.view==='cap')?'var(--text)':'var(--text-2)'}`;
+  const nb=(key)=>{
+    const active=S.view===key
+      ||(key==='patients'&&(S.view==='patients'||S.view==='patient'))
+      ||(key===S.capType&&S.view==='cap')
+      ||(key==='mem-templates'&&S.view==='mem'&&S.memTab==='templates')
+      ||(key==='mem-database'&&S.view==='mem'&&S.memTab==='database')
+      ||(key==='mem-workflow'&&S.view==='mem'&&S.memTab==='workflow');
+    return `background:${active?'var(--accent-soft)':'transparent'};color:${active?'var(--text)':'var(--text-2)'}`;
+  };
   return `
   <div style="display:flex;align-items:center;gap:10px;padding:4px 6px;">
     <span style="width:28px;height:28px;border-radius:9px;background:linear-gradient(150deg,#a78bfa,#7c5cdb);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:#fff;">A</span>
@@ -138,6 +154,21 @@ function renderSidebar(ma,isDark){
     <button class="nav-btn" data-action="cap:referral" style="display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:10px;font-size:13.5px;font-weight:600;${nb('referral')};transition:background .15s;">${I.referral} Referrals</button>
     <button class="nav-btn" data-action="cap:note" style="display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:10px;font-size:13.5px;font-weight:600;${nb('note')};transition:background .15s;">${I.note} Visit notes</button>
     <button class="nav-btn" data-action="cap:doc" style="display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:10px;font-size:13.5px;font-weight:600;${nb('doc')};transition:background .15s;">${I.doc} Documents</button>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:3px;">
+    <div style="font-size:10.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--text-3);padding:0 8px 7px;">Memory</div>
+    <button class="nav-btn" data-action="mem:templates" style="display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:10px;font-size:13.5px;font-weight:600;${nb('mem-templates')};transition:background .15s;">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><path d="M17 13v8M13 17h8"/></svg>
+      Templates
+    </button>
+    <button class="nav-btn" data-action="mem:database" style="display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:10px;font-size:13.5px;font-weight:600;${nb('mem-database')};transition:background .15s;">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v6c0 1.66 3.58 3 8 3s8-1.34 8-3V6"/><path d="M4 12v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/></svg>
+      Database
+    </button>
+    <button class="nav-btn" data-action="mem:workflow" style="display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:10px;font-size:13.5px;font-weight:600;${nb('mem-workflow')};transition:background .15s;">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="12" cy="18" r="2"/><path d="M7 6h10M5 8v4a5 5 0 0 0 5 5h.5M19 8v4a5 5 0 0 1-5 5h-.5"/></svg>
+      Workflow
+    </button>
   </div>
   <div style="margin-top:auto;display:flex;align-items:center;gap:10px;padding:0 4px;">
     <span style="width:30px;height:30px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:800;">SC</span>
@@ -576,6 +607,95 @@ const LAB_TESTS = [
   {id:32, name:'Glucose',              cat:'1003',  cpt:'82947', vendor:'PathGroup', price:2.00,  markup:2.20,  fav:false},
 ];
 
+// PathGroup reference prices (same tests, independent network)
+const PG_PRICES = {
+  'RPR':1.38,'Aldolase':2.42,'Calcium':1.72,'Creatinine, Urine':2.15,'GGT':2.28,
+  'LDH':1.88,'Phosphorus':1.65,'Comprehensive Metabolic Panel (CMP)':3.95,
+  'Complete Blood Count (CBC)':3.20,'HbA1c':5.80,'TSH':6.40,'Lipid Panel':4.50,
+  'Urinalysis, Complete':2.75,'Vitamin D, 25-OH':10.90,'PSA, Total':6.95,
+  'Ferritin':5.40,'Iron & TIBC':4.60,'Uric Acid':2.35,'Magnesium':2.55,
+  'Prothrombin Time (PT/INR)':3.60,'hsCRP':7.20,'Testosterone, Total':9.50,
+  'Estradiol':11.10,'Folate, Serum':6.60,'Vitamin B12':6.50,
+  'Hepatic Function Panel':3.90,'Hemoglobin A1c w/ eAG':5.80,
+  'Creatinine, Serum':1.80,'BUN (Blood Urea Nitrogen)':1.75,
+};
+
+function renderLabWfOverlay(){
+  if(!S.labWf) return '';
+  const selTests=LAB_TESTS.filter(t=>S.labSelected.includes(t.id));
+
+  const stepEl=(n,text,done,active)=>{
+    const spinner=`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5" style="animation:spin .8s linear infinite;"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>`;
+    const check=`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--good)" stroke-width="2.5"><path d="m5 12 5 5 9-11"/></svg>`;
+    return `
+    <div style="display:flex;align-items:center;gap:14px;padding:14px 0;${n<3?'border-bottom:1px solid var(--border);':''}opacity:${done||active?1:.35};transition:opacity .4s;">
+      <div style="width:28px;height:28px;border-radius:50%;background:${done?'var(--good-soft)':active?'var(--accent-soft)':'var(--panel-2)'};display:flex;align-items:center;justify-content:center;flex:none;">
+        ${done?check:active?spinner:`<span style="font-size:11px;font-weight:700;color:var(--text-3);">${n}</span>`}
+      </div>
+      <span style="font-size:13.5px;font-weight:${done||active?'600':'400'};color:${done?'var(--text)':active?'var(--text)':'var(--text-3)'};">${text}</span>
+      ${done?`<span style="margin-left:auto;font-size:11px;color:var(--good);font-weight:700;">Done</span>`:''}
+    </div>`;
+  };
+
+  const s=S.labWfStep;
+  const steps=`
+    ${stepEl(1,'Retrieving selected Labcorp tests',s>=2,s===1)}
+    ${stepEl(2,'Searching PathGroup for matching tests',s>=3,s===2)}
+    ${stepEl(3,'Comparing prices across vendors',s>=4,s===3)}`;
+
+  const table=s>=4?`
+    <div style="margin-top:24px;animation:sap-up .3s ease;">
+      <div style="display:grid;grid-template-columns:1fr 90px 90px 80px;gap:0;border:1px solid var(--border);border-radius:13px;overflow:hidden;">
+        <div style="display:contents;">
+          <div style="padding:9px 16px;background:var(--panel-2);font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);">Test</div>
+          <div style="padding:9px 12px;background:var(--panel-2);font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);text-align:right;">Labcorp</div>
+          <div style="padding:9px 12px;background:var(--panel-2);font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--info);text-align:right;">PathGroup</div>
+          <div style="padding:9px 12px;background:var(--panel-2);font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--good);text-align:right;">Savings</div>
+        </div>
+        ${selTests.map((t,i)=>{
+          const pg=PG_PRICES[t.name]??t.price;
+          const save=t.price-pg;
+          const pgWins=save>0;
+          const isLast=i===selTests.length-1;
+          return `
+          <div style="display:contents;">
+            <div style="padding:12px 16px;${isLast?'':'border-top:1px solid var(--border);'}font-size:13px;font-weight:600;color:var(--text);">${t.name}</div>
+            <div style="padding:12px 12px;${isLast?'':'border-top:1px solid var(--border);'}font-size:13px;text-align:right;color:${pgWins?'var(--text-3)':'var(--text)'};">${money(t.price)}</div>
+            <div style="padding:12px 12px;${isLast?'':'border-top:1px solid var(--border);'}font-size:13px;font-weight:700;text-align:right;color:${pgWins?'var(--info)':'var(--text-3)'};">${money(pg)}${pgWins?'':'*'}</div>
+            <div style="padding:12px 12px;${isLast?'':'border-top:1px solid var(--border);'}font-size:13px;font-weight:700;text-align:right;color:${pgWins?'var(--good)':'var(--danger)'};">${pgWins?'-':'+'}&nbsp;${money(Math.abs(save))}</div>
+          </div>`;
+        }).join('')}
+        <div style="display:contents;">
+          <div style="padding:12px 16px;border-top:2px solid var(--border);font-size:13px;font-weight:700;color:var(--text);">Total</div>
+          <div style="padding:12px 12px;border-top:2px solid var(--border);font-size:13.5px;font-weight:700;text-align:right;">${money(selTests.reduce((a,t)=>a+t.price,0))}</div>
+          <div style="padding:12px 12px;border-top:2px solid var(--border);font-size:13.5px;font-weight:700;text-align:right;color:var(--info);">${money(selTests.reduce((a,t)=>a+(PG_PRICES[t.name]??t.price),0))}</div>
+          ${(()=>{const save=selTests.reduce((a,t)=>a+(t.price-(PG_PRICES[t.name]??t.price)),0);return `<div style="padding:12px 12px;border-top:2px solid var(--border);font-size:13.5px;font-weight:800;text-align:right;color:${save>0?'var(--good)':'var(--danger)'};">${save>0?'−':'+'}${money(Math.abs(save))}</div>`;})()}
+        </div>
+      </div>
+      <p style="font-size:11.5px;color:var(--text-3);margin-top:10px;line-height:1.5;">* Labcorp price is lower for this test. PathGroup pricing sourced from network reference list.</p>
+    </div>`:'';
+
+  return `
+  <div style="position:fixed;inset:0;z-index:50;background:rgba(13,27,77,.26);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;" id="labwf-overlay">
+    <div style="background:var(--bg);border:1px solid var(--border);border-radius:22px;box-shadow:0 28px 80px rgba(13,27,77,.28);width:min(640px,96vw);max-height:90vh;display:flex;flex-direction:column;overflow:hidden;animation:sap-up .25s ease;">
+      <div style="display:flex;align-items:center;padding:20px 26px;border-bottom:1px solid var(--border);flex:none;gap:12px;">
+        <div style="flex:1;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">
+            <span style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;padding:3px 9px;border-radius:20px;background:var(--accent-soft);color:var(--accent);">Memory · Workflow</span>
+          </div>
+          <div style="font-size:17px;font-weight:800;letter-spacing:-.02em;color:var(--text);">Lab panel price comparison</div>
+        </div>
+        <button data-action="labwf-close" style="width:32px;height:32px;border-radius:9px;border:1px solid var(--border);background:var(--panel);color:var(--text-2);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;">×</button>
+      </div>
+      <div style="flex:1;overflow-y:auto;padding:22px 26px 28px;">
+        <div style="margin-bottom:${s>=4?'0':'4px'}">${steps}</div>
+        ${table}
+      </div>
+    </div>
+  </div>
+  <style>@keyframes spin{to{transform:rotate(360deg);}}</style>`;
+}
+
 function renderLabSearch(){
   if(!S.labOpen) return '';
   const q=S.labQ.toLowerCase();
@@ -677,7 +797,11 @@ function renderLabSearch(){
                    </div>
                    <div style="padding:11px 14px;"><div style="font-size:10.5px;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em;">Margin</div><div style="font-size:16px;font-weight:700;color:var(--good);margin-top:2px;">${money(totalMkp-totalCost)}</div></div>
                  </div>
-                 <button data-action="lab-assign" style="width:100%;padding:11px;border-radius:11px;background:var(--accent);color:#fff;font-size:13.5px;font-weight:700;cursor:pointer;border:none;">Assign</button>`
+                 <button data-action="lab-assign" style="width:100%;padding:11px;border-radius:11px;background:var(--accent);color:#fff;font-size:13.5px;font-weight:700;cursor:pointer;border:none;margin-bottom:8px;">Assign</button>
+                 <button data-action="lab-wf-start" style="width:100%;padding:10px;border-radius:11px;border:1.5px solid var(--accent-line);background:var(--accent-soft);color:var(--accent);font-size:12.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;">
+                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="12" cy="18" r="2"/><path d="M7 6h10M5 8v4a5 5 0 0 0 5 5h.5M19 8v4a5 5 0 0 1-5 5h-.5"/></svg>
+                   Memory · Workflow
+                 </button>`
               : `<p style="font-size:12.5px;color:var(--text-3);line-height:1.55;margin:0;">Click tests on the left to build a panel. Combined price, markup, and profit show up here.</p>`
             }
           </div>
@@ -801,6 +925,566 @@ function renderToday(ma){
     ${renderCreateWork(filteredPatients)}
     <div style="border:1px solid var(--border);border-radius:16px;overflow:hidden;background:var(--panel);box-shadow:var(--shadow);">
       ${logs.length?rows:empty}
+    </div>
+  </div>`;
+}
+
+// ── Templates data ────────────────────────────────────────────────────────
+const TEMPLATES = [
+  {
+    id: 'referral-scribe',
+    type: 'referral',
+    label: 'Patient Information Scribe Template',
+    content: `Patient:
+DOB:
+PCP: Cintia Dafashy, MD
+Phone:
+Address:
+Email:
+
+Referral to:
+Effective Date:
+Termination Date:
+
+Reason for Referral:
+
+Please fax office notes to 832-737-0071.
+
+─────────────────────────────────────────
+
+Referring Physician Information
+Name: Cintia Dafashy, MD
+NPI: 1245890953
+Signature:
+
+Phone: 832-318-0090
+Fax: 832-737-0071
+
+Date: ***
+
+─────────────────────────────────────────
+
+To
+Attn:
+Address
+
+Dear Dr. ***
+
+I am referring ***, a *** year old ***, for evaluation of their ***. These reported concerns have been occurring for the past ***.
+
+I have been ***'s primary care physician for the past ***.
+
+Pertinent medical history includes:
+****
+
+Please do not hesitate to reach out if you have any further questions.
+
+Sincerely,
+Cintia Dafashy, MD
+Family Medicine`,
+  },
+  {
+    id: 'note-summary',
+    type: 'note',
+    label: 'Note Summary Template',
+    content: `New Adult Patient
+[Start Time - End Time]
+[Date]
+
+History of Present Illness:
+(Organize by medical problem. For each problem, use full sentences and formal clinical language.)
+- [Problem 1: Description, onset, duration, associated symptoms, relevant negatives, prior evaluation/treatment]
+- [Problem 2: Description, onset, duration, associated symptoms, relevant negatives, prior evaluation/treatment]
+- [Additional problems as needed]
+
+Family History:
+(hyphenated list)
+- [Relative: Condition or pertinent diagnosis]
+- (e.g., Father: hypertension)
+
+Surgical History:
+(hyphenated list)
+- [Surgery name, year, indication, complications if any]
+- (e.g., Appendectomy, 2010, uncomplicated)
+
+Medications:
+(hyphenated list)
+- [Medication name, dose, route, frequency]
+- (e.g., Lisinopril 10 mg oral daily)
+
+Allergies:
+(hyphenated list)
+- [Allergen: reaction]
+- (e.g., Penicillin: rash)
+
+Social History:
+(hyphenated list)
+- [Tobacco: type, amount, duration, quit date if applicable]
+- [Alcohol: type, amount, frequency]
+- [Recreational substances: type, amount, frequency]
+- [Occupation: current job, exposures]
+- [Living situation: who lives with patient, home environment]
+
+Physical Examination:
+(hyphenated list)
+- Vital Signs: [HR: # bpm, BP: #/# mmHg, T: # °C/°F, RR: #, O2 sats: #%]
+- General: [Appearance, distress, orientation]
+- HEENT: [Head, eyes, ears, nose, throat findings]
+- Neck: [Inspection, palpation, lymphadenopathy, thyroid]
+- Cardiovascular: [Heart sounds, murmurs, pulses, edema]
+- Respiratory: [Breath sounds, symmetry, effort, adventitious sounds]
+- Abdomen: [Inspection, auscultation, palpation, tenderness, masses]
+- Genitourinary: [If indicated, findings]
+- Musculoskeletal: [Joints, range of motion, deformities]
+- Neurological: [Mental status, cranial nerves, motor, sensory, reflexes, coordination]
+- Skin: [Rashes, lesions, color, turgor]
+- Psychiatric: [Mood, affect, thought process]
+
+Assessment & Plan:
+(Organize by medical problem. For each problem, use medical terminology and include plan items as hyphenated lists.)
+1) [Problem 1: Assessment]
+- [Investigations planned or ordered]
+- [Treatment plan]
+- [Counselling discussion]
+- [Referrals sent]
+- [Follow up plan]
+- [Return precautions]
+2) [Problem 2: Assessment]
+- [Investigations planned or ordered]
+- [Treatment plan]
+- [Counselling discussion]
+- [Referrals sent]
+- [Follow up plan]
+- [Return precautions]
+[Additional problems as needed]
+
+─────────────────────────────────────────
+
+Follow Up Visits / Acute Visits
+
+Subjective:
+(Include relevant history and associated information in chronological order)
+1) [Chief complaint 1]
+- [Hyphenated list of symptoms and related history]
+2) [Chief complaint 2]
+- [Hyphenated list of symptoms and related history]
+
+Objective:
+(hyphenated list)
+- [Vital signs with units in one line] (e.g., HR: #, BP: #, T: #, RR: #, O2 sats: #%)
+- [Physical exam findings and/or mental status exam findings] (Format as "System: Exam findings", one system per line. Specify anatomical location if relevant)
+- [Investigation results with units] (Only include completed investigations, otherwise leave blank. All planned or ordered investigations should be included under Plan)
+
+Assessment & Plan:
+(Do not fabricate the assessment and plan unless mentioned in the source material. Use medical terminology if appropriate. Each assessment and plan number should correlate directly with the subjective section. Include follow up instructions and return precautions if mentioned.)
+1) [Diagnosis 1 and rationale if mentioned]
+- [Hyphenated plan]
+2) [Diagnosis 2 and rationale if mentioned]
+- [Hyphenated plan]
+
+─────────────────────────────────────────
+
+Well Child Visit
+
+Well Child Check: [create a title for the visit that summarizes the findings and plan in a few words]
+Potential ICD-9 codes: V20.2 (routine infant or child health check, [suggest possible ICD-9 codes given the diagnosis or differential diagnosis]
+Well Child Check - Baby Record: [summarize findings and plan]
+(use "- " to indicate list items, and, if necessary, use "-- " to indicate sub-items in lists)
+
+Medical History:
+- Current age: [give the patients age]
+- [Past medical history] (only include if explicitly mentioned in the transcript, contextual notes or clinical note, otherwise leave blank.)
+- [Current medical conditions] (only include if explicitly mentioned in the transcript, contextual notes or clinical note, otherwise leave blank.)
+- [Medications] (only include if explicitly mentioned in the transcript, contextual notes or clinical note, otherwise leave blank.)
+- [Allergies] (only include if explicitly mentioned in the transcript, contextual notes or clinical note, otherwise leave blank.)
+
+Parental concerns:
+
+Growth: [mention how the patient is progressing according to growth charts] (only include if explicitly mentioned in the transcript, contextual notes or clinical note, otherwise leave blank.)
+
+Nutrition:
+- [Feeding method (breastfeeding, formula, solids)] (only include if explicitly mentioned in the transcript, contextual notes or clinical note, otherwise leave blank.)
+- [Feeding frequency and amount] (only include if explicitly mentioned in the transcript, contextual notes or clinical note, otherwise leave blank.)
+- [Any feeding difficulties] (only include if explicitly mentioned in the transcript, contextual notes or clinical note, otherwise leave blank.)
+- [Any other information discussed regarding nutrition and/or feeding]
+
+Education and Advice:
+- [any education and advice given e.g. injury prevention, behaviour, parental fatigue/depression, environmental health, etc.]
+
+Development:
+- [anything discussed regarding normal development, e.g. language, movement, walking, etc.]
+
+Physical Examination:
+- [include physical exam, e.g. fontanelles, red eye reflex, corneal light reflex, heart/lungs/abdomen, hip exam, etc.]
+
+Investigations/Screening:
+- [any planned investigations; if not are discussed state "none currently indicated"]
+
+Immunizations:
+- [immunizations received] (only include if explicitly mentioned in the transcript, contextual notes or clinical note, otherwise leave blank.)
+- [Upcoming immunizations] (only include if explicitly mentioned in the transcript, contextual notes or clinical note, otherwise leave blank.)
+
+Plan:
+- [Follow-up appointments] (only include if explicitly mentioned in the transcript, contextual notes or clinical note, otherwise leave blank.)
+- [Referrals to specialists] (only include if explicitly mentioned in the transcript, contextual notes or clinical note, otherwise leave blank.)
+- [Any other management plan not mentioned previously]`,
+  },
+];
+
+// ── Memory views ─────────────────────────────────────────────────────────
+function renderAddWorkflow(){
+  if(!S.addWfOpen) return '';
+  const TYPE_OPTS=[
+    {id:'lab',     label:'Lab panels',  icon:I.lab,      color:'var(--accent)',soft:'var(--accent-soft)'},
+    {id:'referral',label:'Referrals',   icon:I.referral, color:'var(--info)',  soft:'var(--info-soft)'},
+    {id:'note',    label:'Visit notes', icon:I.note,     color:'var(--good)',  soft:'var(--good-soft)'},
+    {id:'doc',     label:'Documents',   icon:I.doc,      color:'var(--ready)', soft:'var(--ready-soft)'},
+  ];
+  const typePills=TYPE_OPTS.map(o=>`
+    <button data-action="aw-type:${o.id}"
+      style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:20px;font-size:12.5px;font-weight:700;cursor:pointer;transition:all .15s;
+        background:${S.addWfType===o.id?o.soft:'var(--panel-2)'};
+        color:${S.addWfType===o.id?o.color:'var(--text-3)'};
+        border:1.5px solid ${S.addWfType===o.id?o.color:'transparent'};">
+      ${o.icon.replace('stroke="currentColor"',`stroke="${S.addWfType===o.id?o.color:'var(--text-3)'}"`)
+              .replace(/width="\d+"/,'width="14"').replace(/height="\d+"/,'height="14"')}
+      @ ${o.label}
+    </button>`).join('');
+
+  const stepItems=S.addWfSteps.map((step,i)=>`
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span style="width:24px;height:24px;border-radius:50%;background:var(--accent-soft);color:var(--accent);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex:none;">${i+1}</span>
+      <input id="wf-step-${i}" value="${step.replace(/"/g,'&quot;')}" placeholder="Describe this step…"
+        style="flex:1;padding:10px 13px;border:1.5px solid var(--border);border-radius:10px;background:var(--panel);color:var(--text);font-size:13.5px;font-family:inherit;"/>
+      ${S.addWfSteps.length>1?`<button data-action="aw-rm-step:${i}" style="color:var(--text-3);font-size:17px;cursor:pointer;background:none;border:none;padding:0 3px;flex:none;">×</button>`:''}
+    </div>`).join('');
+
+  const canSave=!!(S.addWfLabel.trim()&&S.addWfSteps.some(s=>s.trim()));
+  return `
+  <div style="position:fixed;inset:0;z-index:50;background:rgba(13,27,77,.22);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;" id="aw-overlay">
+    <div style="background:var(--bg);border:1px solid var(--border);border-radius:22px;box-shadow:0 24px 70px rgba(13,27,77,.24);width:min(620px,96vw);max-height:92vh;display:flex;flex-direction:column;overflow:hidden;">
+      <div style="display:flex;align-items:center;padding:22px 28px;border-bottom:1px solid var(--border);flex:none;">
+        <span style="font-size:17px;font-weight:800;letter-spacing:-.02em;color:var(--text);flex:1;">Add Workflow</span>
+        <button data-action="aw-close" style="width:32px;height:32px;border-radius:9px;border:1px solid var(--border);background:var(--panel);color:var(--text-2);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;">×</button>
+      </div>
+      <div style="flex:1;overflow-y:auto;padding:24px 28px;display:flex;flex-direction:column;gap:20px;">
+        <div>
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);margin-bottom:10px;">Work Item Tag</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;">${typePills}</div>
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);margin-bottom:8px;">Workflow Name</div>
+          <input id="aw-label-input" value="${S.addWfLabel.replace(/"/g,'&quot;')}" placeholder="e.g. Price comparison across vendors"
+            style="width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:11px;background:var(--panel);color:var(--text);font-size:13.5px;font-family:inherit;"/>
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);margin-bottom:10px;">Steps</div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            ${stepItems}
+            <button data-action="aw-add-step"
+              style="display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:10px;border:1.5px dashed var(--border);background:transparent;color:var(--text-3);font-size:13px;font-weight:600;cursor:pointer;margin-top:2px;">
+              ${I.plus} Add step
+            </button>
+          </div>
+        </div>
+      </div>
+      <div style="padding:18px 28px;border-top:1px solid var(--border);flex:none;">
+        <button data-action="aw-save"
+          style="width:100%;padding:13px;border-radius:12px;border:none;font-size:14px;font-weight:700;
+            background:${canSave?'#4c2d9c':'var(--panel-2)'};
+            color:${canSave?'#fff':'var(--text-3)'};
+            cursor:${canSave?'pointer':'default'};">
+          Save Workflow
+        </button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderAddTemplate(){
+  if(!S.addTmplOpen) return '';
+  const TYPE_OPTS=[
+    {id:'referral',label:'Referrals',   icon:I.referral, color:'var(--info)',  soft:'var(--info-soft)'},
+    {id:'note',    label:'Visit notes', icon:I.note,     color:'var(--good)',  soft:'var(--good-soft)'},
+    {id:'lab',     label:'Lab panels',  icon:I.lab,      color:'var(--accent)',soft:'var(--accent-soft)'},
+    {id:'doc',     label:'Documents',   icon:I.doc,      color:'var(--ready)', soft:'var(--ready-soft)'},
+  ];
+  const typePills=TYPE_OPTS.map(o=>`
+    <button data-action="at-type:${o.id}"
+      style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:20px;font-size:12.5px;font-weight:700;cursor:pointer;transition:all .15s;
+        background:${S.addTmplType===o.id?o.soft:'var(--panel-2)'};
+        color:${S.addTmplType===o.id?o.color:'var(--text-3)'};
+        border:1.5px solid ${S.addTmplType===o.id?o.color:'transparent'};">
+      ${o.icon.replace('stroke="currentColor"',`stroke="${S.addTmplType===o.id?o.color:'var(--text-3)'}"`)
+              .replace(/width="\d+"/,'width="14"').replace(/height="\d+"/,'height="14"')}
+      @ ${o.label}
+    </button>`).join('');
+
+  const canSave=!!(S.addTmplLabel.trim()&&S.addTmplContent.trim());
+  return `
+  <div style="position:fixed;inset:0;z-index:50;background:rgba(13,27,77,.22);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;" id="at-overlay">
+    <div style="background:var(--bg);border:1px solid var(--border);border-radius:22px;box-shadow:0 24px 70px rgba(13,27,77,.24);width:min(680px,96vw);height:min(820px,94vh);display:flex;flex-direction:column;overflow:hidden;">
+      <div style="display:flex;align-items:center;padding:22px 28px;border-bottom:1px solid var(--border);flex:none;">
+        <span style="font-size:17px;font-weight:800;letter-spacing:-.02em;color:var(--text);flex:1;">Add Template</span>
+        <button data-action="at-close" style="width:32px;height:32px;border-radius:9px;border:1px solid var(--border);background:var(--panel);color:var(--text-2);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;">×</button>
+      </div>
+      <div style="flex:1;overflow-y:auto;padding:24px 28px;display:flex;flex-direction:column;gap:20px;">
+        <div>
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);margin-bottom:10px;">Work Item Tag</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;">${typePills}</div>
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);margin-bottom:8px;">Template Name</div>
+          <input id="at-label-input" value="${S.addTmplLabel.replace(/"/g,'&quot;')}" placeholder="e.g. Referral Letter – Cardiology"
+            style="width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:11px;background:var(--panel);color:var(--text);font-size:13.5px;font-family:inherit;"/>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;min-height:0;">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);margin-bottom:8px;">Template Content</div>
+          <textarea id="at-content-input" placeholder="Paste or type your template here…"
+            style="flex:1;min-height:280px;width:100%;padding:14px 16px;border:1.5px solid var(--border);border-radius:11px;background:var(--panel);color:var(--text);font-size:13px;font-family:'JetBrains Mono',monospace;line-height:1.75;resize:vertical;">${S.addTmplContent.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</textarea>
+        </div>
+      </div>
+      <div style="padding:18px 28px;border-top:1px solid var(--border);flex:none;">
+        <button data-action="at-save"
+          style="width:100%;padding:13px;border-radius:12px;border:none;font-size:14px;font-weight:700;letter-spacing:-.01em;
+            background:${canSave?'#4c2d9c':'var(--panel-2)'};
+            color:${canSave?'#fff':'var(--text-3)'};
+            cursor:${canSave?'pointer':'default'};">
+          Save Template
+        </button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderTemplateOverlay(){
+  if(!S.templateOpen) return '';
+  const tmpl=TEMPLATES.find(t=>t.id===S.templateId);
+  if(!tmpl) return '';
+  const escaped=tmpl.content.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return `
+  <div style="position:fixed;inset:0;z-index:50;background:rgba(13,27,77,.22);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;" id="tmpl-overlay">
+    <div style="background:var(--bg);border:1px solid var(--border);border-radius:22px;box-shadow:0 24px 70px rgba(13,27,77,.24);width:min(720px,96vw);height:min(860px,94vh);display:flex;flex-direction:column;overflow:hidden;">
+      <div style="display:flex;align-items:center;padding:20px 28px;border-bottom:1px solid var(--border);flex:none;gap:14px;">
+        <div style="flex:1;">
+          <div style="display:flex;align-items:center;gap:9px;margin-bottom:3px;">
+            ${(()=>{
+              const typeMap={note:{icon:I.note,color:'var(--good)',soft:'var(--good-soft)',label:'Visit notes'},referral:{icon:I.referral,color:'var(--info)',soft:'var(--info-soft)',label:'Referrals'}};
+              const m=typeMap[tmpl.type]||typeMap.note;
+              return `<span style="display:inline-flex;align-items:center;gap:6px;padding:4px 11px;border-radius:20px;background:${m.soft};color:${m.color};font-size:12px;font-weight:700;">${m.icon.replace('stroke="currentColor"',`stroke="${m.color}"`).replace(/width="\d+"/,'width="13"').replace(/height="\d+"/,'height="13"')} @ ${m.label}</span>`;
+            })()}
+          </div>
+          <div style="font-size:17px;font-weight:800;letter-spacing:-.02em;color:var(--text);">${tmpl.label}</div>
+        </div>
+        <button data-action="tmpl-copy" style="padding:9px 18px;border-radius:10px;border:1px solid var(--border);background:var(--panel);color:var(--text-2);font-size:13px;font-weight:600;cursor:pointer;" id="tmpl-copy-btn">Copy</button>
+        <button data-action="tmpl-close" style="width:32px;height:32px;border-radius:9px;border:1px solid var(--border);background:var(--panel);color:var(--text-2);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;">×</button>
+      </div>
+      <div style="flex:1;overflow-y:auto;padding:28px 32px;">
+        <pre style="font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:1.8;color:var(--text);white-space:pre-wrap;word-break:break-word;margin:0;">${escaped}</pre>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderMem(){
+  const tabs=[
+    {id:'templates',label:'Templates',icon:`<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><path d="M17 13v8M13 17h8"/></svg>`},
+    {id:'database', label:'Database', icon:`<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v6c0 1.66 3.58 3 8 3s8-1.34 8-3V6"/><path d="M4 12v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/></svg>`},
+    {id:'workflow', label:'Workflow', icon:`<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="12" cy="18" r="2"/><path d="M7 6h10M5 8v4a5 5 0 0 0 5 5h.5M19 8v4a5 5 0 0 1-5 5h-.5"/></svg>`},
+  ];
+
+  const tabBar=tabs.map(t=>`
+    <button data-action="mem:${t.id}"
+      style="display:flex;align-items:center;gap:8px;padding:9px 18px;border-radius:10px;font-size:13.5px;font-weight:600;transition:all .15s;
+        background:${S.memTab===t.id?'var(--accent-soft)':'transparent'};
+        color:${S.memTab===t.id?'var(--text)':'var(--text-2)'};
+        border:${S.memTab===t.id?'1px solid var(--accent-line)':'1px solid transparent'};">
+      ${t.icon} ${t.label}
+    </button>`).join('');
+
+  const emptyCard=(icon,title,desc)=>`
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:72px 24px;text-align:center;">
+      <div style="width:52px;height:52px;border-radius:16px;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;">
+        ${icon.replace(/stroke="currentColor"/g,'stroke="var(--accent)"')}
+      </div>
+      <div>
+        <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px;">${title}</div>
+        <div style="font-size:13px;color:var(--text-3);max-width:300px;line-height:1.6;">${desc}</div>
+      </div>
+      <button style="margin-top:4px;padding:10px 22px;border-radius:11px;background:var(--accent);color:#fff;font-size:13.5px;font-weight:700;cursor:pointer;border:none;opacity:.85;">Coming soon</button>
+    </div>`;
+
+  const allTemplates=[...TEMPLATES,...S.userTemplates];
+  const TYPE_META={
+    referral:{icon:I.referral,label:'Referrals',   color:'var(--info)',  soft:'var(--info-soft)'},
+    note:    {icon:I.note,    label:'Visit notes', color:'var(--good)',  soft:'var(--good-soft)'},
+    lab:     {icon:I.lab,     label:'Lab panels',  color:'var(--accent)',soft:'var(--accent-soft)'},
+    doc:     {icon:I.doc,     label:'Documents',   color:'var(--ready)', soft:'var(--ready-soft)'},
+  };
+  const TYPE_ORDER=['referral','note','lab','doc'];
+
+  const tmplSection=(meta,items)=>`
+    <div style="margin-bottom:24px;">
+      <div style="margin-bottom:10px;">
+        <span style="display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;background:${meta.soft};color:${meta.color};font-size:12px;font-weight:700;">
+          ${meta.icon.replace('stroke="currentColor"',`stroke="${meta.color}"`).replace(/width="\d+"/,'width="14"').replace(/height="\d+"/,'height="14"')}
+          @ ${meta.label}
+        </span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        ${items.map(tmpl=>`
+        <button data-action="tmpl-open:${tmpl.id}" class="action-card"
+          style="display:flex;align-items:center;gap:14px;padding:14px 18px;border:1px solid var(--border);border-radius:13px;background:var(--panel-2);text-align:left;cursor:pointer;transition:all .15s;width:100%;">
+          <div style="width:38px;height:38px;border-radius:11px;background:${meta.soft};display:flex;align-items:center;justify-content:center;flex:none;">
+            ${meta.icon.replace('stroke="currentColor"',`stroke="${meta.color}"`)}
+          </div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:14px;font-weight:700;color:var(--text);">${tmpl.label}</div>
+          </div>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+        </button>`).join('')}
+      </div>
+    </div>`;
+
+  const sections=TYPE_ORDER.map(type=>{
+    const items=allTemplates.filter(t=>t.type===type);
+    return items.length?tmplSection(TYPE_META[type],items):'';
+  }).join('');
+
+  const templatesBody=`
+    <div style="padding:24px;">
+      ${sections}
+      <button data-action="at-open"
+        style="display:flex;align-items:center;justify-content:center;gap:9px;width:100%;padding:13px;border-radius:13px;border:1.5px dashed var(--border);background:transparent;color:var(--text-3);font-size:13.5px;font-weight:600;cursor:pointer;transition:all .15s;">
+        ${I.plus} Add Template
+      </button>
+    </div>`;
+
+  let body='';
+  if(S.memTab==='templates') body=templatesBody;
+  const labRows=LAB_TESTS.map((t,i)=>{
+    const isLast=i===LAB_TESTS.length-1;
+    return `
+    <div style="display:grid;grid-template-columns:1fr 90px 80px 70px 70px;align-items:center;padding:12px 20px;${isLast?'':'border-bottom:1px solid var(--border)'};">
+      <div>
+        <div style="font-size:13.5px;font-weight:600;color:var(--text);">${t.name}</div>
+        <div style="font-size:11.5px;color:var(--text-3);margin-top:2px;">${t.vendor} · Cat ${t.cat}</div>
+      </div>
+      <div style="font-size:12px;color:var(--text-3);text-align:center;">CPT ${t.cpt}</div>
+      <div style="font-size:12px;color:var(--text-3);text-align:right;">${t.vendor}</div>
+      <div style="font-size:13px;font-weight:600;color:var(--text-2);text-align:right;">${money(t.price)}</div>
+      <div style="font-size:13px;font-weight:700;color:var(--accent);text-align:right;">${money(t.markup)}</div>
+    </div>`;
+  }).join('');
+
+  const dbBody= S.dbView==='lab' ? `
+    <div>
+      <div style="display:flex;align-items:center;gap:10px;padding:14px 20px;border-bottom:1px solid var(--border);background:var(--panel-2);">
+        <button data-action="db-back" style="display:flex;align-items:center;gap:5px;font-size:12.5px;font-weight:600;color:var(--text-3);cursor:pointer;background:none;border:none;">${I.back.replace('stroke="currentColor"','stroke="var(--text-3)"')} Back</button>
+        <span style="display:inline-flex;align-items:center;gap:6px;padding:4px 11px;border-radius:20px;background:var(--accent-soft);color:var(--accent);font-size:12px;font-weight:700;">
+          ${I.lab.replace('stroke="currentColor"','stroke="var(--accent)"').replace(/width="\d+"/,'width="13"').replace(/height="\d+"/,'height="13"')} @ Lab panels
+        </span>
+        <span style="font-size:13.5px;font-weight:700;color:var(--text);">Lab Test Database</span>
+        <span style="margin-left:auto;font-size:12px;color:var(--text-3);">${LAB_TESTS.length} tests</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 90px 80px 70px 70px;padding:9px 20px;border-bottom:1px solid var(--border);background:var(--panel-2);">
+        <span style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);">Test</span>
+        <span style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);text-align:center;">CPT</span>
+        <span style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);text-align:right;">Vendor</span>
+        <span style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);text-align:right;">Price</span>
+        <span style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--accent);text-align:right;">Markup</span>
+      </div>
+      <div style="overflow-y:auto;max-height:520px;">${labRows}</div>
+    </div>`
+  : `
+    <div style="padding:24px;">
+      <div style="margin-bottom:12px;">
+        <span style="display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;background:var(--accent-soft);color:var(--accent);font-size:12px;font-weight:700;">
+          ${I.lab.replace('stroke="currentColor"','stroke="var(--accent)"').replace(/width="\d+"/,'width="14"').replace(/height="\d+"/,'height="14"')}
+          @ Lab panels
+        </span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <button data-action="db-view:lab" class="action-card"
+          style="display:flex;align-items:center;gap:14px;padding:14px 18px;border:1px solid var(--border);border-radius:13px;background:var(--panel-2);text-align:left;cursor:pointer;transition:all .15s;width:100%;">
+          <div style="width:38px;height:38px;border-radius:11px;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;flex:none;">
+            ${I.lab.replace('stroke="currentColor"','stroke="var(--accent)"')}
+          </div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:14px;font-weight:700;color:var(--text);">Lab Test Database</div>
+          </div>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+        </button>
+      </div>
+    </div>`;
+
+  if(S.memTab==='database') body=dbBody;
+  const BUILT_IN_WORKFLOWS=[
+    {id:'wf-lab-price',type:'lab',label:'Lab panel price comparison',
+     steps:['Labcorp test selection','Same name test search in PathGroup','Compare the best price']},
+  ];
+  const allWorkflows=[...BUILT_IN_WORKFLOWS,...S.userWorkflows];
+  const WF_TYPE_META={
+    lab:     {icon:I.lab,     label:'Lab panels',  color:'var(--accent)',soft:'var(--accent-soft)'},
+    referral:{icon:I.referral,label:'Referrals',   color:'var(--info)',  soft:'var(--info-soft)'},
+    note:    {icon:I.note,    label:'Visit notes', color:'var(--good)',  soft:'var(--good-soft)'},
+    doc:     {icon:I.doc,     label:'Documents',   color:'var(--ready)', soft:'var(--ready-soft)'},
+  };
+  const WF_TYPE_ORDER=['lab','referral','note','doc'];
+
+  const wfCard=wf=>{
+    const m=WF_TYPE_META[wf.type]||WF_TYPE_META.lab;
+    return `
+    <div style="padding:16px 18px;border:1px solid var(--border);border-radius:13px;background:var(--panel-2);">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+        <div style="width:38px;height:38px;border-radius:11px;background:${m.soft};display:flex;align-items:center;justify-content:center;flex:none;">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="${m.color}" stroke-width="1.8"><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="12" cy="18" r="2"/><path d="M7 6h10M5 8v4a5 5 0 0 0 5 5h.5M19 8v4a5 5 0 0 1-5 5h-.5"/></svg>
+        </div>
+        <div style="font-size:14px;font-weight:700;color:var(--text);">${wf.label}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:7px;">
+        ${wf.steps.map((s,i)=>`
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="width:20px;height:20px;border-radius:50%;background:${m.soft};color:${m.color};font-size:10.5px;font-weight:800;display:flex;align-items:center;justify-content:center;flex:none;">${i+1}</span>
+          <span style="font-size:13px;color:var(--text-2);">${s}</span>
+        </div>`).join('')}
+      </div>
+    </div>`;
+  };
+
+  const wfSections=WF_TYPE_ORDER.map(type=>{
+    const m=WF_TYPE_META[type];
+    const items=allWorkflows.filter(w=>w.type===type);
+    if(!items.length) return '';
+    return `
+      <div style="margin-bottom:22px;">
+        <div style="margin-bottom:10px;">
+          <span style="display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;background:${m.soft};color:${m.color};font-size:12px;font-weight:700;">
+            ${m.icon.replace('stroke="currentColor"',`stroke="${m.color}"`).replace(/width="\d+"/,'width="14"').replace(/height="\d+"/,'height="14"')}
+            @ ${m.label}
+          </span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;">${items.map(wfCard).join('')}</div>
+      </div>`;
+  }).join('');
+
+  const wfBody=`
+    <div style="padding:24px;">
+      ${wfSections}
+      <button data-action="aw-open"
+        style="display:flex;align-items:center;justify-content:center;gap:9px;width:100%;padding:13px;border-radius:13px;border:1.5px dashed var(--border);background:transparent;color:var(--text-3);font-size:13.5px;font-weight:600;cursor:pointer;transition:all .15s;">
+        ${I.plus} Add Workflow
+      </button>
+    </div>`;
+  if(S.memTab==='workflow') body=wfBody;
+
+  return `
+  <div style="padding:36px 32px 70px;max-width:820px;margin:0 auto;width:100%;">
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:28px;padding:5px;background:var(--panel);border:1px solid var(--border);border-radius:13px;width:fit-content;">
+      ${tabBar}
+    </div>
+    <div style="border:1px solid var(--border);border-radius:16px;overflow:hidden;background:var(--panel);box-shadow:var(--shadow);">
+      ${body}
     </div>
   </div>`;
 }
@@ -1083,6 +1767,7 @@ function render(){
   else if(S.view==='patient') content=renderPatient();
   else if(S.view==='task') content=renderTask(ma);
   else if(S.view==='cap') content=renderCap();
+  else if(S.view==='mem') content=renderMem();
   app.innerHTML=`
   <aside class="sidebar" style="width:254px;flex:none;border-right:1px solid var(--border);background:var(--sidebar);backdrop-filter:blur(10px);padding:18px 14px;display:flex;flex-direction:column;gap:20px;position:sticky;top:0;height:100vh;overflow-y:auto;">
     ${renderSidebar(ma,isDark)}
@@ -1096,41 +1781,93 @@ function render(){
   ${renderLabSearch()}
   ${renderNoteRecorder()}
   ${renderDocProcessor()}
-  ${renderReferral()}`;
+  ${renderReferral()}
+  ${renderLabWfOverlay()}
+  ${renderTemplateOverlay()}
+  ${renderAddTemplate()}
+  ${renderAddWorkflow()}`;
   bindInputs();
 }
 
 // ── Input wiring ──────────────────────────────────────────────────────────
+// filterInput: re-renders (for live search) but preserves cursor position
+function filterInput(el, updater){
+  el.addEventListener('input', e=>{
+    const pos=e.target.selectionStart;
+    updater(e.target.value);
+    render();
+    const restored=document.getElementById(el.id);
+    if(restored){ restored.focus(); restored.setSelectionRange(pos,pos); }
+  });
+}
+
+// plainInput: never re-renders — safe for free-text fields (no IME breakage)
+function plainInput(el, updater){
+  el.addEventListener('input', e=>updater(e.target.value));
+}
+
 function bindInputs(){
   const pq=document.getElementById('pq-input');
-  if(pq){
-    pq.focus();
-    pq.setSelectionRange(pq.value.length,pq.value.length);
-    pq.addEventListener('input',e=>{S.pq=e.target.value;render();});
-  }
+  if(pq){ pq.focus(); pq.setSelectionRange(pq.value.length,pq.value.length); filterInput(pq,v=>{S.pq=v;}); }
+
   const ci=document.getElementById('cmd-input');
-  if(ci){
-    ci.focus();
-    ci.addEventListener('input',e=>{S.query=e.target.value;render();});
-  }
+  if(ci){ ci.focus(); filterInput(ci,v=>{S.query=v;}); }
+
   const wq=document.getElementById('work-q-input');
-  if(wq){ wq.focus(); wq.addEventListener('input',e=>{S.workQ=e.target.value;render();}); }
+  if(wq){ wq.focus(); filterInput(wq,v=>{S.workQ=v;}); }
+
+  // new patient name — no render, update button opacity directly
   const np=document.getElementById('new-p-name');
-  if(np){ np.focus(); np.addEventListener('input',e=>{S.newPName=e.target.value;render();}); }
+  if(np){
+    np.focus();
+    plainInput(np, v=>{
+      S.newPName=v;
+      const btn=document.querySelector('[data-action="create-patient"]');
+      if(btn) btn.style.opacity=v.trim()?'1':'.4';
+    });
+  }
+
   const lq=document.getElementById('lab-q-input');
-  if(lq){ lq.focus(); lq.addEventListener('input',e=>{S.labQ=e.target.value;render();}); }
+  if(lq){ lq.focus(); filterInput(lq,v=>{S.labQ=v;}); }
+
   const np2=document.getElementById('note-patient-input');
-  if(np2){ np2.addEventListener('input',e=>{S.notePatient=e.target.value;}); }
+  if(np2) plainInput(np2,v=>{S.notePatient=v;});
   const nd=document.getElementById('note-date-input');
-  if(nd){ nd.addEventListener('input',e=>{S.noteDate=e.target.value;}); }
+  if(nd) plainInput(nd,v=>{S.noteDate=v;});
   const nc=document.getElementById('note-comment-input');
-  if(nc){ nc.addEventListener('input',e=>{S.noteComment=e.target.value;}); }
+  if(nc) plainInput(nc,v=>{S.noteComment=v;});
   const rs=document.getElementById('ref-specialist-input');
-  if(rs){ rs.addEventListener('input',e=>{S.refSpecialist=e.target.value;}); }
+  if(rs) plainInput(rs,v=>{S.refSpecialist=v;});
   const rp=document.getElementById('ref-patient-input');
-  if(rp){ rp.addEventListener('input',e=>{S.refPatient=e.target.value;}); }
+  if(rp) plainInput(rp,v=>{S.refPatient=v;});
   const rr=document.getElementById('ref-reason-input');
-  if(rr){ rr.addEventListener('input',e=>{S.refReason=e.target.value;}); }
+  if(rr) plainInput(rr,v=>{S.refReason=v;});
+  const awl=document.getElementById('aw-label-input');
+  if(awl){ awl.focus(); plainInput(awl,v=>{
+    S.addWfLabel=v;
+    const btn=document.querySelector('[data-action="aw-save"]');
+    if(btn){const ok=!!(v.trim()&&S.addWfSteps.some(s=>s.trim()));btn.style.background=ok?'#4c2d9c':'var(--panel-2)';btn.style.color=ok?'#fff':'var(--text-3)';}
+  }); }
+  S.addWfSteps.forEach((_,i)=>{
+    const el=document.getElementById(`wf-step-${i}`);
+    if(el) plainInput(el,v=>{
+      S.addWfSteps=S.addWfSteps.map((s,j)=>j===i?v:s);
+      const btn=document.querySelector('[data-action="aw-save"]');
+      if(btn){const ok=!!(S.addWfLabel.trim()&&S.addWfSteps.some(s=>s.trim()));btn.style.background=ok?'#4c2d9c':'var(--panel-2)';btn.style.color=ok?'#fff':'var(--text-3)';}
+    });
+  });
+  const atl=document.getElementById('at-label-input');
+  if(atl){ atl.focus(); plainInput(atl,v=>{
+    S.addTmplLabel=v;
+    const btn=document.querySelector('[data-action="at-save"]');
+    if(btn){const ok=!!(v.trim()&&S.addTmplContent.trim());btn.style.background=ok?'#4c2d9c':'var(--panel-2)';btn.style.color=ok?'#fff':'var(--text-3)';}
+  }); }
+  const atc=document.getElementById('at-content-input');
+  if(atc) plainInput(atc,v=>{
+    S.addTmplContent=v;
+    const btn=document.querySelector('[data-action="at-save"]');
+    if(btn){const ok=!!(S.addTmplLabel.trim()&&v.trim());btn.style.background=ok?'#4c2d9c':'var(--panel-2)';btn.style.color=ok?'#fff':'var(--text-3)';}
+  });
 }
 
 // ── Event delegation ──────────────────────────────────────────────────────
@@ -1156,6 +1893,56 @@ document.getElementById('app').addEventListener('click',e=>{
   if(act==='theme'){S.theme=S.theme==='dark'?'light':'dark';render();return;}
   if(act==='go:today'){S.view='today';S.taskId=null;S.patientId=null;S.cmd=false;render();return;}
   if(act==='go:patients'){S.view='patients';S.taskId=null;S.patientId=null;S.cmd=false;render();return;}
+  if(act.startsWith('mem:')){S.view='mem';S.memTab=act.slice(4);S.dbView=null;S.cmd=false;render();return;}
+  if(act.startsWith('db-view:')){S.dbView=act.slice(8);render();return;}
+  if(act==='db-back'){S.dbView=null;render();return;}
+  if(act==='lab-wf-start'){
+    S.labWf=true;S.labWfStep=1;render();
+    setTimeout(()=>{S.labWfStep=2;render();},700);
+    setTimeout(()=>{S.labWfStep=3;render();},1500);
+    setTimeout(()=>{S.labWfStep=4;render();},2300);
+    return;
+  }
+  if(act==='labwf-close'){S.labWf=false;S.labWfStep=0;render();return;}
+  if(act==='aw-open'){S.addWfOpen=true;S.addWfLabel='';S.addWfSteps=[''];S.addWfType='lab';render();return;}
+  if(act==='aw-close'){S.addWfOpen=false;render();return;}
+  if(act.startsWith('aw-type:')){S.addWfType=act.slice(8);render();return;}
+  if(act==='aw-add-step'){S.addWfSteps=[...S.addWfSteps,''];render();return;}
+  if(act.startsWith('aw-rm-step:')){
+    const i=parseInt(act.slice(11));
+    S.addWfSteps=S.addWfSteps.filter((_,j)=>j!==i);
+    render();return;
+  }
+  if(act==='aw-save'){
+    if(!S.addWfLabel.trim()||!S.addWfSteps.some(s=>s.trim())) return;
+    S.userWorkflows=[...S.userWorkflows,{
+      id:'uwf-'+Date.now(), type:S.addWfType,
+      label:S.addWfLabel.trim(),
+      steps:S.addWfSteps.filter(s=>s.trim()),
+    }];
+    S.addWfOpen=false;S.addWfLabel='';S.addWfSteps=[''];
+    showToast('Workflow saved');render();return;
+  }
+  if(act==='at-open'){S.addTmplOpen=true;S.addTmplLabel='';S.addTmplContent='';S.addTmplType='note';render();return;}
+  if(act==='at-close'){S.addTmplOpen=false;render();return;}
+  if(act.startsWith('at-type:')){S.addTmplType=act.slice(8);render();return;}
+  if(act==='at-save'){
+    if(!S.addTmplLabel.trim()||!S.addTmplContent.trim()) return;
+    const id='utmpl-'+Date.now();
+    S.userTemplates=[...S.userTemplates,{id,type:S.addTmplType,label:S.addTmplLabel.trim(),content:S.addTmplContent}];
+    S.addTmplOpen=false;S.addTmplLabel='';S.addTmplContent='';
+    showToast('Template saved');render();return;
+  }
+  if(act.startsWith('tmpl-open:')){S.templateOpen=true;S.templateId=act.slice(10);render();return;}
+  if(act==='tmpl-close'){S.templateOpen=false;S.templateId=null;render();return;}
+  if(act==='tmpl-copy'){
+    const tmpl=TEMPLATES.find(t=>t.id===S.templateId);
+    if(tmpl) navigator.clipboard.writeText(tmpl.content).then(()=>{
+      const btn=document.getElementById('tmpl-copy-btn');
+      if(btn){btn.textContent='Copied!';btn.style.color='var(--good)';setTimeout(()=>{btn.textContent='Copy';btn.style.color='';},1800);}
+    });
+    return;
+  }
   if(act==='role:physician'){S.role='physician';render();return;}
   if(act==='role:assistant'){S.role='assistant';render();return;}
   if(act.startsWith('cap:')){S.view='cap';S.capType=act.slice(4);S.taskId=null;S.patientId=null;S.newTaskOpen=false;render();return;}
@@ -1334,12 +2121,27 @@ document.addEventListener('click', e => {
     const overlay=document.getElementById('ref-overlay');
     if(overlay && e.target===overlay){S.refOpen=false;S.refStep='compose';render();}
   }
+  if(S.templateOpen){
+    const overlay=document.getElementById('tmpl-overlay');
+    if(overlay && e.target===overlay){S.templateOpen=false;S.templateId=null;render();}
+  }
+  if(S.addTmplOpen){
+    const overlay=document.getElementById('at-overlay');
+    if(overlay && e.target===overlay){S.addTmplOpen=false;render();}
+  }
+  if(S.addWfOpen){
+    const overlay=document.getElementById('aw-overlay');
+    if(overlay && e.target===overlay){S.addWfOpen=false;render();}
+  }
 });
 
 // ── Keyboard shortcuts ────────────────────────────────────────────────────
 window.addEventListener('keydown',e=>{
   if((e.metaKey||e.ctrlKey)&&(e.key==='k'||e.key==='K')){e.preventDefault();S.cmd=!S.cmd;S.query='';render();}
   if(e.key==='Escape'){
+    if(S.addWfOpen){S.addWfOpen=false;render();return;}
+    if(S.addTmplOpen){S.addTmplOpen=false;render();return;}
+    if(S.templateOpen){S.templateOpen=false;S.templateId=null;render();return;}
     if(S.refOpen){S.refOpen=false;S.refStep='compose';render();return;}
     if(S.docOpen){S.docOpen=false;S.docStep='upload';render();return;}
     if(S.noteOpen){S.noteOpen=false;S.noteRecording=false;render();return;}
