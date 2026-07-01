@@ -127,6 +127,17 @@ function taskCard(t){
   </div>`;
 }
 
+// ── Memory chip helper (reused across overlays) ───────────────────────────
+function memTag(section,name,action){
+  return `<div data-action="${action}" style="display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:8px;border:1px solid var(--accent-line);background:var(--accent-soft);cursor:pointer;margin-bottom:16px;">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 3v18M15 3v18M3 9h18M3 15h18"/></svg>
+    <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--accent);">Memory · ${section}</span>
+    <span style="width:1px;height:12px;background:var(--accent-line);"></span>
+    <span style="font-size:12.5px;font-weight:600;color:var(--text);">${name}</span>
+    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+  </div>`;
+}
+
 // ── Sidebar ───────────────────────────────────────────────────────────────
 function renderSidebar(ma,isDark){
   const nb=(key)=>{
@@ -276,6 +287,7 @@ function renderReferral(){
           <button data-action="ref-close" style="width:32px;height:32px;border-radius:9px;border:1px solid var(--border);background:var(--panel);color:var(--text-2);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none;">×</button>
         </div>
         <div style="flex:1;overflow-y:auto;padding:28px 32px;">
+          ${memTag('Templates','Patient Information Scribe Template','tmpl-open:referral-scribe')}
           <div style="font-size:14.5px;color:var(--text);line-height:1.9;white-space:pre-line;">${letter}</div>
         </div>
       </div>
@@ -498,6 +510,7 @@ function renderNoteRecorder(){
               <span style="font-size:11px;padding:3px 9px;border-radius:20px;background:var(--good-soft);color:var(--good);font-weight:700;">Generated</span>
             </div>
             <div style="flex:1;overflow-y:auto;padding:20px 22px;">
+              ${memTag('Templates','Note Summary Template','tmpl-open:note-summary')}
               ${soapSection('Subjective','#5b3fa0',SAMPLE_SOAP.S)}
               ${soapSection('Objective','#267a55',SAMPLE_SOAP.O)}
               ${soapSection('Assessment','#b07720',SAMPLE_SOAP.A)}
@@ -638,10 +651,12 @@ function renderLabWfOverlay(){
   };
 
   const s=S.labWfStep;
+  const WF_STEPS=['Labcorp test selection','Same name test search in PathGroup','Compare the best price'];
+  const WF_EXEC=['Retrieving your selected Labcorp tests','Searching PathGroup for matching test names','Comparing prices across vendors'];
   const steps=`
-    ${stepEl(1,'Retrieving selected Labcorp tests',s>=2,s===1)}
-    ${stepEl(2,'Searching PathGroup for matching tests',s>=3,s===2)}
-    ${stepEl(3,'Comparing prices across vendors',s>=4,s===3)}`;
+    ${stepEl(1,WF_EXEC[0],s>=2,s===1)}
+    ${stepEl(2,WF_EXEC[1],s>=3,s===2)}
+    ${stepEl(3,WF_EXEC[2],s>=4,s===3)}`;
 
   const table=s>=4?`
     <div style="margin-top:24px;animation:sap-up .3s ease;">
@@ -680,10 +695,17 @@ function renderLabWfOverlay(){
     <div style="background:var(--bg);border:1px solid var(--border);border-radius:22px;box-shadow:0 28px 80px rgba(13,27,77,.28);width:min(640px,96vw);max-height:90vh;display:flex;flex-direction:column;overflow:hidden;animation:sap-up .25s ease;">
       <div style="display:flex;align-items:center;padding:20px 26px;border-bottom:1px solid var(--border);flex:none;gap:12px;">
         <div style="flex:1;">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">
-            <span style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;padding:3px 9px;border-radius:20px;background:var(--accent-soft);color:var(--accent);">Memory · Workflow</span>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.2"><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="12" cy="18" r="2"/><path d="M7 6h10M5 8v4a5 5 0 0 0 5 5h.5M19 8v4a5 5 0 0 1-5 5h-.5"/></svg>
+            <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--accent);">Memory · Workflow loaded</span>
           </div>
-          <div style="font-size:17px;font-weight:800;letter-spacing:-.02em;color:var(--text);">Lab panel price comparison</div>
+          <div style="font-size:17px;font-weight:800;letter-spacing:-.02em;color:var(--text);margin-bottom:8px;">Lab panel price comparison</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            ${WF_STEPS.map((s,i)=>`
+            <span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--text-2);border:1px solid var(--border);border-radius:7px;padding:3px 9px;">
+              <span style="font-size:9.5px;font-weight:700;color:var(--text-3);">${i+1}</span>${s}
+            </span>`).join('')}
+          </div>
         </div>
         <button data-action="labwf-close" style="width:32px;height:32px;border-radius:9px;border:1px solid var(--border);background:var(--panel);color:var(--text-2);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;">×</button>
       </div>
@@ -798,10 +820,21 @@ function renderLabSearch(){
                    <div style="padding:11px 14px;"><div style="font-size:10.5px;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em;">Margin</div><div style="font-size:16px;font-weight:700;color:var(--good);margin-top:2px;">${money(totalMkp-totalCost)}</div></div>
                  </div>
                  <button data-action="lab-assign" style="width:100%;padding:11px;border-radius:11px;background:var(--accent);color:#fff;font-size:13.5px;font-weight:700;cursor:pointer;border:none;margin-bottom:8px;">Assign</button>
-                 <button data-action="lab-wf-start" style="width:100%;padding:10px;border-radius:11px;border:1.5px solid var(--accent-line);background:var(--accent-soft);color:var(--accent);font-size:12.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;">
-                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="12" cy="18" r="2"/><path d="M7 6h10M5 8v4a5 5 0 0 0 5 5h.5M19 8v4a5 5 0 0 1-5 5h-.5"/></svg>
-                   Memory · Workflow
-                 </button>`
+                 <div data-action="lab-wf-start" style="border:1px solid var(--accent-line);border-radius:12px;background:var(--accent-soft);padding:12px 14px;cursor:pointer;">
+                   <div style="display:flex;align-items:center;gap:7px;margin-bottom:7px;">
+                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.2"><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="12" cy="18" r="2"/><path d="M7 6h10M5 8v4a5 5 0 0 0 5 5h.5M19 8v4a5 5 0 0 1-5 5h-.5"/></svg>
+                     <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--accent);">Memory · Workflow</span>
+                   </div>
+                   <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:9px;">Lab panel price comparison</div>
+                   <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:10px;">
+                     ${['Labcorp test selection','PathGroup matching','Compare best price'].map((s,i)=>`
+                     <div style="display:flex;align-items:center;gap:8px;">
+                       <span style="width:16px;height:16px;border-radius:50%;background:rgba(91,63,160,.15);color:var(--accent);font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;flex:none;">${i+1}</span>
+                       <span style="font-size:11.5px;color:var(--text-2);">${s}</span>
+                     </div>`).join('')}
+                   </div>
+                   <div style="text-align:center;font-size:12px;font-weight:700;color:var(--accent);">▶ Run workflow</div>
+                 </div>`
               : `<p style="font-size:12.5px;color:var(--text-3);line-height:1.55;margin:0;">Click tests on the left to build a panel. Combined price, markup, and profit show up here.</p>`
             }
           </div>
@@ -1597,6 +1630,7 @@ function renderTask(ma){
       </div>`).join('');
     const reasons=t.lab.reasons.map(r=>`<div style="display:flex;gap:9px;align-items:flex-start;font-size:13.5px;color:var(--text-2);"><span style="color:var(--accent);margin-top:1px;">•</span>${r}</div>`).join('');
     body=`
+      ${memTag('Workflow','Lab panel price comparison','lab-wf-start')}
       <div style="font-size:12.5px;color:var(--text-3);margin-bottom:13px;">Assembled from ${t.patient.first}'s visit note · priced against the Archway list.</div>
       <div style="border:1px solid var(--border);border-radius:15px;overflow:hidden;background:var(--panel);box-shadow:var(--shadow);">
         <div style="display:flex;padding:11px 18px;border-bottom:1px solid var(--border);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3);">
@@ -1620,6 +1654,7 @@ function renderTask(ma){
       </div>`).join('');
     const sugg=t.suggestions.map(g=>`<span style="font-size:13px;color:var(--accent);border:1px solid var(--accent-line);background:var(--accent-soft);border-radius:999px;padding:6px 13px;">+ ${g}</span>`).join('');
     body=`
+      ${memTag('Templates','Note Summary Template','tmpl-open:note-summary')}
       <div style="display:flex;flex-direction:column;gap:13px;">${soap}</div>
       <div style="margin-top:16px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3);">Suggested next actions</div>
       <div style="display:flex;gap:9px;flex-wrap:wrap;margin-top:10px;">${sugg}</div>`;
@@ -1628,6 +1663,7 @@ function renderTask(ma){
     const bparas=t.referral.body.map(b=>`<p style="margin:0;font-size:14px;color:var(--text);line-height:1.65;">${b}</p>`).join('');
     const atts=t.referral.attachments.map(a=>`<span style="display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--text-2);border:1px solid var(--border);border-radius:8px;padding:5px 10px;">${I.file}${a}</span>`).join('');
     body=`
+      ${memTag('Templates','Patient Information Scribe Template','tmpl-open:referral-scribe')}
       <div style="border:1px solid var(--border);background:var(--panel);border-radius:15px;padding:26px 28px;box-shadow:var(--shadow);">
         <div style="font-size:12.5px;color:var(--text-3);line-height:1.7;">
           <div style="color:var(--text-2);"><b style="color:var(--text);">To:</b> ${t.referral.to}</div>
@@ -1897,6 +1933,10 @@ document.getElementById('app').addEventListener('click',e=>{
   if(act.startsWith('db-view:')){S.dbView=act.slice(8);render();return;}
   if(act==='db-back'){S.dbView=null;render();return;}
   if(act==='lab-wf-start'){
+    if(!S.labSelected.length&&S.taskId){
+      const rawT=[...TASKS,...S.extraTasks].find(x=>x.id===S.taskId);
+      if(rawT&&rawT.lab){S.labSelected=rawT.lab.items.map(item=>{const lt=LAB_TESTS.find(l=>l.cpt===item.cpt&&l.cat===item.cat);return lt?lt.id:null;}).filter(Boolean);}
+    }
     S.labWf=true;S.labWfStep=1;render();
     setTimeout(()=>{S.labWfStep=2;render();},700);
     setTimeout(()=>{S.labWfStep=3;render();},1500);
