@@ -20,13 +20,110 @@ const S = {
   addTmplOpen: false, addTmplType: 'note', addTmplLabel: '', addTmplContent: '',
   userTemplates: [],
   labWf: false, labWfStep: 0,
-  dbView: null,
-  addWfOpen: false, addWfType: 'lab', addWfLabel: '', addWfSteps: [''],
-  userWorkflows: [],
+  workItem: null,
+  completedWork: [],
+  clinic: 'cypress', clinicDrop: false,
+  ccmCareType: 'CCM', ccmSignOff: 'All', ccmInsurance: 'All', practicesOpen: false,
+  carePlanOpen: false, billingOpen: false,
+  billingLoaded: false,
+  carePlanStep: 'select', selectedTemplate: null, carePlanLoaded: false,
+  ptStatus: 'all', ptSort: 'name', ptProvider: 'all',
+  workItemView: null,
+  ftDetailId: null,
+  ftCreateOpen: false, ftCreateName: '', ftCreateDesc: '', ftCreateContent: '', ftCreatePrompt: '',
+  userFtTemplates: [],
 };
 
+// ── Clinics ───────────────────────────────────────────────────────────────
+const CLINICS = [
+  { id:'cypress', label:'Cypress Physicians Association', short:'Cypress',    emr:'eMDs',            patients:377, signoffReady:252, signoffDone:118, pendingActs:14, missingMin:8,  revenue:15840, todayCalls:18 },
+  { id:'ikp',     label:'IKP Family Medicine',           short:'IKP',         emr:'eMDs',            patients:48,  signoffReady:31,  signoffDone:12,  pendingActs:5,  missingMin:3,  revenue:1950,  todayCalls:4  },
+  { id:'westtx',  label:'West Texas Primary Care',       short:'West TX',     emr:'Azalea Health',   patients:62,  signoffReady:44,  signoffDone:21,  pendingActs:9,  missingMin:6,  revenue:2760,  todayCalls:6  },
+  { id:'pulm',    label:'Pulmonology Associates',        short:'Pulm',        emr:'eClinicalWorks',  patients:89,  signoffReady:67,  signoffDone:29,  pendingActs:11, missingMin:4,  revenue:4210,  todayCalls:8  },
+  { id:'cardio',  label:'Cardiology of West Texas',      short:'Cardiology',  emr:'eClinicalWorks',  patients:134, signoffReady:98,  signoffDone:47,  pendingActs:17, missingMin:12, revenue:6130,  todayCalls:12 },
+];
+function currentClinic(){ return CLINICS.find(c=>c.id===S.clinic)||CLINICS[0]; }
+
 // ── Data ─────────────────────────────────────────────────────────────────
-const PATIENTS = [];
+const PATIENTS = [
+  { id:'p1', name:'Margaret Torres', dob:'03/12/1948', age:76, sex:'F', mrn:'CYP-4829',
+    plan:'Medicare', risk:'High', provider:'Sam', last:'Jun 10',
+    conditions:['Type 2 Diabetes Mellitus','Hypertension','Chronic Kidney Disease (Stage 3)'],
+    medications:['Metformin 1000mg BID','Lisinopril 10mg daily','Amlodipine 5mg daily','Atorvastatin 40mg nightly'],
+    vitals:{bp:'138/82',hr:78,temp:'98.4°F',weight:'167 lbs',a1c:'7.8%'},
+    minutesThisMonth:47, lastCall:'Jun 10, 2026', ccmStatus:'ready',
+    activities:[
+      {date:'Jun 10',desc:'Monthly follow-up call — diabetes & hypertension review',staff:'Maria R., RN',clinical:true,minutes:22},
+      {date:'Jun 3', desc:'Medication refill coordination with pharmacy',staff:'Maria R., RN',clinical:true,minutes:15},
+      {date:'May 28',desc:'Lab result review and patient notification — HbA1c, BMP',staff:'Maria R., RN',clinical:true,minutes:10},
+    ]},
+  { id:'p2', name:'Robert Nguyen', dob:'07/28/1952', age:73, sex:'M', mrn:'CYP-3847',
+    plan:'Medicare Advantage', risk:'High', provider:'Davis', last:'Jun 14',
+    conditions:['Congestive Heart Failure (HFrEF)','Atrial Fibrillation','Hypertension'],
+    medications:['Carvedilol 25mg BID','Furosemide 40mg daily','Apixaban 5mg BID','Lisinopril 5mg daily'],
+    vitals:{bp:'128/76',hr:62,temp:'98.1°F',weight:'198 lbs',a1c:'N/A'},
+    minutesThisMonth:28, lastCall:'Jun 14, 2026', ccmStatus:'ready',
+    activities:[
+      {date:'Jun 14',desc:'CHF monitoring — daily weight log review, edema assessment',staff:'Sandra K., LVN',clinical:true,minutes:28},
+    ]},
+  { id:'p3', name:'Linda Patel', dob:'11/04/1955', age:70, sex:'F', mrn:'CYP-2913',
+    plan:'Medicare', risk:'Medium', provider:'Richard', last:'Jun 2',
+    conditions:['COPD (GOLD Stage II)','Hyperlipidemia','Osteoarthritis'],
+    medications:['Tiotropium inhaler daily','Albuterol PRN','Atorvastatin 20mg nightly','Acetaminophen 500mg TID'],
+    vitals:{bp:'124/78',hr:74,temp:'97.9°F',weight:'142 lbs',a1c:'N/A'},
+    minutesThisMonth:12, lastCall:'Jun 2, 2026', ccmStatus:'needs-call',
+    activities:[
+      {date:'Jun 2', desc:'Pharmacy coordination — inhaler refill and technique review',staff:'Sandra K., LVN',clinical:true,minutes:12},
+    ]},
+  { id:'p4', name:'James Kowalski', dob:'05/19/1944', age:82, sex:'M', mrn:'CYP-5541',
+    plan:'Medicare', risk:'High', provider:'Sam', last:'Jun 12',
+    conditions:['Coronary Artery Disease','Type 2 Diabetes Mellitus','Chronic Kidney Disease (Stage 3b)','Hypertension'],
+    medications:['Aspirin 81mg daily','Atorvastatin 80mg nightly','Metoprolol 50mg BID','Metformin 500mg daily','Amlodipine 10mg daily'],
+    vitals:{bp:'142/88',hr:68,temp:'98.2°F',weight:'189 lbs',a1c:'8.1%'},
+    minutesThisMonth:62, lastCall:'Jun 12, 2026', ccmStatus:'ready',
+    activities:[
+      {date:'Jun 12',desc:'Monthly CCM call — CAD management, diabetes review, kidney monitoring',staff:'Maria R., RN',clinical:true,minutes:30},
+      {date:'Jun 5', desc:'Cardiology follow-up coordination — appointment scheduling',staff:'Maria R., RN',clinical:true,minutes:20},
+      {date:'May 30',desc:'Lab results review — eGFR, creatinine trending',staff:'Maria R., RN',clinical:true,minutes:12},
+    ]},
+  { id:'p5', name:'Dorothy Simmons', dob:'09/23/1950', age:75, sex:'F', mrn:'CYP-1876',
+    plan:'Medicare Advantage', risk:'Medium', provider:'Richard', last:'May 20',
+    conditions:['Hypertension','Hypothyroidism','Osteoporosis'],
+    medications:['Amlodipine 10mg daily','Levothyroxine 75mcg daily','Alendronate 70mg weekly','Calcium+D3 daily'],
+    vitals:{bp:'130/80',hr:72,temp:'98.0°F',weight:'155 lbs',a1c:'N/A'},
+    minutesThisMonth:0, lastCall:'May 20, 2026', ccmStatus:'needs-call',
+    activities:[]},
+  { id:'p6', name:'Antonio Reyes', dob:'02/14/1958', age:68, sex:'M', mrn:'CYP-6204',
+    plan:'Medicare', risk:'High', provider:'Davis', last:'Jun 11',
+    conditions:['Type 2 Diabetes Mellitus','Hypertension','Hyperlipidemia','Peripheral Artery Disease'],
+    medications:['Glipizide 10mg daily','Lisinopril 20mg daily','Rosuvastatin 40mg nightly','Clopidogrel 75mg daily','Cilostazol 100mg BID'],
+    vitals:{bp:'136/84',hr:80,temp:'98.3°F',weight:'201 lbs',a1c:'8.4%'},
+    minutesThisMonth:35, lastCall:'Jun 11, 2026', ccmStatus:'ready',
+    activities:[
+      {date:'Jun 11',desc:'Monthly CCM call — diabetes management, PAD foot care education',staff:'Sandra K., LVN',clinical:true,minutes:25},
+      {date:'Jun 6', desc:'Medication reconciliation — clopidogrel refill',staff:'Sandra K., LVN',clinical:true,minutes:10},
+    ]},
+  { id:'p7', name:'Helen Crawford', dob:'12/08/1946', age:79, sex:'F', mrn:'CYP-3390',
+    plan:'Medicare', risk:'Medium', provider:'Sam', last:'Jun 8',
+    conditions:['Atrial Fibrillation','Hypertension','Mild Cognitive Impairment'],
+    medications:['Warfarin 5mg daily','Metoprolol 25mg BID','Ramipril 5mg daily'],
+    vitals:{bp:'126/74',hr:64,temp:'97.8°F',weight:'138 lbs',a1c:'N/A'},
+    minutesThisMonth:18, lastCall:'Jun 8, 2026', ccmStatus:'in-progress',
+    activities:[
+      {date:'Jun 8', desc:'INR check follow-up — result review, dose adjustment notification',staff:'Maria R., RN',clinical:true,minutes:18},
+    ]},
+  { id:'p8', name:'Charles Brown', dob:'06/30/1953', age:72, sex:'M', mrn:'CYP-7712',
+    plan:'Medicare Advantage', risk:'High', provider:'Richard', last:'Jun 13',
+    conditions:['COPD (GOLD Stage III)','Lung Cancer (Remission, 2023)','Depression','Hypertension'],
+    medications:['Symbicort 160/4.5 BID','Albuterol PRN','Sertraline 100mg daily','Amlodipine 5mg daily'],
+    vitals:{bp:'132/80',hr:82,temp:'98.5°F',weight:'174 lbs',a1c:'N/A'},
+    minutesThisMonth:54, lastCall:'Jun 13, 2026', ccmStatus:'ready',
+    activities:[
+      {date:'Jun 13',desc:'Monthly CCM call — COPD symptom monitoring, depression screen (PHQ-2)',staff:'Maria R., RN',clinical:true,minutes:30},
+      {date:'Jun 7', desc:'Oncology follow-up coordination — imaging results',staff:'Maria R., RN',clinical:true,minutes:15},
+      {date:'Jun 3', desc:'Mental health check-in — mood assessment, medication adherence',staff:'Maria R., RN',clinical:true,minutes:9},
+    ]},
+];
 
 const TASKS = [];
 const PROGRESS = [];
@@ -142,17 +239,46 @@ function memTag(section,name,action){
 function renderSidebar(ma,isDark){
   const nb=(key)=>{
     const active=S.view===key
-      ||(key==='patients'&&(S.view==='patients'||S.view==='patient'))
+      ||(key==='patients'&&S.view==='patients'&&!S.workItem)
+      ||(key==='patients'&&S.view==='patient'&&!S.workItem)
+      ||(key==='followup'&&S.workItem==='followup'&&(S.view==='patients'||S.view==='patient'))
+      ||(key==='careplan'&&S.workItem==='careplan'&&(S.view==='patients'||S.view==='patient'))
       ||(key===S.capType&&S.view==='cap')
-      ||(key==='mem-templates'&&S.view==='mem'&&S.memTab==='templates')
-      ||(key==='mem-database'&&S.view==='mem'&&S.memTab==='database')
-      ||(key==='mem-workflow'&&S.view==='mem'&&S.memTab==='workflow');
+      ||(key==='mem-templates'&&S.view==='mem');
     return `background:${active?'var(--accent-soft)':'transparent'};color:${active?'var(--text)':'var(--text-2)'}`;
   };
+  const clinic=currentClinic();
+  const dropItems=CLINICS.map(c=>`
+    <button data-action="clinic-select:${c.id}"
+      style="display:flex;align-items:center;gap:10px;width:100%;padding:8px 11px;border-radius:9px;border:none;background:${c.id===S.clinic?'var(--accent-soft)':'transparent'};text-align:left;cursor:pointer;transition:background .12s;">
+      <span style="width:20px;height:20px;border-radius:5px;background:${c.id===S.clinic?'var(--accent)':'var(--panel-2)'};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:${c.id===S.clinic?'#fff':'var(--text-3)'};flex:none;">${c.short[0]}</span>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:12.5px;font-weight:${c.id===S.clinic?'700':'500'};color:${c.id===S.clinic?'var(--text)':'var(--text-2)'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${c.short}</div>
+        <div style="font-size:10.5px;color:var(--text-3);">${c.emr}</div>
+      </div>
+      ${c.id===S.clinic?`<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5"><path d="m5 12 5 5 9-11"/></svg>`:''}
+    </button>`).join('');
+
   return `
-  <div style="display:flex;align-items:center;gap:10px;padding:4px 6px;">
-    <span style="width:28px;height:28px;border-radius:9px;background:linear-gradient(150deg,#a78bfa,#7c5cdb);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:#fff;">A</span>
-    <span style="font-size:14px;font-weight:700;letter-spacing:-.015em;line-height:1.2;">Archway Family<br>Medicine</span>
+  <div style="display:flex;flex-direction:column;gap:6px;padding:2px 0 10px;">
+    <div style="display:flex;align-items:center;gap:9px;padding:2px 4px;">
+      <span style="width:28px;height:28px;border-radius:8px;background:linear-gradient(150deg,#7c5cdb,#4c2d9c);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px;color:#fff;flex:none;letter-spacing:-.02em;">C</span>
+      <span style="font-size:12px;font-weight:800;letter-spacing:-.01em;line-height:1.25;color:var(--text);">Chronic Care<br>Management Solutions</span>
+    </div>
+    <!-- Clinic selector -->
+    <div style="position:relative;">
+      <button data-action="clinic-drop"
+        style="display:flex;align-items:center;gap:8px;width:100%;padding:7px 10px;border-radius:9px;border:1px solid var(--border);background:var(--panel);cursor:pointer;transition:border-color .15s;">
+        <span style="width:20px;height:20px;border-radius:5px;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:var(--accent);flex:none;">${clinic.label[0]}</span>
+        <span style="flex:1;font-size:12px;font-weight:600;color:var(--text);text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${clinic.short||clinic.label}</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2.5" style="flex:none;transform:${S.clinicDrop?'rotate(180deg)':'none'};transition:transform .2s;"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+      ${S.clinicDrop?`
+      <div style="position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:99;background:var(--bg);border:1px solid var(--border);border-radius:12px;box-shadow:0 8px 28px rgba(13,27,77,.18);padding:5px;animation:sap-up .15s ease;" id="clinic-dropdown">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);padding:5px 10px 7px;">Clinics</div>
+        ${dropItems}
+      </div>`:''}
+    </div>
   </div>
   <div style="display:flex;flex-direction:column;gap:3px;">
     <div style="font-size:10.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--text-3);padding:0 8px 7px;">Workspace</div>
@@ -161,10 +287,14 @@ function renderSidebar(ma,isDark){
   </div>
   <div style="display:flex;flex-direction:column;gap:3px;">
     <div style="font-size:10.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--text-3);padding:0 8px 7px;">Work Items</div>
-    <button class="nav-btn" data-action="cap:lab" style="display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:10px;font-size:13.5px;font-weight:600;${nb('lab')};transition:background .15s;">${I.lab} Lab panels</button>
-    <button class="nav-btn" data-action="cap:referral" style="display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:10px;font-size:13.5px;font-weight:600;${nb('referral')};transition:background .15s;">${I.referral} Referrals</button>
-    <button class="nav-btn" data-action="cap:note" style="display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:10px;font-size:13.5px;font-weight:600;${nb('note')};transition:background .15s;">${I.note} Visit notes</button>
-    <button class="nav-btn" data-action="cap:doc" style="display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:10px;font-size:13.5px;font-weight:600;${nb('doc')};transition:background .15s;">${I.doc} Documents</button>
+    <button class="nav-btn" data-action="work:followup" style="display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:10px;font-size:13.5px;font-weight:600;${nb('followup')};transition:background .15s;">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.63A2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"/></svg>
+      Followup Call
+    </button>
+    <button class="nav-btn" data-action="work:careplan" style="display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:10px;font-size:13.5px;font-weight:600;${nb('careplan')};transition:background .15s;">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 3v4h4"/><path d="M6 3h8l4 4v14H6z"/><path d="M9 12h6M9 16h4"/></svg>
+      Care Plan
+    </button>
   </div>
   <div style="display:flex;flex-direction:column;gap:3px;">
     <div style="font-size:10.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--text-3);padding:0 8px 7px;">Memory</div>
@@ -172,20 +302,12 @@ function renderSidebar(ma,isDark){
       <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><path d="M17 13v8M13 17h8"/></svg>
       Templates
     </button>
-    <button class="nav-btn" data-action="mem:database" style="display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:10px;font-size:13.5px;font-weight:600;${nb('mem-database')};transition:background .15s;">
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v6c0 1.66 3.58 3 8 3s8-1.34 8-3V6"/><path d="M4 12v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/></svg>
-      Database
-    </button>
-    <button class="nav-btn" data-action="mem:workflow" style="display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:10px;font-size:13.5px;font-weight:600;${nb('mem-workflow')};transition:background .15s;">
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="12" cy="18" r="2"/><path d="M7 6h10M5 8v4a5 5 0 0 0 5 5h.5M19 8v4a5 5 0 0 1-5 5h-.5"/></svg>
-      Workflow
-    </button>
   </div>
   <div style="margin-top:auto;display:flex;align-items:center;gap:10px;padding:0 4px;">
-    <span style="width:30px;height:30px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:800;">SC</span>
+    <span style="width:30px;height:30px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:800;">IV</span>
     <div style="flex:1;min-width:0;">
-      <div style="font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Dr. Seungik Cho</div>
-      <div style="font-size:11px;color:var(--text-3);">Archway Family Medicine</div>
+      <div style="font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Ivan</div>
+      <div style="font-size:11px;color:var(--text-3);">${clinic.short}</div>
     </div>
     <button class="theme-btn" data-action="theme" style="width:32px;height:32px;border-radius:9px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text-2);transition:border-color .15s;" title="Toggle theme">
       ${isDark?I.sun:I.moon}
@@ -260,8 +382,8 @@ If you require any additional information or would like to discuss this case pri
 Thank you for your continued collaboration in the care of our shared patients.
 
 Sincerely,
-Dr. Seungik Cho
-Archway Family Medicine`;
+Ivan
+Cypress Physicians Association`;
 }
 
 function renderReferral(){
@@ -771,7 +893,7 @@ function renderLabSearch(){
       <div style="display:flex;align-items:center;padding:22px 28px 16px;border-bottom:1px solid var(--border);flex:none;">
         <div style="flex:1;">
           <div style="font-size:22px;font-weight:800;letter-spacing:-.025em;color:var(--text);">Lab Test Search</div>
-          <div style="font-size:13px;color:var(--text-3);margin-top:3px;">Search the Archway lab price list, build a panel, and see your combined pricing.</div>
+          <div style="font-size:13px;color:var(--text-3);margin-top:3px;">Search the lab price list, build a panel, and see your combined pricing.</div>
         </div>
         <button data-action="lab-close" style="width:32px;height:32px;border-radius:9px;border:1px solid var(--border);background:var(--panel);color:var(--text-2);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;">×</button>
       </div>
@@ -914,51 +1036,209 @@ function renderCreateWork(filteredPatients){
   </div>`;
 }
 
-// ── Today view ────────────────────────────────────────────────────────────
+// ── CCM Dashboard ─────────────────────────────────────────────────────────
 function renderToday(ma){
-  const allPatients=[...PATIENTS,...S.extraPatients];
-  const wq=S.workQ.toLowerCase();
-  const filteredPatients=allPatients.filter(p=>!wq||p.name.toLowerCase().includes(wq));
+  const cl=currentClinic();
+  const totalPatients=CLINICS.reduce((s,c)=>s+c.patients,0);
+  const totalSignoff=CLINICS.reduce((s,c)=>s+c.signoffReady,0);
+  const totalRevenue=CLINICS.reduce((s,c)=>s+c.revenue,0);
+  const totalPending=CLINICS.reduce((s,c)=>s+c.pendingActs,0);
 
-  const TYPE_COLOR={lab:'var(--accent)',note:'var(--good)',referral:'var(--info)',doc:'var(--ready)'};
-  const TYPE_LABEL={lab:'Lab panel',note:'Visit note',referral:'Referral',doc:'Document'};
-
-  function oneSentence(t){
-    const p=byId(t.patient);
-    const n=p?.name||'patient';
-    if(t.type==='lab'){const c=t.lab?.items?.length||1;return `Ordered ${c} lab test${c!==1?'s':''} for ${n}.`;}
-    if(t.type==='note') return `Visit note recorded for ${n}.`;
-    if(t.type==='referral') return `Referral to ${t.referral?.specialist||'specialist'} drafted for ${n}.`;
-    if(t.type==='doc') return `Document "${t.doc?.source||'file'}" extracted and summarized for ${n}.`;
-    return `${t.title} assigned for ${n}.`;
-  }
-
-  const logs=[...S.extraTasks].reverse();
-
-  const rows=logs.map((t,i)=>{
-    const color=TYPE_COLOR[t.type]||'var(--text-3)';
-    const label=TYPE_LABEL[t.type]||t.type;
-    const isLast=i===logs.length-1;
-    return `
-    <div style="display:flex;align-items:center;gap:14px;padding:15px 22px;${isLast?'':'border-bottom:1px solid var(--border)'};">
-      <span style="width:7px;height:7px;border-radius:50%;background:${color};flex:none;"></span>
-      <span style="flex:1;font-size:13.5px;color:var(--text);line-height:1.45;">${oneSentence(t)}</span>
-      <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:${color};flex:none;">${label}</span>
-      <span style="font-size:12px;color:var(--text-3);flex:none;width:54px;text-align:right;">${t.at}</span>
+  const kpi=(val,label,sub,color,icon)=>`
+    <div style="border:1px solid var(--border);border-radius:13px;background:var(--panel);padding:16px 20px;display:flex;flex-direction:column;gap:6px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <span style="font-size:10.5px;font-weight:600;color:var(--text-3);letter-spacing:.02em;">${label}</span>
+        <span style="font-size:11px;color:${color};background:${color}18;padding:2px 8px;border-radius:99px;font-weight:700;">${sub}</span>
+      </div>
+      <div style="font-size:28px;font-weight:800;color:var(--text);letter-spacing:-.03em;line-height:1.1;">${val}</div>
     </div>`;
+
+  // Sign-off queue from current clinic's patients
+  const signoffRows=PATIENTS.filter(p=>p.ccmStatus==='ready'&&p.minutesThisMonth>=20).map(p=>{
+    const min=p.minutesThisMonth;
+    let codes='',rev=0;
+    if(min>=60){codes='99487';const add=Math.floor((min-60)/30);rev=132.93+(add*68.02);if(add)codes+=' + '+Array(add).fill('99489').join(' + ');}
+    else{codes='99490';const add=Math.min(2,Math.floor((min-20)/20));rev=62.71+(add*47.34);if(add)codes+=' + '+Array(add).fill('99439').join(' + ');}
+    return {p,min,codes,rev};
+  });
+
+  const signoffTable=signoffRows.length?signoffRows.map((r,i)=>`
+    <div style="display:grid;grid-template-columns:1fr 80px 160px 80px;align-items:center;padding:11px 16px;${i<signoffRows.length-1?'border-bottom:1px solid var(--border)':''};">
+      <div>
+        <button data-action="pt-open:${r.p.id}" style="font-size:13px;font-weight:700;color:var(--text);cursor:pointer;background:none;border:none;padding:0;text-align:left;">${r.p.name}</button>
+        <div style="font-size:11px;color:var(--text-3);margin-top:1px;">Dr. ${r.p.provider}</div>
+      </div>
+      <div style="font-size:13px;font-weight:700;color:var(--accent);text-align:center;">${r.min} min</div>
+      <div style="font-size:11.5px;color:var(--text-2);font-family:monospace;">${r.codes}</div>
+      <div style="font-size:13px;font-weight:700;color:var(--good);text-align:right;">$${r.rev.toFixed(2)}</div>
+    </div>`).join('')
+  :`<div style="padding:28px;text-align:center;color:var(--text-3);font-size:13px;">No patients ready for sign-off this month.</div>`;
+
+  // Activity review queue (missing or low minutes)
+  const ACTIVITY_QUEUE=[
+    {patient:'Margaret Torres', staff:'Phone Room Staff',  type:'Patient phone inquiry — refill request',   date:'Jun 18', minutes:null, clinical:false},
+    {patient:'Robert Nguyen',   staff:'Sandra K., LVN',    type:'Specialist note review — cardiology',       date:'Jun 17', minutes:null, clinical:true},
+    {patient:'Linda Patel',     staff:'Maria R., RN',      type:'Inhaler technique education — phone call',  date:'Jun 16', minutes:null, clinical:true},
+    {patient:'Helen Crawford',  staff:'Maria R., RN',      type:'Lab result discussion — CBC, CMP',          date:'Jun 15', minutes:null, clinical:true},
+    {patient:'Dorothy Simmons', staff:'Admin Staff',       type:'Appointment scheduling',                    date:'Jun 14', minutes:null, clinical:false},
+  ];
+
+  const actRows=ACTIVITY_QUEUE.map((a,i)=>`
+    <div style="display:grid;grid-template-columns:1fr 130px 70px 90px;align-items:center;padding:10px 16px;${i<ACTIVITY_QUEUE.length-1?'border-bottom:1px solid var(--border)':''};">
+      <div>
+        <div style="font-size:12.5px;font-weight:600;color:var(--text);">${a.type}</div>
+        <div style="font-size:11px;color:var(--text-3);margin-top:1px;">${a.patient}</div>
+      </div>
+      <div style="font-size:11.5px;color:var(--text-2);">${a.staff}</div>
+      <div>
+        <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;${a.clinical?'background:var(--good-soft);color:var(--good)':'background:var(--border);color:var(--text-3)'};">${a.clinical?'Clinical':'Admin'}</span>
+      </div>
+      <div style="text-align:right;">
+        ${a.clinical?`<button style="font-size:11.5px;font-weight:700;padding:4px 12px;border-radius:8px;border:1.5px solid var(--accent);color:var(--accent);background:transparent;cursor:pointer;">Add Min</button>`
+        :`<span style="font-size:11px;color:var(--text-3);">Non-billable</span>`}
+      </div>
+    </div>`).join('');
+
+  // Practice overview cards
+  const practiceCards=CLINICS.map(c=>{
+    const pct=Math.round((c.signoffDone/(c.signoffReady+c.signoffDone||1))*100);
+    const isActive=c.id===S.clinic;
+    return `
+    <button data-action="clinic-select:${c.id}"
+      style="text-align:left;padding:14px 16px;border:1.5px solid ${isActive?'var(--accent)':'var(--border)'};border-radius:13px;background:${isActive?'var(--accent-soft)':'var(--panel)'};cursor:pointer;transition:all .15s;width:100%;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <div style="font-size:12.5px;font-weight:700;color:var(--text);">${c.short}</div>
+        <div style="font-size:10px;color:var(--text-3);padding:2px 7px;border:1px solid var(--border);border-radius:5px;">${c.emr}</div>
+      </div>
+      <div style="font-size:22px;font-weight:800;color:${isActive?'var(--accent)':'var(--text)'};letter-spacing:-.02em;line-height:1;margin-bottom:4px;">${c.patients}</div>
+      <div style="font-size:11px;color:var(--text-3);margin-bottom:8px;">active patients</div>
+      <div style="height:4px;background:var(--border);border-radius:99px;overflow:hidden;margin-bottom:6px;">
+        <div style="height:100%;width:${pct}%;background:var(--good);border-radius:99px;transition:width .4s;"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;">
+        <span style="font-size:10.5px;color:var(--good);font-weight:600;">${c.signoffDone} signed off</span>
+        <span style="font-size:10.5px;color:var(--ready);font-weight:600;">${c.signoffReady} ready</span>
+      </div>
+    </button>`;
   }).join('');
 
-  const empty=`
-    <div style="padding:52px 24px;text-align:center;font-size:13.5px;color:var(--text-3);">
-      Assigned work will appear here.
-    </div>`;
-
   return `
-  <div style="padding:86px 32px 70px;max-width:820px;margin:0 auto;width:100%;">
-    ${renderCreateWork(filteredPatients)}
-    <div style="border:1px solid var(--border);border-radius:16px;overflow:hidden;background:var(--panel);box-shadow:var(--shadow);">
-      ${logs.length?rows:empty}
+  <div style="padding:22px 28px 60px;width:100%;overflow-x:hidden;">
+
+    <!-- Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+      <div>
+        <div style="font-size:11px;font-weight:600;color:var(--text-3);letter-spacing:.04em;text-transform:uppercase;margin-bottom:3px;">Chronic Care Management</div>
+        <h1 style="font-size:19px;font-weight:800;letter-spacing:-.02em;color:var(--text);">Operations Dashboard</h1>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="font-size:12px;color:var(--text-3);">Jun 2026</div>
+        <div style="width:8px;height:8px;border-radius:50%;background:var(--good);"></div>
+        <span style="font-size:12px;color:var(--good);font-weight:600;">All systems live</span>
+      </div>
     </div>
+
+    <!-- Practice Overview (collapsible) -->
+    <div style="margin-bottom:20px;">
+      <button data-action="practices-toggle" style="display:flex;align-items:center;gap:7px;background:none;border:none;cursor:pointer;padding:0;margin-bottom:${S.practicesOpen?'10px':'0'};">
+        <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);">Practices</span>
+        <svg width="13" height="13" viewBox="0 0 12 12" fill="none" style="color:var(--text-3);transition:transform .2s;transform:rotate(${S.practicesOpen?'0':'180'}deg);">
+          <path d="M2 4.5L6 7.5L10 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      ${S.practicesOpen ? `<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;">${practiceCards}</div>` : ''}
+    </div>
+
+    <!-- Stats (current clinic) -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px;">
+
+      <div style="border:1px solid var(--border);border-radius:14px;background:var(--panel);box-shadow:var(--shadow);padding:16px 18px;grid-column:span 2;">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--text-3);margin-bottom:10px;">Patients</div>
+        <div style="display:flex;align-items:center;gap:0;">
+          <div style="display:flex;flex-direction:column;gap:2px;padding-right:18px;border-right:1px solid var(--border);margin-right:18px;flex:none;">
+            <div style="font-size:34px;font-weight:800;color:var(--accent);letter-spacing:-.03em;line-height:1;">${cl.patients}</div>
+            <div style="font-size:11.5px;font-weight:600;color:var(--text-2);">Active Patients</div>
+          </div>
+          <div style="display:flex;gap:20px;">
+            ${[
+              {v:6,   label:'No Active<br>Care Plan',   color:'var(--text-2)'},
+              {v:1,   label:'In Progress<br>Care Plan', color:'var(--ready)'},
+              {v:cl.patients-7, label:'Completed<br>Care Plan', color:'var(--good)'},
+            ].map(s=>`
+            <div>
+              <div style="font-size:22px;font-weight:800;color:${s.color};letter-spacing:-.02em;line-height:1;">${s.v}</div>
+              <div style="font-size:11px;color:var(--text-3);margin-top:3px;line-height:1.3;">${s.label}</div>
+            </div>`).join('')}
+          </div>
+        </div>
+      </div>
+
+      <div style="border:1px solid var(--border);border-radius:14px;background:var(--panel);box-shadow:var(--shadow);padding:16px 18px;">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--text-3);margin-bottom:10px;">Sign-Off to EHR/Bill</div>
+        <div style="font-size:34px;font-weight:800;color:var(--good);letter-spacing:-.03em;line-height:1;">${cl.signoffReady}</div>
+        <div style="font-size:11.5px;font-weight:600;color:var(--text-2);margin-top:3px;">Potential Sign-Offs</div>
+      </div>
+
+      <div style="border:1px solid var(--border);border-radius:14px;background:var(--panel);box-shadow:var(--shadow);padding:16px 18px;grid-column:span 2;">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--text-3);margin-bottom:10px;">Scheduled Activities</div>
+        <div style="display:flex;align-items:center;gap:0;">
+          <div style="display:flex;flex-direction:column;gap:2px;padding-right:18px;border-right:1px solid var(--border);margin-right:18px;flex:none;">
+            <div style="font-size:34px;font-weight:800;color:var(--ready);letter-spacing:-.03em;line-height:1;">${cl.todayCalls}</div>
+            <div style="font-size:11.5px;font-weight:600;color:var(--text-2);">Scheduled Today &amp; Prior</div>
+          </div>
+          <div>
+            <div style="font-size:34px;font-weight:800;color:var(--info);letter-spacing:-.03em;line-height:1;">${cl.patients-cl.todayCalls}</div>
+            <div style="font-size:11.5px;font-weight:600;color:var(--text-2);margin-top:3px;">Future Scheduled</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="border:1px solid var(--border);border-radius:14px;background:var(--panel);box-shadow:var(--shadow);padding:16px 18px;">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--text-3);margin-bottom:10px;">${cl.emr} Interface</div>
+        <div style="font-size:34px;font-weight:800;color:var(--info);letter-spacing:-.03em;line-height:1;">${cl.pendingActs}</div>
+        <div style="font-size:11.5px;font-weight:600;color:var(--text-2);margin-top:3px;">Pending Activities</div>
+      </div>
+
+    </div>
+
+    <!-- Filter bar -->
+    <div style="border:1px solid var(--border);border-radius:12px;background:var(--panel);box-shadow:var(--shadow);margin-bottom:16px;overflow:hidden;">
+      ${[
+        {label:'Care Type', action:'ccm-care',    active:S.ccmCareType,  opts:['CCM','Staff Provider','Chronic CCM']},
+        {label:'Sign-Off',  action:'ccm-signoff', active:S.ccmSignOff,   opts:['All','No','Yes','Re?']},
+        {label:'Insurance', action:'ccm-ins',     active:S.ccmInsurance, opts:['All','Medicare','Medicare Advantage']},
+      ].map((g,gi,arr)=>`
+      <div style="display:flex;align-items:center;gap:12px;padding:10px 18px;${gi<arr.length-1?'border-bottom:1px solid var(--border)':''}">
+        <span style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);width:80px;flex:none;">${g.label}</span>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          ${g.opts.map(o=>`<button data-action="${g.action}:${o}" style="padding:4px 13px;border-radius:20px;border:1.5px solid ${g.active===o?'var(--accent)':'var(--border)'};background:${g.active===o?'var(--accent)':'transparent'};color:${g.active===o?'#fff':'var(--text-2)'};font-size:12px;font-weight:${g.active===o?'700':'500'};cursor:pointer;transition:all .15s;">${o}</button>`).join('')}
+        </div>
+      </div>`).join('')}
+    </div>
+
+    <!-- Bar chart -->
+    <div style="border:1px solid var(--border);border-radius:14px;background:var(--panel);box-shadow:var(--shadow);padding:20px 20px 12px;">
+      <div style="font-size:12px;font-weight:700;color:var(--text-3);margin-bottom:14px;">Distribution by Minutes of Care</div>
+      <div style="display:flex;align-items:flex-end;gap:4px;overflow-x:auto;padding-bottom:4px;">
+        ${[
+          {r:'0–4',v:86},{r:'5–9',v:14},{r:'10–14',v:25},{r:'15–19',v:12},
+          {r:'20–24',v:45},{r:'25–29',v:15},{r:'30–34',v:13},{r:'35–39',v:30},
+          {r:'40–44',v:23},{r:'45–49',v:19},{r:'50–54',v:12},{r:'55–59',v:20},
+          {r:'60–74',v:27},{r:'75–89',v:13},{r:'90–104',v:11},{r:'105–119',v:5},
+          {r:'120+',v:4},
+        ].map(b=>{
+          const h=Math.max(4,Math.round((b.v/86)*140));
+          return `<div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;min-width:0;">
+            <span style="font-size:9.5px;font-weight:700;color:var(--text-2);">${b.v}</span>
+            <div style="width:100%;display:flex;flex-direction:column;justify-content:flex-end;height:140px;">
+              <div style="width:100%;background:var(--accent);border-radius:3px 3px 0 0;height:${h}px;opacity:.8;"></div>
+            </div>
+            <span style="font-size:9px;color:var(--text-3);writing-mode:vertical-rl;transform:rotate(180deg);height:36px;line-height:1;">${b.r}</span>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+
   </div>`;
 }
 
@@ -1165,75 +1445,6 @@ Plan:
 ];
 
 // ── Memory views ─────────────────────────────────────────────────────────
-function renderAddWorkflow(){
-  if(!S.addWfOpen) return '';
-  const TYPE_OPTS=[
-    {id:'lab',     label:'Lab panels',  icon:I.lab,      color:'var(--accent)',soft:'var(--accent-soft)'},
-    {id:'referral',label:'Referrals',   icon:I.referral, color:'var(--info)',  soft:'var(--info-soft)'},
-    {id:'note',    label:'Visit notes', icon:I.note,     color:'var(--good)',  soft:'var(--good-soft)'},
-    {id:'doc',     label:'Documents',   icon:I.doc,      color:'var(--ready)', soft:'var(--ready-soft)'},
-  ];
-  const typePills=TYPE_OPTS.map(o=>`
-    <button data-action="aw-type:${o.id}"
-      style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:20px;font-size:12.5px;font-weight:700;cursor:pointer;transition:all .15s;
-        background:${S.addWfType===o.id?o.soft:'var(--panel-2)'};
-        color:${S.addWfType===o.id?o.color:'var(--text-3)'};
-        border:1.5px solid ${S.addWfType===o.id?o.color:'transparent'};">
-      ${o.icon.replace('stroke="currentColor"',`stroke="${S.addWfType===o.id?o.color:'var(--text-3)'}"`)
-              .replace(/width="\d+"/,'width="14"').replace(/height="\d+"/,'height="14"')}
-      @ ${o.label}
-    </button>`).join('');
-
-  const stepItems=S.addWfSteps.map((step,i)=>`
-    <div style="display:flex;align-items:center;gap:10px;">
-      <span style="width:24px;height:24px;border-radius:50%;background:var(--accent-soft);color:var(--accent);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex:none;">${i+1}</span>
-      <input id="wf-step-${i}" value="${step.replace(/"/g,'&quot;')}" placeholder="Describe this step…"
-        style="flex:1;padding:10px 13px;border:1.5px solid var(--border);border-radius:10px;background:var(--panel);color:var(--text);font-size:13.5px;font-family:inherit;"/>
-      ${S.addWfSteps.length>1?`<button data-action="aw-rm-step:${i}" style="color:var(--text-3);font-size:17px;cursor:pointer;background:none;border:none;padding:0 3px;flex:none;">×</button>`:''}
-    </div>`).join('');
-
-  const canSave=!!(S.addWfLabel.trim()&&S.addWfSteps.some(s=>s.trim()));
-  return `
-  <div style="position:fixed;inset:0;z-index:50;background:rgba(13,27,77,.22);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;" id="aw-overlay">
-    <div style="background:var(--bg);border:1px solid var(--border);border-radius:22px;box-shadow:0 24px 70px rgba(13,27,77,.24);width:min(620px,96vw);max-height:92vh;display:flex;flex-direction:column;overflow:hidden;">
-      <div style="display:flex;align-items:center;padding:22px 28px;border-bottom:1px solid var(--border);flex:none;">
-        <span style="font-size:17px;font-weight:800;letter-spacing:-.02em;color:var(--text);flex:1;">Add Workflow</span>
-        <button data-action="aw-close" style="width:32px;height:32px;border-radius:9px;border:1px solid var(--border);background:var(--panel);color:var(--text-2);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;">×</button>
-      </div>
-      <div style="flex:1;overflow-y:auto;padding:24px 28px;display:flex;flex-direction:column;gap:20px;">
-        <div>
-          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);margin-bottom:10px;">Work Item Tag</div>
-          <div style="display:flex;flex-wrap:wrap;gap:8px;">${typePills}</div>
-        </div>
-        <div>
-          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);margin-bottom:8px;">Workflow Name</div>
-          <input id="aw-label-input" value="${S.addWfLabel.replace(/"/g,'&quot;')}" placeholder="e.g. Price comparison across vendors"
-            style="width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:11px;background:var(--panel);color:var(--text);font-size:13.5px;font-family:inherit;"/>
-        </div>
-        <div>
-          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);margin-bottom:10px;">Steps</div>
-          <div style="display:flex;flex-direction:column;gap:8px;">
-            ${stepItems}
-            <button data-action="aw-add-step"
-              style="display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:10px;border:1.5px dashed var(--border);background:transparent;color:var(--text-3);font-size:13px;font-weight:600;cursor:pointer;margin-top:2px;">
-              ${I.plus} Add step
-            </button>
-          </div>
-        </div>
-      </div>
-      <div style="padding:18px 28px;border-top:1px solid var(--border);flex:none;">
-        <button data-action="aw-save"
-          style="width:100%;padding:13px;border-radius:12px;border:none;font-size:14px;font-weight:700;
-            background:${canSave?'#4c2d9c':'var(--panel-2)'};
-            color:${canSave?'#fff':'var(--text-3)'};
-            cursor:${canSave?'pointer':'default'};">
-          Save Workflow
-        </button>
-      </div>
-    </div>
-  </div>`;
-}
-
 function renderAddTemplate(){
   if(!S.addTmplOpen) return '';
   const TYPE_OPTS=[
@@ -1320,20 +1531,6 @@ function renderTemplateOverlay(){
 }
 
 function renderMem(){
-  const tabs=[
-    {id:'templates',label:'Templates',icon:`<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><path d="M17 13v8M13 17h8"/></svg>`},
-    {id:'database', label:'Database', icon:`<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v6c0 1.66 3.58 3 8 3s8-1.34 8-3V6"/><path d="M4 12v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/></svg>`},
-    {id:'workflow', label:'Workflow', icon:`<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="12" cy="18" r="2"/><path d="M7 6h10M5 8v4a5 5 0 0 0 5 5h.5M19 8v4a5 5 0 0 1-5 5h-.5"/></svg>`},
-  ];
-
-  const tabBar=tabs.map(t=>`
-    <button data-action="mem:${t.id}"
-      style="display:flex;align-items:center;gap:8px;padding:9px 18px;border-radius:10px;font-size:13.5px;font-weight:600;transition:all .15s;
-        background:${S.memTab===t.id?'var(--accent-soft)':'transparent'};
-        color:${S.memTab===t.id?'var(--text)':'var(--text-2)'};
-        border:${S.memTab===t.id?'1px solid var(--accent-line)':'1px solid transparent'};">
-      ${t.icon} ${t.label}
-    </button>`).join('');
 
   const emptyCard=(icon,title,desc)=>`
     <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:72px 24px;text-align:center;">
@@ -1347,263 +1544,932 @@ function renderMem(){
       <button style="margin-top:4px;padding:10px 22px;border-radius:11px;background:var(--accent);color:#fff;font-size:13.5px;font-weight:700;cursor:pointer;border:none;opacity:.85;">Coming soon</button>
     </div>`;
 
-  const allTemplates=[...TEMPLATES,...S.userTemplates];
-  const TYPE_META={
-    referral:{icon:I.referral,label:'Referrals',   color:'var(--info)',  soft:'var(--info-soft)'},
-    note:    {icon:I.note,    label:'Visit notes', color:'var(--good)',  soft:'var(--good-soft)'},
-    lab:     {icon:I.lab,     label:'Lab panels',  color:'var(--accent)',soft:'var(--accent-soft)'},
-    doc:     {icon:I.doc,     label:'Documents',   color:'var(--ready)', soft:'var(--ready-soft)'},
-  };
-  const TYPE_ORDER=['referral','note','lab','doc'];
+  // ── Templates tab: Followup Call management ──────────────────────────────
+  const allFtTemplates=[...CALL_TEMPLATES.map(t=>({...t,_builtin:true})),...S.userFtTemplates];
+  const phoneIcon=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.63A2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"/></svg>`;
 
-  const tmplSection=(meta,items)=>`
-    <div style="margin-bottom:24px;">
-      <div style="margin-bottom:10px;">
-        <span style="display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;background:${meta.soft};color:${meta.color};font-size:12px;font-weight:700;">
-          ${meta.icon.replace('stroke="currentColor"',`stroke="${meta.color}"`).replace(/width="\d+"/,'width="14"').replace(/height="\d+"/,'height="14"')}
-          @ ${meta.label}
-        </span>
+  let templatesBody='';
+  if(S.ftDetailId!==null){
+    // ── Detail view ──────────────────────────────────────────────────────
+    const tmpl=allFtTemplates.find(t=>t.id===S.ftDetailId)||allFtTemplates[0];
+    const rawLines=(tmpl.rawContent||'').split('\n');
+    const formattedContent=rawLines.map(line=>{
+      if(!line) return '<div style="height:6px;"></div>';
+      const isSectionHeader=line&&!line.startsWith('•')&&!line.startsWith('-')&&line.trim()===line&&rawLines.indexOf(line)>0&&rawLines[rawLines.indexOf(line)-1]==='';
+      if(isSectionHeader) return `<div style="font-size:12px;font-weight:700;color:var(--text);margin-top:8px;margin-bottom:2px;">${line}</div>`;
+      return `<div style="font-size:13px;color:var(--text-2);">${line}</div>`;
+    }).join('');
+
+    templatesBody=`
+    <div style="padding:0;">
+      <div style="padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;background:var(--panel-2);">
+        <button data-action="ft-back" style="display:flex;align-items:center;gap:5px;font-size:12.5px;font-weight:600;color:var(--text-3);cursor:pointer;background:none;border:none;">${I.back.replace('stroke="currentColor"','stroke="var(--text-3)"')} Back</button>
+        <span style="display:inline-flex;align-items:center;gap:6px;padding:4px 11px;border-radius:20px;background:var(--accent-soft);color:var(--accent);font-size:12px;font-weight:700;">${phoneIcon.replace('stroke="currentColor"','stroke="var(--accent)"')} @ Followup Call</span>
+        <span style="font-size:13.5px;font-weight:700;color:var(--text);">${tmpl.title}</span>
       </div>
-      <div style="display:flex;flex-direction:column;gap:8px;">
-        ${items.map(tmpl=>`
-        <button data-action="tmpl-open:${tmpl.id}" class="action-card"
-          style="display:flex;align-items:center;gap:14px;padding:14px 18px;border:1px solid var(--border);border-radius:13px;background:var(--panel-2);text-align:left;cursor:pointer;transition:all .15s;width:100%;">
-          <div style="width:38px;height:38px;border-radius:11px;background:${meta.soft};display:flex;align-items:center;justify-content:center;flex:none;">
-            ${meta.icon.replace('stroke="currentColor"',`stroke="${meta.color}"`)}
+      <div style="display:flex;gap:0;height:100%;">
+        <!-- Template content preview -->
+        <div style="flex:1;padding:24px 28px;border-right:1px solid var(--border);">
+          <div style="margin-bottom:16px;">
+            <div style="font-size:16px;font-weight:800;color:var(--text);border-bottom:2px solid var(--accent);padding-bottom:10px;margin-bottom:14px;">${tmpl.num ? tmpl.num+'. '+tmpl.title : tmpl.title}</div>
+            <div style="font-family:inherit;line-height:1.8;">${formattedContent}</div>
           </div>
-          <div style="flex:1;min-width:0;">
-            <div style="font-size:14px;font-weight:700;color:var(--text);">${tmpl.label}</div>
-          </div>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
-        </button>`).join('')}
+        </div>
+        <!-- Prompt panel -->
+        <div style="width:300px;flex:none;padding:20px;">
+          <div style="font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);margin-bottom:10px;">Prompt</div>
+          <div style="padding:14px 16px;border:1px solid var(--border);border-radius:11px;background:var(--panel-2);font-size:13px;color:var(--text-2);line-height:1.65;">${(tmpl.prompt||'').replace(/\n/g,'<br>')}</div>
+        </div>
       </div>
     </div>`;
+  } else {
+    // ── List view ────────────────────────────────────────────────────────
+    const cards=allFtTemplates.map(t=>`
+      <button data-action="ft-detail:${t.id}" class="action-card"
+        style="display:flex;align-items:center;gap:14px;padding:14px 18px;border:1px solid var(--border);border-radius:13px;background:var(--panel-2);text-align:left;cursor:pointer;transition:all .15s;width:100%;">
+        <div style="width:36px;height:36px;border-radius:10px;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;flex:none;font-size:11px;font-weight:800;color:var(--accent);">${t.num||'+'}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:13.5px;font-weight:700;color:var(--text);">${t.title}</div>
+          <div style="font-size:12px;color:var(--text-3);margin-top:2px;">${t.hint||''}</div>
+        </div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+      </button>`).join('');
 
-  const sections=TYPE_ORDER.map(type=>{
-    const items=allTemplates.filter(t=>t.type===type);
-    return items.length?tmplSection(TYPE_META[type],items):'';
-  }).join('');
-
-  const templatesBody=`
-    <div style="padding:24px;">
-      ${sections}
-      <button data-action="at-open"
-        style="display:flex;align-items:center;justify-content:center;gap:9px;width:100%;padding:13px;border-radius:13px;border:1.5px dashed var(--border);background:transparent;color:var(--text-3);font-size:13.5px;font-weight:600;cursor:pointer;transition:all .15s;">
-        ${I.plus} Add Template
-      </button>
-    </div>`;
-
-  let body='';
-  if(S.memTab==='templates') body=templatesBody;
-  const labRows=LAB_TESTS.map((t,i)=>{
-    const isLast=i===LAB_TESTS.length-1;
-    return `
-    <div style="display:grid;grid-template-columns:1fr 90px 80px 70px 70px;align-items:center;padding:12px 20px;${isLast?'':'border-bottom:1px solid var(--border)'};">
-      <div>
-        <div style="font-size:13.5px;font-weight:600;color:var(--text);">${t.name}</div>
-        <div style="font-size:11.5px;color:var(--text-3);margin-top:2px;">${t.vendor} · Cat ${t.cat}</div>
-      </div>
-      <div style="font-size:12px;color:var(--text-3);text-align:center;">CPT ${t.cpt}</div>
-      <div style="font-size:12px;color:var(--text-3);text-align:right;">${t.vendor}</div>
-      <div style="font-size:13px;font-weight:600;color:var(--text-2);text-align:right;">${money(t.price)}</div>
-      <div style="font-size:13px;font-weight:700;color:var(--accent);text-align:right;">${money(t.markup)}</div>
-    </div>`;
-  }).join('');
-
-  const dbBody= S.dbView==='lab' ? `
-    <div>
-      <div style="display:flex;align-items:center;gap:10px;padding:14px 20px;border-bottom:1px solid var(--border);background:var(--panel-2);">
-        <button data-action="db-back" style="display:flex;align-items:center;gap:5px;font-size:12.5px;font-weight:600;color:var(--text-3);cursor:pointer;background:none;border:none;">${I.back.replace('stroke="currentColor"','stroke="var(--text-3)"')} Back</button>
-        <span style="display:inline-flex;align-items:center;gap:6px;padding:4px 11px;border-radius:20px;background:var(--accent-soft);color:var(--accent);font-size:12px;font-weight:700;">
-          ${I.lab.replace('stroke="currentColor"','stroke="var(--accent)"').replace(/width="\d+"/,'width="13"').replace(/height="\d+"/,'height="13"')} @ Lab panels
-        </span>
-        <span style="font-size:13.5px;font-weight:700;color:var(--text);">Lab Test Database</span>
-        <span style="margin-left:auto;font-size:12px;color:var(--text-3);">${LAB_TESTS.length} tests</span>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 90px 80px 70px 70px;padding:9px 20px;border-bottom:1px solid var(--border);background:var(--panel-2);">
-        <span style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);">Test</span>
-        <span style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);text-align:center;">CPT</span>
-        <span style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);text-align:right;">Vendor</span>
-        <span style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);text-align:right;">Price</span>
-        <span style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--accent);text-align:right;">Markup</span>
-      </div>
-      <div style="overflow-y:auto;max-height:520px;">${labRows}</div>
-    </div>`
-  : `
+    templatesBody=`
     <div style="padding:24px;">
       <div style="margin-bottom:12px;">
         <span style="display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;background:var(--accent-soft);color:var(--accent);font-size:12px;font-weight:700;">
-          ${I.lab.replace('stroke="currentColor"','stroke="var(--accent)"').replace(/width="\d+"/,'width="14"').replace(/height="\d+"/,'height="14"')}
-          @ Lab panels
+          ${phoneIcon.replace('stroke="currentColor"','stroke="var(--accent)"')} @ Followup Call
         </span>
       </div>
-      <div style="display:flex;flex-direction:column;gap:8px;">
-        <button data-action="db-view:lab" class="action-card"
-          style="display:flex;align-items:center;gap:14px;padding:14px 18px;border:1px solid var(--border);border-radius:13px;background:var(--panel-2);text-align:left;cursor:pointer;transition:all .15s;width:100%;">
-          <div style="width:38px;height:38px;border-radius:11px;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;flex:none;">
-            ${I.lab.replace('stroke="currentColor"','stroke="var(--accent)"')}
-          </div>
-          <div style="flex:1;min-width:0;">
-            <div style="font-size:14px;font-weight:700;color:var(--text);">Lab Test Database</div>
-          </div>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
-        </button>
-      </div>
-    </div>`;
-
-  if(S.memTab==='database') body=dbBody;
-  const BUILT_IN_WORKFLOWS=[
-    {id:'wf-lab-price',type:'lab',label:'Lab panel price comparison',
-     steps:['Labcorp test selection','Same name test search in PathGroup','Compare the best price']},
-  ];
-  const allWorkflows=[...BUILT_IN_WORKFLOWS,...S.userWorkflows];
-  const WF_TYPE_META={
-    lab:     {icon:I.lab,     label:'Lab panels',  color:'var(--accent)',soft:'var(--accent-soft)'},
-    referral:{icon:I.referral,label:'Referrals',   color:'var(--info)',  soft:'var(--info-soft)'},
-    note:    {icon:I.note,    label:'Visit notes', color:'var(--good)',  soft:'var(--good-soft)'},
-    doc:     {icon:I.doc,     label:'Documents',   color:'var(--ready)', soft:'var(--ready-soft)'},
-  };
-  const WF_TYPE_ORDER=['lab','referral','note','doc'];
-
-  const wfCard=wf=>{
-    const m=WF_TYPE_META[wf.type]||WF_TYPE_META.lab;
-    return `
-    <div style="padding:16px 18px;border:1px solid var(--border);border-radius:13px;background:var(--panel-2);">
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
-        <div style="width:38px;height:38px;border-radius:11px;background:${m.soft};display:flex;align-items:center;justify-content:center;flex:none;">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="${m.color}" stroke-width="1.8"><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="12" cy="18" r="2"/><path d="M7 6h10M5 8v4a5 5 0 0 0 5 5h.5M19 8v4a5 5 0 0 1-5 5h-.5"/></svg>
-        </div>
-        <div style="font-size:14px;font-weight:700;color:var(--text);">${wf.label}</div>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:7px;">
-        ${wf.steps.map((s,i)=>`
-        <div style="display:flex;align-items:center;gap:10px;">
-          <span style="width:20px;height:20px;border-radius:50%;background:${m.soft};color:${m.color};font-size:10.5px;font-weight:800;display:flex;align-items:center;justify-content:center;flex:none;">${i+1}</span>
-          <span style="font-size:13px;color:var(--text-2);">${s}</span>
-        </div>`).join('')}
-      </div>
-    </div>`;
-  };
-
-  const wfSections=WF_TYPE_ORDER.map(type=>{
-    const m=WF_TYPE_META[type];
-    const items=allWorkflows.filter(w=>w.type===type);
-    if(!items.length) return '';
-    return `
-      <div style="margin-bottom:22px;">
-        <div style="margin-bottom:10px;">
-          <span style="display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;background:${m.soft};color:${m.color};font-size:12px;font-weight:700;">
-            ${m.icon.replace('stroke="currentColor"',`stroke="${m.color}"`).replace(/width="\d+"/,'width="14"').replace(/height="\d+"/,'height="14"')}
-            @ ${m.label}
-          </span>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:8px;">${items.map(wfCard).join('')}</div>
-      </div>`;
-  }).join('');
-
-  const wfBody=`
-    <div style="padding:24px;">
-      ${wfSections}
-      <button data-action="aw-open"
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">${cards}</div>
+      <button data-action="ft-create-open"
         style="display:flex;align-items:center;justify-content:center;gap:9px;width:100%;padding:13px;border-radius:13px;border:1.5px dashed var(--border);background:transparent;color:var(--text-3);font-size:13.5px;font-weight:600;cursor:pointer;transition:all .15s;">
-        ${I.plus} Add Workflow
+        ${I.plus} Create Template
       </button>
     </div>`;
-  if(S.memTab==='workflow') body=wfBody;
+  }
 
   return `
   <div style="padding:36px 32px 70px;max-width:820px;margin:0 auto;width:100%;">
-    <div style="display:flex;align-items:center;gap:6px;margin-bottom:28px;padding:5px;background:var(--panel);border:1px solid var(--border);border-radius:13px;width:fit-content;">
-      ${tabBar}
-    </div>
     <div style="border:1px solid var(--border);border-radius:16px;overflow:hidden;background:var(--panel);box-shadow:var(--shadow);">
-      ${body}
+      ${templatesBody}
     </div>
   </div>`;
 }
 
 // ── Patients list view ────────────────────────────────────────────────────
 function renderPatients(){
-  const live=liveTasks();
   const q=S.pq.toLowerCase();
-  const allPatients=[...PATIENTS,...S.extraPatients];
-  const list=allPatients.filter(p=>!q||p.name.toLowerCase().includes(q));
+  const statusMeta={
+    'ready':    {label:'Ready to Bill', color:'var(--good)',   bg:'var(--good-soft)'},
+    'in-progress':{label:'In Progress', color:'var(--ready)',  bg:'var(--ready-soft)'},
+    'needs-call':{label:'Needs Call',   color:'var(--text-3)', bg:'var(--panel-2)'},
+  };
+
+  // filter
+  let list=PATIENTS.filter(p=>{
+    if(q && !p.name.toLowerCase().includes(q)) return false;
+    if(S.ptStatus!=='all' && p.ccmStatus!==S.ptStatus) return false;
+    if(S.ptProvider!=='all' && p.provider!==S.ptProvider) return false;
+    return true;
+  });
+
+  // sort
+  if(S.ptSort==='min-desc') list=[...list].sort((a,b)=>b.minutesThisMonth-a.minutesThisMonth);
+  else if(S.ptSort==='min-asc') list=[...list].sort((a,b)=>a.minutesThisMonth-b.minutesThisMonth);
+  else if(S.ptSort==='last-call') list=[...list].sort((a,b)=>new Date(b.lastCall)-new Date(a.lastCall));
+  else list=[...list].sort((a,b)=>a.name.localeCompare(b.name));
+
+  const pill=(label,act,active)=>`<button data-action="${act}" style="padding:5px 12px;border-radius:99px;font-size:12px;font-weight:600;border:1px solid ${active?'var(--accent)':'var(--border)'};background:${active?'var(--accent-soft)':'transparent'};color:${active?'var(--accent)':'var(--text-3)'};cursor:pointer;transition:all .15s;">${label}</button>`;
+
+  const statusPills=[
+    pill('All',         'pt-status:all',         S.ptStatus==='all'),
+    pill('Ready to Bill','pt-status:ready',       S.ptStatus==='ready'),
+    pill('In Progress', 'pt-status:in-progress',  S.ptStatus==='in-progress'),
+    pill('Needs Call',  'pt-status:needs-call',   S.ptStatus==='needs-call'),
+  ].join('');
+
+  const providerPills=[
+    pill('All',    'pt-provider:all',     S.ptProvider==='all'),
+    pill('Sam',    'pt-provider:Sam',     S.ptProvider==='Sam'),
+    pill('Davis',  'pt-provider:Davis',   S.ptProvider==='Davis'),
+    pill('Richard','pt-provider:Richard', S.ptProvider==='Richard'),
+  ].join('');
+
+  const sortPills=[
+    pill('Name',      'pt-sort:name',     S.ptSort==='name'),
+    pill('Min ↓',     'pt-sort:min-desc', S.ptSort==='min-desc'),
+    pill('Min ↑',     'pt-sort:min-asc',  S.ptSort==='min-asc'),
+    pill('Last Call', 'pt-sort:last-call',S.ptSort==='last-call'),
+  ].join('');
+
   const rows=list.map(p=>{
-    const cnt=live.filter(t=>t.patient===p.id).length;
+    const sm=statusMeta[p.ccmStatus]||statusMeta['needs-call'];
+    const minColor=p.minutesThisMonth>=20?'var(--good)':p.minutesThisMonth>=10?'var(--ready)':'var(--danger)';
     return `
-    <div class="table-row" data-action="patient:${p.id}" style="display:flex;align-items:center;padding:14px 20px;border-bottom:1px solid var(--border);transition:background .14s;">
+    <div class="table-row" data-action="patient:${p.id}" style="display:flex;align-items:center;padding:13px 20px;border-bottom:1px solid var(--border);transition:background .14s;gap:0;">
       <span style="flex:1;display:flex;align-items:center;gap:12px;min-width:0;">
         <span style="width:34px;height:34px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex:none;">${initials(p.name)}</span>
-        <span style="font-size:14px;font-weight:600;white-space:nowrap;">${p.name}</span>
+        <span style="font-size:13.5px;font-weight:600;">${p.name}</span>
       </span>
-      <span style="width:160px;text-align:center;">
-        <span style="${MONO};font-size:12.5px;font-weight:700;color:${cnt>0?'var(--ready)':'var(--text-3)'};">${cnt>0?cnt+' open':'—'}</span>
+      <span style="width:110px;font-size:13px;font-weight:700;color:var(--text);">${p.provider}</span>
+      <span style="width:100px;text-align:center;">
+        <span style="font-size:14px;font-weight:800;color:${minColor};">${p.minutesThisMonth}</span>
+        <span style="font-size:11px;color:var(--text-3);"> min</span>
       </span>
-      <span style="width:120px;text-align:right;font-size:12.5px;color:var(--text-3);">${p.last||'—'}</span>
-    </div>`;}).join('');
-  const empty=`<div style="padding:40px;text-align:center;font-size:13.5px;color:var(--text-3);">No patients yet.</div>`;
+      <span style="width:130px;text-align:center;">
+        <span style="font-size:11.5px;font-weight:700;color:${sm.color};background:${sm.bg};padding:4px 10px;border-radius:99px;">${sm.label}</span>
+      </span>
+      <span style="width:100px;text-align:right;font-size:12px;color:var(--text-3);">${p.lastCall.replace(', 2026','')}</span>
+    </div>`}).join('');
+
   return `
-  <div style="padding:20px 30px 70px;max-width:900px;margin:0 auto;width:100%;">
-    <div style="border:1px solid var(--border);border-radius:15px;overflow:hidden;background:var(--panel);box-shadow:var(--shadow);">
-      <div style="display:flex;align-items:center;padding:11px 20px;border-bottom:1px solid var(--border);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3);">
-        <span style="flex:1;">Patient</span><span style="width:160px;text-align:center;">Assigned Work</span><span style="width:120px;text-align:right;">Date</span>
+  <div style="padding:20px 30px 70px;max-width:1100px;margin:0 auto;width:100%;">
+    <!-- Header row -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+      <h1 style="font-size:20px;font-weight:800;letter-spacing:-.02em;color:var(--text);margin:0;">Patients</h1>
+      <div style="display:flex;align-items:center;gap:8px;padding:7px 13px;border:1px solid var(--border);border-radius:10px;background:var(--panel);">
+        ${I.search}<input id="pq-input" value="${S.pq}" placeholder="Search patients…" style="border:none;background:transparent;color:var(--text);font-size:13px;font-family:inherit;outline:none;width:170px;"/>
       </div>
-      ${list.length?rows:empty}
+    </div>
+
+    <!-- Filter bar -->
+    <div style="display:flex;flex-direction:column;gap:8px;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:var(--panel);margin-bottom:14px;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);width:64px;flex:none;">Status</span>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">${statusPills}</div>
+      </div>
+      <div style="height:1px;background:var(--border);"></div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);width:64px;flex:none;">Provider</span>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">${providerPills}</div>
+      </div>
+      <div style="height:1px;background:var(--border);"></div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);width:64px;flex:none;">Sort by</span>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">${sortPills}</div>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div style="border:1px solid var(--border);border-radius:14px;overflow:hidden;background:var(--panel);box-shadow:var(--shadow);">
+      <div style="display:flex;align-items:center;padding:10px 20px;border-bottom:1px solid var(--border);background:var(--panel-2);">
+        <span style="flex:1;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);">Patient</span>
+        <span style="width:110px;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);">Provider</span>
+        <span style="width:100px;text-align:center;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);">Min / Mo</span>
+        <span style="width:130px;text-align:center;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);">Status</span>
+        <span style="width:100px;text-align:right;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);">Last Call</span>
+      </div>
+      ${rows||`<div style="padding:36px;text-align:center;font-size:13.5px;color:var(--text-3);">No patients match the current filter.</div>`}
     </div>
   </div>`;
 }
 
 // ── Patient detail view ───────────────────────────────────────────────────
 function renderPatient(){
-  const p=byId(S.patientId); if(!p) return '';
-  const rm=riskMeta(p.risk); const live=liveTasks();
-  const ptasks=live.filter(t=>t.patient===p.id).map(vo);
-  const isNewPatient=S.extraPatients.some(ep=>ep.id===p.id);
-  const timeline=[
-    ...ptasks.map(t=>({title:'Sapiens prepared: '+t.title,at:t.at+' today',dot:'var(--accent)'})),
-    ...(isNewPatient?[]:[
-      {title:'Lab results received from Labcorp',at:'Yesterday',dot:'var(--info)'},
-      {title:'Visit note signed',at:'May 28',dot:'var(--good)'},
-      {title:'Follow-up message sent',at:'May 21',dot:'var(--ready)'},
-    ]),
-  ];
-  const workRows=ptasks.map(t=>`
-    <div class="table-row" data-action="task:${t.id}" style="display:flex;align-items:center;gap:14px;padding:13px 16px;border-bottom:1px solid var(--border);transition:background .12s;cursor:pointer;">
-      <span style="width:7px;height:7px;border-radius:50%;background:var(--ready);flex:none;"></span>
-      <span style="font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3);width:88px;flex:none;">${t.typeLabel}</span>
-      <span style="flex:1;font-size:14px;font-weight:500;color:var(--text);">${t.title}</span>
-      ${t.urgent?`<span style="font-size:11px;font-weight:600;color:var(--ready);background:var(--ready-soft);padding:3px 9px;border-radius:999px;white-space:nowrap;">Before noon</span>`:''}
-      <span style="font-size:12px;color:var(--text-3);">Review →</span>
-    </div>`).join('');
-  const tlItems=timeline.map((e,i)=>`
-    <div style="display:flex;gap:13px;padding:11px 0;">
-      <div style="display:flex;flex-direction:column;align-items:center;padding-top:4px;">
-        <span style="width:9px;height:9px;border-radius:50%;background:${e.dot};flex:none;"></span>
-        ${i<timeline.length-1?`<span style="width:1.5px;flex:1;background:var(--border);margin-top:4px;"></span>`:''}
-      </div>
-      <div style="flex:1;padding-bottom:4px;">
-        <div style="font-size:13px;color:var(--text);line-height:1.4;">${e.title}</div>
-        <div style="font-size:11.5px;color:var(--text-3);margin-top:3px;">${e.at}</div>
-      </div>
-    </div>`).join('');
+  const p=PATIENTS.find(pt=>pt.id===S.patientId); if(!p) return '';
+  const statusMeta={
+    'ready':    {label:'Ready to Bill', color:'var(--good)',   bg:'var(--good-soft)'},
+    'in-progress':{label:'In Progress', color:'var(--ready)',  bg:'var(--ready-soft)'},
+    'needs-call':{label:'Needs Call',   color:'var(--text-3)', bg:'var(--panel-2)'},
+  };
+  const sm=statusMeta[p.ccmStatus]||statusMeta['needs-call'];
+  const totalMin=p.activities.reduce((s,a)=>s+a.minutes,0);
+
+  const actRows=p.activities.length
+    ? p.activities.map(a=>`
+      <div style="display:flex;align-items:flex-start;padding:11px 16px;border-bottom:1px solid var(--border);gap:12px;">
+        <div style="width:52px;flex:none;padding-top:1px;">
+          <div style="font-size:11px;font-weight:600;color:var(--text-3);">${a.date}</div>
+        </div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:13px;color:var(--text);line-height:1.4;">${a.desc}</div>
+          <div style="font-size:11.5px;color:var(--text-3);margin-top:2px;">${a.staff}</div>
+        </div>
+        <div style="flex:none;text-align:right;">
+          <div style="font-size:13px;font-weight:700;color:var(--accent);">${a.minutes} min</div>
+          <div style="font-size:10px;padding:2px 6px;border-radius:99px;margin-top:2px;font-weight:600;${a.clinical?'background:var(--accent-soft);color:var(--accent);':'background:var(--panel-2);color:var(--text-3);'}">${a.clinical?'Clinical':'Admin'}</div>
+        </div>
+      </div>`).join('')
+    : `<div style="padding:24px;text-align:center;font-size:13px;color:var(--text-3);">No CCM activity this month.</div>`;
+
   return `
-  <div style="padding:30px 30px 70px;max-width:1140px;margin:0 auto;width:100%;">
-    <h1 style="font-size:28px;font-weight:700;letter-spacing:-.025em;margin:0 0 22px;">${p.name}</h1>
-    <div style="margin:0 0 8px;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);">Work Items</div>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">
-      <button class="action-card" data-action="launch:lab" style="text-align:left;border:1px solid var(--border);background:var(--panel);border-radius:13px;padding:15px;display:flex;flex-direction:column;gap:9px;transition:border-color .15s,transform .15s;">${I.lab.replace('stroke="currentColor"','stroke="var(--accent)"').replace('width="17"','width="19"').replace('height="17"','height="19"')}<span style="font-size:13.5px;font-weight:600;">Lab panels</span></button>
-      <button class="action-card" data-action="launch:referral" style="text-align:left;border:1px solid var(--border);background:var(--panel);border-radius:13px;padding:15px;display:flex;flex-direction:column;gap:9px;transition:border-color .15s,transform .15s;">${I.referral.replace('stroke="currentColor"','stroke="var(--accent)"').replace('width="17"','width="19"').replace('height="17"','height="19"')}<span style="font-size:13.5px;font-weight:600;">Referrals</span></button>
-      <button class="action-card" data-action="launch:note" style="text-align:left;border:1px solid var(--border);background:var(--panel);border-radius:13px;padding:15px;display:flex;flex-direction:column;gap:9px;transition:border-color .15s,transform .15s;">${I.note.replace('stroke="currentColor"','stroke="var(--accent)"').replace('width="17"','width="19"').replace('height="17"','height="19"')}<span style="font-size:13.5px;font-weight:600;">Visit notes</span></button>
-      <button class="action-card" data-action="launch:doc" style="text-align:left;border:1px solid var(--border);background:var(--panel);border-radius:13px;padding:15px;display:flex;flex-direction:column;gap:9px;transition:border-color .15s,transform .15s;">${I.doc.replace('stroke="currentColor"','stroke="var(--accent)"').replace('width="17"','width="19"').replace('height="17"','height="19"')}<span style="font-size:13.5px;font-weight:600;">Documents</span></button>
-    </div>
-    <div style="display:flex;gap:26px;align-items:flex-start;margin-top:28px;">
-      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:13px;">
-        <h2 style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);margin:0;">Works Record</h2>
-        ${workRows?`<div style="border:1px solid var(--border);border-radius:13px;overflow:hidden;background:var(--panel);box-shadow:var(--shadow);">${workRows}</div>`:'<div style="border:1px dashed var(--border);border-radius:13px;padding:26px;text-align:center;font-size:13.5px;color:var(--text-3);">No records yet.</div>'}
+  <div style="padding:24px 30px 70px;max-width:1140px;margin:0 auto;width:100%;">
+    <!-- Header -->
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;gap:20px;">
+      <div style="display:flex;align-items:center;gap:13px;">
+        <span style="width:44px;height:44px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;flex:none;">${initials(p.name)}</span>
+        <div>
+          <h1 style="font-size:21px;font-weight:800;letter-spacing:-.02em;margin:0;">${p.name}</h1>
+        </div>
       </div>
-      <div style="width:340px;flex:none;display:flex;flex-direction:column;gap:13px;">
-        <h2 style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);margin:0;">Timeline</h2>
-        ${timeline.length?`<div style="border:1px solid var(--border);background:var(--panel);border-radius:15px;padding:6px 18px;box-shadow:var(--shadow);">${tlItems}</div>`:`<div style="border:1px dashed var(--border);border-radius:13px;padding:26px;text-align:center;font-size:13.5px;color:var(--text-3);">No history yet.</div>`}
+      <div style="display:flex;gap:8px;flex:none;">
+        <button data-action="billing-open" style="display:flex;align-items:center;gap:6px;padding:9px 15px;border-radius:10px;border:1.5px solid var(--accent-line);background:var(--accent-soft);color:var(--accent);font-size:12.5px;font-weight:700;cursor:pointer;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+          Billing Code Match
+        </button>
+        <button data-action="care-plan-open" style="display:flex;align-items:center;gap:6px;padding:9px 15px;border-radius:10px;background:var(--accent-2);color:#fff;font-size:12.5px;font-weight:700;cursor:pointer;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          Fill Call Template
+        </button>
+      </div>
+    </div>
+
+    <!-- Status strip -->
+    <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;">
+      <div style="display:flex;align-items:center;gap:7px;padding:7px 14px;border-radius:9px;border:1px solid var(--border);background:var(--panel-2);">
+        <span style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);">Status</span>
+        <span style="font-size:12px;font-weight:700;color:${sm.color};background:${sm.bg};padding:2px 9px;border-radius:99px;">${sm.label}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:7px;padding:7px 14px;border-radius:9px;border:1px solid var(--border);background:var(--panel-2);">
+        <span style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);">CCM Min</span>
+        <span style="font-size:14px;font-weight:800;color:${totalMin>=20?'var(--good)':'var(--ready)'};">${totalMin}</span>
+      </div>
+    </div>
+
+    <!-- Two-column layout -->
+    <div style="display:flex;gap:18px;align-items:flex-start;">
+      <!-- Left: raw chart note -->
+      <div style="flex:1;min-width:0;">
+        <div style="border:1px solid var(--border);border-radius:14px;overflow:hidden;background:var(--panel);box-shadow:var(--shadow);">
+          <div style="padding:11px 18px;border-bottom:1px solid var(--border);background:var(--panel-2);display:flex;align-items:center;gap:8px;">
+            <span style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);">Patient Chart</span>
+            <span style="font-size:10px;color:var(--text-3);padding:2px 7px;border:1px solid var(--border);border-radius:5px;">eMDs</span>
+          </div>
+          <div style="padding:20px 22px;font-family:'SF Mono','Menlo','Consolas',monospace;font-size:12.5px;line-height:1.8;color:var(--text-2);">
+            <div style="font-size:14px;font-weight:700;color:var(--text);letter-spacing:.01em;margin-bottom:2px;">${p.name.toUpperCase()}</div>
+            <div style="color:var(--text-3);margin-bottom:16px;">DOB: ${p.dob}  |  ${p.sex}  |  Age ${p.age}  |  MRN: ${p.mrn}  |  ${p.plan}</div>
+
+            <div style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text-3);margin-bottom:6px;">Active Problems</div>
+            <div style="margin-bottom:16px;">${p.conditions.map((c,i)=>`${i+1}. ${c}`).join('<br>')}</div>
+
+            <div style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text-3);margin-bottom:6px;">Current Medications</div>
+            <div style="margin-bottom:16px;">${p.medications.map(m=>`- ${m}`).join('<br>')}</div>
+
+            <div style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text-3);margin-bottom:6px;">Last Recorded Vitals</div>
+            <div>BP: ${p.vitals.bp}  |  HR: ${p.vitals.hr} bpm  |  Temp: ${p.vitals.temp}  |  Wt: ${p.vitals.weight}  |  A1c: ${p.vitals.a1c}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: CCM activity log + Work Items Done -->
+      <div style="flex:none;width:360px;display:flex;flex-direction:column;gap:14px;">
+        <div style="border:1px solid var(--border);border-radius:14px;overflow:hidden;background:var(--panel);box-shadow:var(--shadow);">
+          <div style="padding:11px 16px;border-bottom:1px solid var(--border);background:var(--panel-2);display:flex;align-items:center;justify-content:space-between;">
+            <span style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);">CCM Activity Log</span>
+            <span style="font-size:12px;font-weight:700;color:var(--accent);">${totalMin} min</span>
+          </div>
+          ${actRows}
+        </div>
+
+        ${(()=>{
+          const done=S.completedWork.filter(w=>w.patientId===p.id);
+          if(done.length===0) return '';
+          return `
+        <div style="border:1px solid var(--border);border-radius:14px;overflow:hidden;background:var(--panel);box-shadow:var(--shadow);">
+          <div style="padding:11px 16px;border-bottom:1px solid var(--border);background:var(--panel-2);display:flex;align-items:center;justify-content:space-between;">
+            <span style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);">Work Items Done</span>
+            <span style="font-size:11px;font-weight:700;color:var(--accent);background:var(--accent-soft);padding:2px 8px;border-radius:99px;">${done.length}</span>
+          </div>
+          ${done.map(w=>`
+          <button data-action="wi-view:${w.id}" style="display:flex;align-items:flex-start;padding:12px 14px;border-bottom:1px solid var(--border);gap:10px;width:100%;text-align:left;cursor:pointer;background:transparent;transition:background .12s;" class="action-card">
+            <div style="width:30px;height:30px;border-radius:8px;background:${w.type==='billing'?'var(--good-soft)':'var(--accent-soft)'};display:flex;align-items:center;justify-content:center;flex:none;margin-top:1px;">
+              ${w.type==='billing'
+                ?`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--good)" stroke-width="2.3"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>`
+                :`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.3"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`}
+            </div>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:12.5px;font-weight:700;color:var(--text);margin-bottom:2px;">
+                ${w.type==='billing'?'Billing Code Match':w.templateTitle}
+              </div>
+              <div style="font-size:11.5px;color:var(--text-3);">
+                ${w.type==='billing'?w.codes:'Call Template'}
+              </div>
+              ${w.type==='billing'&&w.revenue!=='—'?`<div style="font-size:12px;font-weight:700;color:var(--good);margin-top:3px;">${w.revenue}</div>`:''}
+              <div style="font-size:10.5px;color:var(--text-3);margin-top:3px;">${w.date}</div>
+            </div>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2" style="flex:none;margin-top:4px;"><path d="m9 18 6-6-6-6"/></svg>
+          </button>`).join('')}
+        </div>`;
+        })()}
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── Billing Code Match Overlay ────────────────────────────────────────────
+function renderBillingMatchOverlay(){
+  if(!S.billingOpen) return '';
+  const p=PATIENTS.find(pt=>pt.id===S.patientId); if(!p) return '';
+  const totalMin=p.activities.reduce((s,a)=>s+a.minutes,0);
+
+  if(!S.billingLoaded){
+    return `
+    <style>
+      @keyframes sap-spin{to{transform:rotate(360deg)}}
+      @keyframes sap-pulse{0%,100%{opacity:1}50%{opacity:.35}}
+      @keyframes sap-bar{from{width:0}to{width:${Math.min(100,Math.round(totalMin/60*100))}%}}
+    </style>
+    <div id="billing-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;display:flex;align-items:center;justify-content:center;">
+      <div style="background:var(--bg);border-radius:24px;box-shadow:0 32px 100px rgba(0,0,0,.4);width:420px;padding:48px 40px;text-align:center;">
+        <div style="position:relative;width:72px;height:72px;margin:0 auto 28px;">
+          <div style="position:absolute;inset:0;border:3px solid var(--accent-line);border-radius:50%;"></div>
+          <div style="position:absolute;inset:0;border:3px solid transparent;border-top-color:var(--accent);border-radius:50%;animation:sap-spin .9s linear infinite;"></div>
+          <div style="position:absolute;inset:10px;background:var(--accent-soft);border-radius:50%;display:flex;align-items:center;justify-content:center;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+          </div>
+        </div>
+        <div style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:8px;">Analyzing chart data…</div>
+        <div style="font-size:13px;color:var(--text-3);margin-bottom:28px;animation:sap-pulse 1.8s ease infinite;">Cross-referencing ${totalMin} documented minutes against Medicare billing rules</div>
+        <div style="height:6px;background:var(--border);border-radius:99px;overflow:hidden;">
+          <div style="height:100%;background:var(--accent);border-radius:99px;animation:sap-bar 1.8s ease-out forwards;"></div>
+        </div>
+        <div style="font-size:11.5px;color:var(--text-3);margin-top:12px;">CPT code lookup · Revenue projection · Activity audit</div>
+      </div>
+    </div>`;
+  }
+
+  const codes=[];
+  if(totalMin>=60){
+    codes.push({cpt:'99487',desc:'Complex Chronic Care Management',sub:'60+ min/month · complex conditions',rate:132.93,eligible:true});
+    const addOns=Math.floor((totalMin-60)/30);
+    for(let i=0;i<addOns;i++) codes.push({cpt:'99489',desc:'Complex CCM Add-on',sub:'Each additional 30 min',rate:68.02,eligible:true});
+  } else if(totalMin>=20){
+    codes.push({cpt:'99490',desc:'Chronic Care Management',sub:'20+ min/month · standard CCM',rate:62.71,eligible:true});
+    const addOns=Math.min(2,Math.floor((totalMin-20)/20));
+    for(let i=0;i<addOns;i++) codes.push({cpt:'99439',desc:'CCM Add-on',sub:'Each additional 20 min (max 2)',rate:47.34,eligible:true});
+  } else {
+    codes.push({cpt:'99490',desc:'Chronic Care Management',sub:`Need ${20-totalMin} more min to qualify`,rate:62.71,eligible:false});
+  }
+
+  const totalRev=codes.filter(c=>c.eligible).reduce((s,c)=>s+c.rate,0);
+  const annualProj=(totalRev*12).toFixed(2);
+
+  // minutes bar: thresholds at 20, 40, 60
+  const barMax=Math.max(60,totalMin);
+  const barPct=Math.min(100,(totalMin/barMax*100)).toFixed(1);
+  const t20=Math.round(20/barMax*100);
+  const t40=Math.round(40/barMax*100);
+  const t60=Math.round(60/barMax*100);
+
+  const codeCards=codes.map(c=>`
+    <div style="display:flex;align-items:center;gap:16px;padding:16px 20px;border-bottom:1px solid var(--border);">
+      <div style="width:52px;height:52px;border-radius:12px;background:${c.eligible?'var(--accent-soft)':'var(--panel-2)'};display:flex;align-items:center;justify-content:center;flex:none;">
+        <span style="font-size:11px;font-weight:900;font-family:monospace;color:${c.eligible?'var(--accent)':'var(--text-3)'};">${c.cpt}</span>
+      </div>
+      <div style="flex:1;">
+        <div style="font-size:14px;font-weight:700;color:${c.eligible?'var(--text)':'var(--text-3)'};">${c.desc}</div>
+        <div style="font-size:12px;color:var(--text-3);margin-top:2px;">${c.sub}</div>
+      </div>
+      <div style="text-align:right;flex:none;">
+        ${c.eligible
+          ? `<div style="font-size:20px;font-weight:900;color:var(--good);">$${c.rate.toFixed(2)}</div><div style="font-size:10.5px;color:var(--text-3);">per month</div>`
+          : `<div style="font-size:12px;font-weight:600;color:var(--text-3);background:var(--panel-2);padding:4px 10px;border-radius:8px;">Not eligible</div>`}
+      </div>
+    </div>`).join('');
+
+  return `
+  <style>@keyframes sap-grow{from{width:0}to{width:${barPct}%}}</style>
+  <div id="billing-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;">
+    <div style="background:var(--bg);border-radius:20px;box-shadow:0 28px 90px rgba(0,0,0,.4);width:100%;max-width:600px;max-height:90vh;overflow-y:auto;display:flex;flex-direction:column;">
+
+      <!-- Header -->
+      <div style="padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--panel);z-index:1;">
+        <div>
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);margin-bottom:3px;">Billing Code Match</div>
+          <div style="font-size:17px;font-weight:800;">${p.name}</div>
+        </div>
+        <button data-action="billing-close" style="width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:var(--panel-2);font-size:17px;cursor:pointer;color:var(--text-3);">×</button>
+      </div>
+
+      <div style="padding:20px 24px;display:flex;flex-direction:column;gap:20px;">
+        <!-- Minutes bar -->
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;">
+            <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);">Documented Minutes This Month</span>
+            <span style="font-size:22px;font-weight:900;color:${totalMin>=20?'var(--accent)':'var(--text-3)'};">${totalMin} <span style="font-size:13px;font-weight:600;color:var(--text-3);">min</span></span>
+          </div>
+          <div style="position:relative;height:12px;background:var(--panel-2);border-radius:99px;overflow:hidden;border:1px solid var(--border);">
+            <div style="position:absolute;left:0;top:0;bottom:0;background:${totalMin>=20?'var(--accent)':'var(--ready)'};border-radius:99px;animation:sap-grow .8s ease-out forwards;"></div>
+          </div>
+          <div style="position:relative;height:20px;margin-top:4px;">
+            <div style="position:absolute;left:${t20}%;transform:translateX(-50%);font-size:10px;color:var(--text-3);">20 min</div>
+            ${barMax>40?`<div style="position:absolute;left:${t40}%;transform:translateX(-50%);font-size:10px;color:var(--text-3);">40 min</div>`:''}
+            ${barMax>60?`<div style="position:absolute;left:${t60}%;transform:translateX(-50%);font-size:10px;color:var(--text-3);">60 min</div>`:''}
+          </div>
+        </div>
+
+        <!-- Revenue cards -->
+        ${totalRev>0?`
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div style="padding:18px;border-radius:14px;background:var(--good-soft);border:1px solid var(--good-soft);text-align:center;">
+            <div style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--good);margin-bottom:6px;">This Month</div>
+            <div style="font-size:28px;font-weight:900;color:var(--good);">$${totalRev.toFixed(2)}</div>
+          </div>
+          <div style="padding:18px;border-radius:14px;background:var(--panel-2);border:1px solid var(--border);text-align:center;">
+            <div style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);margin-bottom:6px;">Annual Projection</div>
+            <div style="font-size:28px;font-weight:900;color:var(--text);">$${annualProj}</div>
+          </div>
+        </div>`:''}
+
+        <!-- CPT codes -->
+        <div>
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);margin-bottom:10px;">Recommended CPT Codes</div>
+          <div style="border:1px solid var(--border);border-radius:14px;overflow:hidden;background:var(--panel);">${codeCards}</div>
+        </div>
+
+        <!-- Activity log -->
+        <div>
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);margin-bottom:8px;">Minutes Log</div>
+          <div style="border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--panel);">
+            ${p.activities.map(a=>`
+            <div style="display:flex;align-items:center;padding:10px 16px;border-bottom:1px solid var(--border);gap:10px;">
+              <div style="font-size:11px;color:var(--text-3);width:48px;flex:none;">${a.date}</div>
+              <div style="flex:1;font-size:12.5px;color:var(--text-2);">${a.desc.length>60?a.desc.slice(0,60)+'…':a.desc}</div>
+              <div style="font-size:13px;font-weight:700;color:var(--accent);flex:none;">${a.minutes} min</div>
+            </div>`).join('')}
+            <div style="display:flex;justify-content:space-between;padding:11px 16px;background:var(--panel-2);">
+              <span style="font-size:12px;font-weight:700;color:var(--text);">Total</span>
+              <span style="font-size:13px;font-weight:900;color:var(--accent);">${totalMin} min</span>
+            </div>
+          </div>
+        </div>
+
+        <button data-action="billing-assign" style="width:100%;padding:13px;border-radius:11px;background:var(--accent-2);color:#fff;font-size:14px;font-weight:700;cursor:pointer;">Assign</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── Call Template Overlay ─────────────────────────────────────────────────
+const CALL_TEMPLATES=[
+  {id:1,num:'I',title:'Monthly Follow-Up Call',hint:'General monthly review',prompt:'You are given raw data about a patient, and notes that was recorded while performing a call with the patient. Fill the template by extracting relevant information from the input to complete the document.\nIf you cannot find the relevant information for a corresponding key, return "N/A" if the value type is "Text"; if the type is "Array", return "[]".',rawContent:`Detailed Review of Patient Chart
+• Initial care plan completed on: _______________
+• Next office visit scheduled for: _______________
+• Last office visit was on: _______________
+• Vitals: _______________
+• Being followed by CCM for: _______________
+
+Current Medications
+• _______________
+
+Labs / Diagnostic Testing
+• _______________
+
+Quality Metrics
+• DM Control: _______________
+• HTN Control: _______________
+• Depression Screen: _______________
+• Breast Cancer Screen: _______________
+• Colorectal Cancer Screen: _______________
+
+Discuss
+• _______________
+
+Phone Call to Patient
+• Phone number: _______________
+• Notes: _______________`},
+  {id:2,num:'II',title:'Monthly Follow-Up — A-Fib',hint:'A-Fib management & anticoagulation',prompt:'You are given raw data about a patient, and notes that was recorded while performing a call with the patient. Fill the template by extracting relevant information from the input to complete the document.\nIf you cannot find the relevant information for a corresponding key, return "N/A" if the value type is "Text"; if the type is "Array", return "[]".',rawContent:`Detailed Review of Patient Chart
+• Initial care plan completed on: _______________
+• Next office visit scheduled for: _______________
+• Vitals: _______________
+• A-Fib rhythm status (Paroxysmal / Persistent / Permanent): _______________
+
+A-Fib Management
+• Current antiarrhythmic medication: _______________
+• Anticoagulation therapy: _______________
+• INR / Anti-Xa level: _______________
+• CHA₂DS₂-VASc score: _______________
+• Rate control goal achieved: _______________
+
+Quality Metrics
+• Stroke risk addressed: _______________
+• Bleeding risk (HAS-BLED): _______________
+• Depression Screen: _______________
+
+Discuss
+• Medication adherence and side effects
+• Symptoms: palpitations, dyspnea, fatigue
+• _______________
+
+Phone Call to Patient
+• Phone number: _______________
+• Notes: _______________`},
+  {id:3,num:'III',title:'Monthly Follow-Up — CHF',hint:'Heart failure monitoring',prompt:'You are given raw data about a patient, and notes that was recorded while performing a call with the patient. Fill the template by extracting relevant information from the input to complete the document.\nIf you cannot find the relevant information for a corresponding key, return "N/A" if the value type is "Text"; if the type is "Array", return "[]".',rawContent:`Detailed Review of Patient Chart
+• Initial care plan completed on: _______________
+• Next office visit scheduled for: _______________
+• Vitals: _______________
+• LVEF: _______________ (date: _______________)
+• CHF classification (NYHA): _______________
+
+Heart Failure Monitoring
+• Daily weight trend: _______________
+• Edema assessment: _______________
+• Current diuretic dose: _______________
+• BNP / NT-proBNP: _______________
+• Fluid restriction adherence: _______________
+
+Quality Metrics
+• LVEF documented: _______________
+• ACE-I / ARB / ARNI on board: _______________
+• Beta-blocker on board: _______________
+• Depression Screen: _______________
+
+Discuss
+• Weight gain alerts and when to call 911
+• Sodium / fluid restriction
+• _______________
+
+Phone Call to Patient
+• Phone number: _______________
+• Notes: _______________`},
+  {id:4,num:'IV',title:'Monthly Follow-Up — COPD',hint:'Pulmonary management & O2',prompt:'You are given raw data about a patient, and notes that was recorded while performing a call with the patient. Fill the template by extracting relevant information from the input to complete the document.\nIf you cannot find the relevant information for a corresponding key, return "N/A" if the value type is "Text"; if the type is "Array", return "[]".',rawContent:`Detailed Review of Patient Chart
+• Initial care plan completed on: _______________
+• Next office visit scheduled for: _______________
+• Vitals: _______________
+• COPD GOLD stage: _______________
+• Last spirometry: _______________
+
+Pulmonary Management
+• Current inhalers: _______________
+• O2 use (home): _______________
+• Rescue inhaler use (times/week): _______________
+• Exacerbations since last call: _______________
+• Smoking status: _______________
+
+Quality Metrics
+• Influenza vaccine: _______________
+• Pneumococcal vaccine: _______________
+• Pulmonary rehab referral: _______________
+• Depression Screen: _______________
+
+Discuss
+• Inhaler technique review
+• Action plan for exacerbations
+• _______________
+
+Phone Call to Patient
+• Phone number: _______________
+• Notes: _______________`},
+  {id:5,num:'V',title:'Monthly Follow-Up — Diabetes',hint:'DM management & A1c tracking',prompt:'You are given raw data about a patient, and notes that was recorded while performing a call with the patient. Fill the template by extracting relevant information from the input to complete the document.\nIf you cannot find the relevant information for a corresponding key, return "N/A" if the value type is "Text"; if the type is "Array", return "[]".',rawContent:`Detailed Review of Patient Chart
+• Initial care plan completed on: _______________
+• Next office visit scheduled for: _______________
+• Vitals: _______________
+• HbA1c: _______________ (date: _______________)
+• DM type: _______________
+
+Diabetes Management
+• Current DM medications: _______________
+• Blood glucose monitoring frequency: _______________
+• Fasting glucose trend: _______________
+• Hypoglycemic episodes: _______________
+• Foot exam date: _______________
+
+Quality Metrics
+• HbA1c at goal (<8%): _______________
+• Eye exam (annual): _______________
+• Nephropathy screening (uACR): _______________
+• Statin on board: _______________
+• Depression Screen: _______________
+
+Discuss
+• Dietary adherence and carb counting
+• Exercise and weight management
+• _______________
+
+Phone Call to Patient
+• Phone number: _______________
+• Notes: _______________`},
+  {id:6,num:'VI',title:'Monthly Follow-Up — Hyperlipidemia',hint:'Lipids & CAD risk',prompt:'You are given raw data about a patient, and notes that was recorded while performing a call with the patient. Fill the template by extracting relevant information from the input to complete the document.\nIf you cannot find the relevant information for a corresponding key, return "N/A" if the value type is "Text"; if the type is "Array", return "[]".',rawContent:`Detailed Review of Patient Chart
+• Initial care plan completed on: _______________
+• Next office visit scheduled for: _______________
+• Vitals: _______________
+• Last lipid panel: _______________
+
+Lipid Management
+• LDL: _______________ (goal: _______________)
+• HDL: _______________
+• Triglycerides: _______________
+• Current statin / dose: _______________
+• Statin side effects: _______________
+
+Cardiovascular Risk
+• 10-year ASCVD risk: _______________
+• Aspirin therapy: _______________
+• Other CV medications: _______________
+
+Quality Metrics
+• LDL at goal: _______________
+• Lipid panel within 12 months: _______________
+• Depression Screen: _______________
+
+Discuss
+• Diet (saturated fat, fiber, plant sterols)
+• Exercise 150 min/week goal
+• _______________
+
+Phone Call to Patient
+• Phone number: _______________
+• Notes: _______________`},
+  {id:7,num:'VII',title:'Monthly Follow-Up — HTN',hint:'Blood pressure management',prompt:'You are given raw data about a patient, and notes that was recorded while performing a call with the patient. Fill the template by extracting relevant information from the input to complete the document.\nIf you cannot find the relevant information for a corresponding key, return "N/A" if the value type is "Text"; if the type is "Array", return "[]".',rawContent:`Detailed Review of Patient Chart
+• Initial care plan completed on: _______________
+• Next office visit scheduled for: _______________
+• Vitals: _______________
+• Home BP log average: _______________
+• HTN stage: _______________
+
+Blood Pressure Management
+• Current antihypertensives: _______________
+• Target BP: _______________
+• Medication adherence: _______________
+• Home BP monitor confirmed accurate: _______________
+
+Quality Metrics
+• BP at goal (<130/80): _______________
+• Renal function (BMP): _______________
+• Potassium level: _______________
+• Depression Screen: _______________
+
+Discuss
+• Sodium restriction (<2,300 mg/day)
+• DASH diet adherence
+• _______________
+
+Phone Call to Patient
+• Phone number: _______________
+• Notes: _______________`},
+  {id:8,num:'VIII',title:'Monthly Follow-Up — Oncology',hint:'Cancer management & immunology',prompt:'You are given raw data about a patient, and notes that was recorded while performing a call with the patient. Fill the template by extracting relevant information from the input to complete the document.\nIf you cannot find the relevant information for a corresponding key, return "N/A" if the value type is "Text"; if the type is "Array", return "[]".',rawContent:`Detailed Review of Patient Chart
+• Initial care plan completed on: _______________
+• Next office visit scheduled for: _______________
+• Vitals: _______________
+• Cancer diagnosis / stage: _______________
+• Oncology team: _______________
+
+Cancer Management
+• Current treatment regimen: _______________
+• Last treatment date: _______________
+• Next oncology appointment: _______________
+• Side effect management: _______________
+• Pain level (0–10): _______________
+
+Supportive Care
+• Nutrition support: _______________
+• Fatigue management: _______________
+• Palliative care consult: _______________
+• Advance directive on file: _______________
+
+Quality Metrics
+• Depression Screen (PHQ-9): _______________
+• Immunization status (flu, PCV): _______________
+
+Discuss
+• Treatment adherence and side effects
+• Emotional support and resources
+• _______________
+
+Phone Call to Patient
+• Phone number: _______________
+• Notes: _______________`},
+  {id:9,num:'IX',title:'Medication Reconciliation',hint:'Full med list review',prompt:'You are given raw data about a patient, and notes that was recorded while performing a call with the patient. Fill the template by extracting relevant information from the input to complete the document.\nIf you cannot find the relevant information for a corresponding key, return "N/A" if the value type is "Text"; if the type is "Array", return "[]".',rawContent:`Medication Reconciliation Summary
+• Date of reconciliation: _______________
+• Performed by: _______________
+
+Current Medication List (Patient-Reported)
+• _______________
+
+Prescriptions on File (EHR)
+• _______________
+
+Discrepancies Identified
+• _______________
+
+High-Risk Medications Review
+• Anticoagulants: _______________
+• Insulin / sulfonylureas: _______________
+• Opioids: _______________
+• NSAIDs: _______________
+
+Drug Interactions Flagged
+• _______________
+
+Allergies Confirmed
+• _______________
+
+Actions Taken
+• _______________
+
+Phone Call to Patient
+• Phone number: _______________
+• Notes: _______________`},
+  {id:10,num:'X',title:'Social Determinants of Health',hint:'SDOH screening',prompt:'You are given raw data about a patient, and notes that was recorded while performing a call with the patient. Fill the template by extracting relevant information from the input to complete the document.\nIf you cannot find the relevant information for a corresponding key, return "N/A" if the value type is "Text"; if the type is "Array", return "[]".',rawContent:`SDOH Screening — AHC Health-Related Social Needs
+
+Housing
+• Stable housing: _______________
+• Housing quality concerns (mold, heat, safety): _______________
+
+Food Security
+• Worried about food running out: _______________
+• Food assistance enrolled: _______________
+
+Transportation
+• Transportation barrier to appointments: _______________
+• Transportation resources offered: _______________
+
+Utility Needs
+• Difficulty paying utility bills: _______________
+
+Interpersonal Safety
+• Concerns about safety at home: _______________
+
+Social Isolation
+• Frequency of social contact: _______________
+• Interest in community programs: _______________
+
+Financial Strain
+• Difficulty paying for medications: _______________
+• Benefits screening completed: _______________
+
+Referrals Made
+• _______________
+
+Phone Call to Patient
+• Phone number: _______________
+• Notes: _______________`},
+  {id:11,num:'XI',title:'Vaccination Review & Update',hint:'CDC immunization review',prompt:'You are given raw data about a patient, and notes that was recorded while performing a call with the patient. Fill the template by extracting relevant information from the input to complete the document.\nIf you cannot find the relevant information for a corresponding key, return "N/A" if the value type is "Text"; if the type is "Array", return "[]".',rawContent:`Vaccination Review — CDC Adult Immunization Schedule
+
+Patient Demographics
+• Age: _______________   Sex: _______________   Immunocompromised: _______________
+
+Influenza
+• Last flu vaccine: _______________   Due: _______________
+
+COVID-19
+• Primary series complete: _______________   Last booster: _______________   Due: _______________
+
+Pneumococcal
+• PCV15 / PCV20 received: _______________   PPSV23 received: _______________
+
+Shingles (Zoster — Shingrix)
+• Dose 1: _______________   Dose 2: _______________
+
+Tdap / Td
+• Last Tdap: _______________   Td booster due: _______________
+
+Hepatitis B
+• Series complete: _______________
+
+RSV (age ≥60)
+• RSV vaccine received: _______________
+
+Actions
+• Vaccines administered today: _______________
+• Vaccines ordered / referred: _______________
+• Patient education provided: _______________
+
+Phone Call to Patient
+• Phone number: _______________
+• Notes: _______________`},
+];
+
+function buildFilledTemplate(p){
+  const totalMin=p.activities.reduce((s,a)=>s+a.minutes,0);
+  const actNotes=p.activities.map(a=>`${a.date}: ${a.desc} (${a.minutes} min)`).join('\n');
+  return [
+    {
+      label:'Detailed Review of Patient Chart',
+      content:`• ${p.age} year old ${p.sex==='F'?'female':'male'}\n• Initial care plan completed on: 01/15/2026\n• Next office visit scheduled for: 07/15/2026 with Dr. ${p.provider}\n• Last office visit was on: 05/14/2026 with Dr. ${p.provider}\n• Vitals: Wt. ${p.vitals.weight}, BP ${p.vitals.bp}, HR ${p.vitals.hr}, Temp ${p.vitals.temp}${p.vitals.a1c!=='N/A'?', A1c '+p.vitals.a1c:''}\n• Being followed by CCM for: ${p.conditions.join(', ')}`
+    },
+    {
+      label:'Current Medications',
+      content:p.medications.map(m=>`• ${m}`).join('\n')
+    },
+    {
+      label:'Labs / Diagnostic Testing',
+      content:[
+        p.vitals.a1c!=='N/A'?`• HbA1c: ${p.vitals.a1c} (Jun 2026) — ${parseFloat(p.vitals.a1c)>=8?'above':'at or near'} goal`:'',
+        '• BMP (May 2026): eGFR within monitoring range',
+        '• Lipid panel: pending next quarter',
+      ].filter(Boolean).join('\n')||'• No labs on file this period'
+    },
+    {
+      label:'Quality Metrics',
+      content:[
+        p.conditions.some(c=>c.includes('Diabetes'))?`• DM Control: HbA1c ${p.vitals.a1c} — monitor quarterly`:'• DM Control: No Diabetes Dx',
+        `• HTN Control: ${p.activities[0]?.date||'—'} — BP ${p.vitals.bp}`,
+        `• Depression Screen: PHQ-2 negative per Dr. ${p.provider} (05/2026)`,
+        '• Breast Cancer Screen: up to date',
+        '• Colorectal Cancer Screen: up to date',
+      ].join('\n')
+    },
+    {
+      label:'Discuss',
+      content:[
+        ...p.conditions.map(c=>`• Review ${c} management and medication adherence`),
+        '• Any new symptoms or concerns since last call?',
+        '• Medication refills needed?',
+      ].join('\n')
+    },
+    {
+      label:'Phone Call to Patient',
+      content:`• Phone number: on file\n• Total documented time: ${totalMin} min\n\nCall Notes:\n${actNotes}\n\n• Patient is aware of next appointment with Dr. ${p.provider} 07/15/26.`
+    },
+  ];
+}
+
+function renderCarePlanOverlay(){
+  if(!S.carePlanOpen) return '';
+  const p=PATIENTS.find(pt=>pt.id===S.patientId); if(!p) return '';
+
+  // ── Step 1: Template selection ──────────────────────────────────────────
+  if(S.carePlanStep==='select'){
+    const cards=CALL_TEMPLATES.map(t=>`
+      <button data-action="care-plan-select:${t.id}" style="text-align:left;padding:14px 16px;border:1px solid var(--border);border-radius:12px;background:var(--panel);cursor:pointer;transition:border-color .15s,background .15s;width:100%;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+          <span style="width:28px;height:28px;border-radius:8px;background:var(--accent-soft);color:var(--accent);font-size:10.5px;font-weight:800;display:flex;align-items:center;justify-content:center;flex:none;">${t.num}</span>
+          <span style="font-size:13px;font-weight:700;color:var(--text);">${t.title}</span>
+        </div>
+        <div style="font-size:11.5px;color:var(--text-3);padding-left:38px;">${t.hint}</div>
+      </button>`).join('');
+
+    return `
+    <div id="care-plan-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;">
+      <div style="background:var(--bg);border-radius:20px;box-shadow:0 28px 90px rgba(0,0,0,.4);width:100%;max-width:580px;max-height:88vh;overflow-y:auto;display:flex;flex-direction:column;">
+        <div style="padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--bg);z-index:1;">
+          <div>
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);margin-bottom:3px;">Fill Call Template</div>
+            <div style="font-size:17px;font-weight:800;">${p.name}</div>
+            <div style="font-size:12px;color:var(--text-3);margin-top:2px;">Select a template — Sapiens will fill it using the patient's chart</div>
+          </div>
+          <button data-action="care-plan-close" style="width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:var(--panel-2);font-size:17px;cursor:pointer;color:var(--text-3);">×</button>
+        </div>
+        <div style="padding:16px 20px;display:flex;flex-direction:column;gap:8px;">${cards}</div>
+      </div>
+    </div>`;
+  }
+
+  // ── Step 2: Loading animation ───────────────────────────────────────────
+  if(S.carePlanStep==='loading'){
+    const tmpl=CALL_TEMPLATES.find(t=>t.id===S.selectedTemplate)||CALL_TEMPLATES[0];
+    return `
+    <style>
+      @keyframes sap-spin{to{transform:rotate(360deg)}}
+      @keyframes sap-blink{0%,100%{opacity:1}50%{opacity:.2}}
+      @keyframes sap-slide{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+    </style>
+    <div id="care-plan-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;display:flex;align-items:center;justify-content:center;">
+      <div style="background:var(--bg);border-radius:24px;box-shadow:0 32px 100px rgba(0,0,0,.4);width:440px;padding:48px 40px;text-align:center;">
+        <div style="position:relative;width:72px;height:72px;margin:0 auto 28px;">
+          <div style="position:absolute;inset:0;border:3px solid var(--accent-line);border-radius:50%;"></div>
+          <div style="position:absolute;inset:0;border:3px solid transparent;border-top-color:var(--accent);border-radius:50%;animation:sap-spin .8s linear infinite;"></div>
+          <div style="position:absolute;inset:10px;background:var(--accent-soft);border-radius:50%;display:flex;align-items:center;justify-content:center;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          </div>
+        </div>
+        <div style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:8px;">Filling template…</div>
+        <div style="font-size:13px;color:var(--text-3);margin-bottom:28px;">Template ${tmpl.num} · ${tmpl.title}</div>
+        <div style="display:flex;flex-direction:column;gap:8px;text-align:left;">
+          ${['Reading patient chart from eMDs','Cross-referencing CCM activity log','Matching conditions to template sections','Populating vitals and medications','Drafting quality metrics','Finalizing call notes'].map((step,i)=>`
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--panel-2);border-radius:9px;animation:sap-slide .3s ease ${i*.12}s both;">
+            <div style="width:7px;height:7px;border-radius:50%;background:var(--accent);animation:sap-blink 1.4s ease ${i*.2}s infinite;flex:none;"></div>
+            <span style="font-size:12px;color:var(--text-2);">${step}</span>
+          </div>`).join('')}
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // ── Step 3: Filled template ─────────────────────────────────────────────
+  const tmpl=CALL_TEMPLATES.find(t=>t.id===S.selectedTemplate)||CALL_TEMPLATES[0];
+  const sections=buildFilledTemplate(p);
+  const sectionBlocks=sections.map(s=>`
+    <div style="margin-bottom:16px;">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--accent);margin-bottom:6px;display:flex;align-items:center;gap:8px;">
+        ${s.label}
+        <span style="font-size:9.5px;font-weight:700;background:var(--accent-soft);color:var(--accent);padding:1px 7px;border-radius:99px;letter-spacing:.05em;">AI filled</span>
+      </div>
+      <div style="font-family:'SF Mono','Menlo','Consolas',monospace;font-size:12.5px;line-height:1.8;color:var(--text-2);white-space:pre-line;padding:14px 16px;background:var(--panel-2);border-radius:10px;border:1px solid var(--border);">${s.content}</div>
+    </div>`).join('');
+
+  return `
+  <div id="care-plan-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;">
+    <div style="background:var(--bg);border-radius:20px;box-shadow:0 28px 90px rgba(0,0,0,.4);width:100%;max-width:680px;max-height:90vh;overflow-y:auto;display:flex;flex-direction:column;">
+      <div style="padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--bg);z-index:1;">
+        <div>
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);margin-bottom:3px;">Template ${tmpl.num} — ${tmpl.title}</div>
+          <div style="font-size:17px;font-weight:800;">${p.name}</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <button data-action="care-plan-back" style="font-size:12px;font-weight:600;color:var(--text-3);background:var(--panel-2);border:1px solid var(--border);border-radius:8px;padding:6px 12px;cursor:pointer;">← Back</button>
+          <button data-action="care-plan-close" style="width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:var(--panel-2);font-size:17px;cursor:pointer;color:var(--text-3);">×</button>
+        </div>
+      </div>
+      <div style="padding:20px 24px;">
+        ${sectionBlocks}
+        <div style="display:flex;gap:10px;margin-top:8px;">
+          <button data-action="care-plan-close" style="flex:1;padding:12px;border-radius:10px;border:1px solid var(--border);font-size:13px;font-weight:600;color:var(--text-2);background:var(--panel);cursor:pointer;">Discard</button>
+          <button data-action="care-plan-sign" style="flex:2;padding:12px;border-radius:10px;background:var(--accent-2);color:#fff;font-size:13.5px;font-weight:700;cursor:pointer;">Assign</button>
+        </div>
       </div>
     </div>
   </div>`;
@@ -1631,7 +2497,7 @@ function renderTask(ma){
     const reasons=t.lab.reasons.map(r=>`<div style="display:flex;gap:9px;align-items:flex-start;font-size:13.5px;color:var(--text-2);"><span style="color:var(--accent);margin-top:1px;">•</span>${r}</div>`).join('');
     body=`
       ${memTag('Workflow','Lab panel price comparison','lab-wf-start')}
-      <div style="font-size:12.5px;color:var(--text-3);margin-bottom:13px;">Assembled from ${t.patient.first}'s visit note · priced against the Archway list.</div>
+      <div style="font-size:12.5px;color:var(--text-3);margin-bottom:13px;">Assembled from ${t.patient.first}'s visit note · priced against the clinic price list.</div>
       <div style="border:1px solid var(--border);border-radius:15px;overflow:hidden;background:var(--panel);box-shadow:var(--shadow);">
         <div style="display:flex;padding:11px 18px;border-bottom:1px solid var(--border);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3);">
           <span style="flex:1;">Test</span><span style="width:90px;">CPT</span><span style="width:80px;text-align:right;">Cost</span><span style="width:90px;text-align:right;">Your price</span>
@@ -1791,6 +2657,162 @@ function renderToast(){
   return `<div class="anim-up" style="position:fixed;bottom:26px;left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);font-size:13.5px;font-weight:600;padding:12px 20px;border-radius:11px;box-shadow:0 16px 40px -12px rgba(0,0,0,.3);z-index:60;display:flex;align-items:center;gap:9px;">${I.check15}${S.toast}</div>`;
 }
 
+// ── Work Item View Overlay ────────────────────────────────────────────────
+function renderWorkItemViewOverlay(){
+  if(!S.workItemView) return '';
+  const w=S.workItemView;
+  const p=PATIENTS.find(pt=>pt.id===w.patientId);
+
+  let bodyHtml='';
+  if(w.type==='billing'){
+    const codeList=(w.codes||'—').split(' + ');
+    const codeCards=codeList.filter(c=>c&&c!=='—').map(c=>{
+      const meta={
+        '99490':{desc:'Chronic Care Management',sub:'20+ min/month'},
+        '99439':{desc:'CCM Add-on',sub:'Each additional 20 min'},
+        '99487':{desc:'Complex Chronic Care Management',sub:'60+ min/month'},
+        '99489':{desc:'Complex CCM Add-on',sub:'Each additional 30 min'},
+      }[c]||{desc:c,sub:''};
+      return `<div style="padding:12px 16px;border:1px solid var(--border);border-radius:11px;background:var(--panel-2);">
+        <div style="font-size:14px;font-weight:800;color:var(--good);margin-bottom:2px;">${c}</div>
+        <div style="font-size:12.5px;font-weight:600;color:var(--text);">${meta.desc}</div>
+        <div style="font-size:11.5px;color:var(--text-3);">${meta.sub}</div>
+      </div>`;
+    }).join('');
+
+    bodyHtml=`
+      <div style="padding:20px 24px;display:flex;flex-direction:column;gap:16px;">
+        <div>
+          <div style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);margin-bottom:8px;">Matched CPT Codes</div>
+          <div style="display:flex;flex-direction:column;gap:8px;">${codeCards||'<div style="font-size:13px;color:var(--text-3);">No billable codes — insufficient minutes documented.</div>'}</div>
+        </div>
+        ${w.revenue&&w.revenue!=='—'?`
+        <div style="padding:14px 18px;border-radius:12px;background:var(--good-soft);display:flex;align-items:center;justify-content:space-between;">
+          <div style="font-size:13px;font-weight:600;color:var(--good);">Estimated Revenue</div>
+          <div style="font-size:20px;font-weight:800;color:var(--good);">${w.revenue}</div>
+        </div>`:''}
+        ${p?`
+        <div>
+          <div style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);margin-bottom:8px;">CCM Activity Log</div>
+          <div style="border:1px solid var(--border);border-radius:11px;overflow:hidden;">
+            ${p.activities.map((a,i)=>`
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;${i<p.activities.length-1?'border-bottom:1px solid var(--border)':''};">
+              <div>
+                <div style="font-size:12.5px;font-weight:600;color:var(--text);">${a.desc}</div>
+                <div style="font-size:11px;color:var(--text-3);">${a.date}</div>
+              </div>
+              <div style="font-size:12px;font-weight:700;color:var(--accent);">${a.minutes} min</div>
+            </div>`).join('')}
+          </div>
+        </div>`:''}
+      </div>`;
+  } else {
+    const sections=(w.filledSections||[]);
+    bodyHtml=`
+      <div style="padding:20px 24px;display:flex;flex-direction:column;gap:16px;">
+        ${sections.map(sec=>`
+        <div>
+          <div style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);margin-bottom:6px;">${sec.label}</div>
+          <div style="font-size:13px;color:var(--text-2);line-height:1.7;white-space:pre-line;">${sec.content}</div>
+        </div>`).join('<div style="border-top:1px solid var(--border);"></div>')}
+      </div>`;
+  }
+
+  const title=w.type==='billing'?'Billing Code Match':w.templateTitle;
+  return `
+  <div id="wi-view-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:300;display:flex;align-items:center;justify-content:center;padding:20px;">
+    <div style="background:var(--bg);border-radius:20px;box-shadow:0 28px 90px rgba(0,0,0,.4);width:100%;max-width:600px;max-height:88vh;overflow-y:auto;display:flex;flex-direction:column;">
+      <div style="padding:18px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--bg);z-index:1;">
+        <div>
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:${w.type==='billing'?'var(--good)':'var(--accent)'};margin-bottom:3px;">
+            ${w.type==='billing'?'Billing Code Match':'Call Template'}
+          </div>
+          <div style="font-size:17px;font-weight:800;">${title}</div>
+          <div style="font-size:12px;color:var(--text-3);margin-top:2px;">${w.patient} · ${w.date}</div>
+        </div>
+        <button data-action="wi-view-close" style="width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:var(--panel-2);font-size:17px;cursor:pointer;color:var(--text-3);">×</button>
+      </div>
+      ${bodyHtml}
+    </div>
+  </div>`;
+}
+
+// ── Followup Template Create Overlay ─────────────────────────────────────
+function renderFtCreateOverlay(){
+  if(!S.ftCreateOpen) return '';
+  const content=S.ftCreateContent;
+  const placeholders=[...new Set([...content.matchAll(/\{([^}]+)\}/g)].map(m=>m[1]))];
+  const fieldRows=placeholders.map(k=>`
+    <div style="border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--panel-2);">
+      <div style="display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;margin-bottom:8px;">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);">Key</div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);">Type</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 110px;gap:8px;align-items:center;margin-bottom:8px;">
+        <div style="padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;background:var(--panel);font-size:13px;color:var(--text);font-family:monospace;">${k}</div>
+        <div style="padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;background:var(--panel);font-size:13px;color:var(--text);display:flex;align-items:center;justify-content:space-between;">String<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></div>
+      </div>
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);margin-bottom:4px;">Description</div>
+      <input placeholder="" style="width:100%;padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;background:var(--panel);color:var(--text);font-size:13px;font-family:inherit;box-sizing:border-box;"/>
+    </div>`).join('');
+
+  const canSave=!!(S.ftCreateName.trim()&&S.ftCreateContent.trim());
+  return `
+  <div id="ft-create-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:300;display:flex;align-items:center;justify-content:center;padding:20px;">
+    <div style="background:var(--bg);border-radius:20px;box-shadow:0 28px 90px rgba(0,0,0,.4);width:100%;max-width:900px;max-height:92vh;display:flex;flex-direction:column;">
+      <div style="padding:18px 24px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div style="font-size:18px;font-weight:800;">Create template</div>
+          <div style="font-size:12.5px;color:var(--text-3);margin-top:2px;">Build a reusable medical document template.</div>
+        </div>
+        <button data-action="ft-create-close" style="width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:var(--panel-2);font-size:17px;cursor:pointer;color:var(--text-3);">×</button>
+      </div>
+      <div style="flex:1;display:flex;overflow:hidden;">
+        <!-- Left: form -->
+        <div style="flex:1;padding:20px 24px;display:flex;flex-direction:column;gap:14px;overflow-y:auto;border-right:1px solid var(--border);">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div>
+              <div style="font-size:11.5px;font-weight:600;color:var(--text-3);margin-bottom:5px;">Name</div>
+              <input id="ft-name-input" value="${S.ftCreateName.replace(/"/g,'&quot;')}" placeholder="e.g. Monthly Follow-Up Call"
+                style="width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:10px;background:var(--panel);color:var(--text);font-size:13.5px;font-family:inherit;box-sizing:border-box;"/>
+            </div>
+            <div>
+              <div style="font-size:11.5px;font-weight:600;color:var(--text-3);margin-bottom:5px;">Description</div>
+              <input id="ft-desc-input" value="${S.ftCreateDesc.replace(/"/g,'&quot;')}" placeholder="Brief description of this template"
+                style="width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:10px;background:var(--panel);color:var(--text);font-size:13.5px;font-family:inherit;box-sizing:border-box;"/>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:11.5px;font-weight:600;color:var(--text-3);margin-bottom:5px;">Content <span style="font-weight:400;color:var(--text-3);">— use {placeholder} for auto-detected fields</span></div>
+            <textarea id="ft-content-input" placeholder="Write your template here. Use {key} for dynamic fields that will be auto-detected…"
+              style="width:100%;min-height:300px;padding:14px 16px;border:1.5px solid var(--border);border-radius:11px;background:var(--panel);color:var(--text);font-size:13px;font-family:'SF Mono','Menlo','Consolas',monospace;line-height:1.75;resize:vertical;box-sizing:border-box;">${S.ftCreateContent.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</textarea>
+          </div>
+          <div>
+            <div style="font-size:11.5px;font-weight:600;color:var(--text-3);margin-bottom:5px;">Prompt</div>
+            <textarea id="ft-prompt-input" placeholder="Instructions for AI to fill this template…"
+              style="width:100%;min-height:80px;padding:12px 16px;border:1.5px solid var(--border);border-radius:11px;background:var(--panel);color:var(--text);font-size:13px;line-height:1.6;resize:vertical;box-sizing:border-box;">${S.ftCreatePrompt.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</textarea>
+          </div>
+        </div>
+        <!-- Right: auto-detected fields -->
+        <div style="width:300px;flex:none;padding:20px;display:flex;flex-direction:column;gap:12px;overflow-y:auto;">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div style="font-size:14px;font-weight:700;">Fields</div>
+            <div style="font-size:12px;color:var(--text-3);">${placeholders.length} detected</div>
+          </div>
+          ${placeholders.length>0?fieldRows:`
+          <div style="padding:24px 0;text-align:center;color:var(--text-3);font-size:12.5px;line-height:1.6;">
+            Use <code style="background:var(--panel-2);padding:1px 5px;border-radius:4px;font-size:12px;">{key}</code> in your content<br>to auto-detect fields here.
+          </div>`}
+        </div>
+      </div>
+      <div style="padding:14px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;">
+        <button data-action="ft-create-close" style="padding:10px 22px;border-radius:11px;border:1.5px solid var(--border);background:var(--panel-2);color:var(--text-2);font-size:13.5px;font-weight:600;cursor:pointer;">Cancel</button>
+        <button data-action="ft-create-save" style="padding:10px 22px;border-radius:11px;background:${canSave?'var(--accent-2)':'var(--panel-2)'};color:${canSave?'#fff':'var(--text-3)'};font-size:13.5px;font-weight:700;cursor:pointer;">Save</button>
+      </div>
+    </div>
+  </div>`;
+}
+
 // ── Main render ───────────────────────────────────────────────────────────
 function render(){
   document.body.dataset.theme=S.theme;
@@ -1814,14 +2836,12 @@ function render(){
   </div>
   ${S.cmd?renderCmd():''}
   ${S.toast?renderToast():''}
-  ${renderLabSearch()}
-  ${renderNoteRecorder()}
-  ${renderDocProcessor()}
-  ${renderReferral()}
-  ${renderLabWfOverlay()}
+  ${renderBillingMatchOverlay()}
+  ${renderCarePlanOverlay()}
   ${renderTemplateOverlay()}
   ${renderAddTemplate()}
-  ${renderAddWorkflow()}`;
+  ${renderWorkItemViewOverlay()}
+  ${renderFtCreateOverlay()}`;
   bindInputs();
 }
 
@@ -1878,20 +2898,6 @@ function bindInputs(){
   if(rp) plainInput(rp,v=>{S.refPatient=v;});
   const rr=document.getElementById('ref-reason-input');
   if(rr) plainInput(rr,v=>{S.refReason=v;});
-  const awl=document.getElementById('aw-label-input');
-  if(awl){ awl.focus(); plainInput(awl,v=>{
-    S.addWfLabel=v;
-    const btn=document.querySelector('[data-action="aw-save"]');
-    if(btn){const ok=!!(v.trim()&&S.addWfSteps.some(s=>s.trim()));btn.style.background=ok?'#4c2d9c':'var(--panel-2)';btn.style.color=ok?'#fff':'var(--text-3)';}
-  }); }
-  S.addWfSteps.forEach((_,i)=>{
-    const el=document.getElementById(`wf-step-${i}`);
-    if(el) plainInput(el,v=>{
-      S.addWfSteps=S.addWfSteps.map((s,j)=>j===i?v:s);
-      const btn=document.querySelector('[data-action="aw-save"]');
-      if(btn){const ok=!!(S.addWfLabel.trim()&&S.addWfSteps.some(s=>s.trim()));btn.style.background=ok?'#4c2d9c':'var(--panel-2)';btn.style.color=ok?'#fff':'var(--text-3)';}
-    });
-  });
   const atl=document.getElementById('at-label-input');
   if(atl){ atl.focus(); plainInput(atl,v=>{
     S.addTmplLabel=v;
@@ -1904,6 +2910,19 @@ function bindInputs(){
     const btn=document.querySelector('[data-action="at-save"]');
     if(btn){const ok=!!(S.addTmplLabel.trim()&&v.trim());btn.style.background=ok?'#4c2d9c':'var(--panel-2)';btn.style.color=ok?'#fff':'var(--text-3)';}
   });
+  // followup template create
+  const ftn=document.getElementById('ft-name-input');
+  if(ftn){ ftn.focus(); filterInput(ftn,v=>{S.ftCreateName=v;}); }
+  const ftd=document.getElementById('ft-desc-input');
+  if(ftd) filterInput(ftd,v=>{S.ftCreateDesc=v;});
+  const ftc=document.getElementById('ft-content-input');
+  if(ftc) filterInput(ftc,v=>{
+    S.ftCreateContent=v;
+    const btn=document.querySelector('[data-action="ft-create-save"]');
+    if(btn){const ok=!!(S.ftCreateName.trim()&&v.trim());btn.style.background=ok?'var(--accent-2)':'var(--panel-2)';btn.style.color=ok?'#fff':'var(--text-3)';}
+  });
+  const ftp=document.getElementById('ft-prompt-input');
+  if(ftp) filterInput(ftp,v=>{S.ftCreatePrompt=v;});
 }
 
 // ── Event delegation ──────────────────────────────────────────────────────
@@ -1923,15 +2942,77 @@ document.getElementById('app').addEventListener('click',e=>{
   if(act==='create-patient'){
     const name=S.newPName.trim(); if(!name) return;
     const id='ep'+Date.now();
-    S.extraPatients=[...S.extraPatients,{id,name,age:null,sex:null,plan:null,risk:null,mrn:null,clinic:'Archway Family Medicine',last:'Just now'}];
+    S.extraPatients=[...S.extraPatients,{id,name,age:null,sex:null,plan:null,risk:null,mrn:null,clinic:currentClinic().label,last:'Just now'}];
     S.view='patient';S.patientId=id;S.workOpen=false;S.workMode=null;S.newPName='';render();return;
   }
+  if(act.startsWith('pt-open:')){S.view='patient';S.patientId=act.slice(8);render();return;}
+  if(act==='practices-toggle'){S.practicesOpen=!S.practicesOpen;render();return;}
+  if(act.startsWith('ccm-care:')){S.ccmCareType=act.slice(9);render();return;}
+  if(act.startsWith('ccm-signoff:')){S.ccmSignOff=act.slice(12);render();return;}
+  if(act.startsWith('ccm-ins:')){S.ccmInsurance=act.slice(8);render();return;}
+  if(act.startsWith('pt-status:')){S.ptStatus=act.slice(10);render();return;}
+  if(act.startsWith('pt-provider:')){S.ptProvider=act.slice(12);render();return;}
+  if(act.startsWith('pt-sort:')){S.ptSort=act.slice(8);render();return;}
+  if(act==='billing-open'){
+    S.billingOpen=true;S.billingLoaded=false;render();
+    setTimeout(()=>{if(S.billingOpen){S.billingLoaded=true;render();}},2200);
+    return;
+  }
+  if(act==='billing-close'){S.billingOpen=false;S.billingLoaded=false;render();return;}
+  if(act==='billing-assign'){
+    const p=PATIENTS.find(pt=>pt.id===S.patientId);
+    if(p){
+      const totalMin=p.activities.reduce((s,a)=>s+a.minutes,0);
+      const codes=[];
+      if(totalMin>=60){codes.push('99487');const add=Math.floor((totalMin-60)/30);for(let i=0;i<add;i++)codes.push('99489');}
+      else if(totalMin>=20){codes.push('99490');const add=Math.min(2,Math.floor((totalMin-20)/20));for(let i=0;i<add;i++)codes.push('99439');}
+      const rev=codes.includes('99487')?(132.93+(codes.filter(c=>c==='99489').length*68.02)):(codes.includes('99490')?(62.71+(codes.filter(c=>c==='99439').length*47.34)):0);
+      S.completedWork=[{
+        id:Date.now(), type:'billing', patientId:p.id, patient:p.name, provider:p.provider,
+        codes:codes.join(' + ')||'—', revenue:rev>0?'$'+rev.toFixed(2):'—',
+        date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'}),
+      },...S.completedWork];
+    }
+    S.billingOpen=false;S.billingLoaded=false;
+    showToast('Billing codes assigned');render();return;
+  }
+  if(act==='care-plan-open'){S.carePlanOpen=true;S.carePlanStep='select';S.selectedTemplate=null;render();return;}
+  if(act==='care-plan-close'){S.carePlanOpen=false;render();return;}
+  if(act==='care-plan-back'){S.carePlanStep='select';S.selectedTemplate=null;render();return;}
+  if(act.startsWith('care-plan-select:')){
+    S.selectedTemplate=parseInt(act.slice(17));
+    S.carePlanStep='loading';render();
+    setTimeout(()=>{if(S.carePlanOpen){S.carePlanStep='filled';render();}},2600);
+    return;
+  }
+  if(act==='care-plan-sign'){
+    const p=PATIENTS.find(pt=>pt.id===S.patientId);
+    const tmpl=CALL_TEMPLATES.find(t=>t.id===S.selectedTemplate)||CALL_TEMPLATES[0];
+    if(p){
+      S.completedWork=[{
+        id:Date.now(), type:'template', patientId:p.id, patient:p.name, provider:p.provider,
+        templateNum:tmpl.num, templateTitle:tmpl.title, templateId:tmpl.id,
+        filledSections:buildFilledTemplate(p),
+        date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'}),
+      },...S.completedWork];
+    }
+    S.carePlanOpen=false;
+    showToast('Template assigned');render();return;
+  }
+  if(act==='clinic-drop'){S.clinicDrop=!S.clinicDrop;render();return;}
+  if(act.startsWith('clinic-select:')){
+    S.clinic=act.slice(14);S.clinicDrop=false;
+    S.view='today';S.taskId=null;S.patientId=null;
+    render();return;
+  }
   if(act==='theme'){S.theme=S.theme==='dark'?'light':'dark';render();return;}
-  if(act==='go:today'){S.view='today';S.taskId=null;S.patientId=null;S.cmd=false;render();return;}
-  if(act==='go:patients'){S.view='patients';S.taskId=null;S.patientId=null;S.cmd=false;render();return;}
-  if(act.startsWith('mem:')){S.view='mem';S.memTab=act.slice(4);S.dbView=null;S.cmd=false;render();return;}
-  if(act.startsWith('db-view:')){S.dbView=act.slice(8);render();return;}
-  if(act==='db-back'){S.dbView=null;render();return;}
+  if(act==='go:today'){S.view='today';S.taskId=null;S.patientId=null;S.workItem=null;S.cmd=false;render();return;}
+  if(act==='go:patients'){S.view='patients';S.taskId=null;S.patientId=null;S.workItem=null;S.cmd=false;render();return;}
+  if(act.startsWith('work:')){
+    const item=act.slice(5);
+    S.view='patients';S.taskId=null;S.patientId=null;S.workItem=item;S.cmd=false;render();return;
+  }
+  if(act.startsWith('mem:')){S.view='mem';S.cmd=false;render();return;}
   if(act==='lab-wf-start'){
     if(!S.labSelected.length&&S.taskId){
       const rawT=[...TASKS,...S.extraTasks].find(x=>x.id===S.taskId);
@@ -1944,24 +3025,26 @@ document.getElementById('app').addEventListener('click',e=>{
     return;
   }
   if(act==='labwf-close'){S.labWf=false;S.labWfStep=0;render();return;}
-  if(act==='aw-open'){S.addWfOpen=true;S.addWfLabel='';S.addWfSteps=[''];S.addWfType='lab';render();return;}
-  if(act==='aw-close'){S.addWfOpen=false;render();return;}
-  if(act.startsWith('aw-type:')){S.addWfType=act.slice(8);render();return;}
-  if(act==='aw-add-step'){S.addWfSteps=[...S.addWfSteps,''];render();return;}
-  if(act.startsWith('aw-rm-step:')){
-    const i=parseInt(act.slice(11));
-    S.addWfSteps=S.addWfSteps.filter((_,j)=>j!==i);
+  if(act.startsWith('wi-view:')){
+    const id=parseInt(act.slice(8));
+    S.workItemView=S.completedWork.find(w=>w.id===id)||null;
     render();return;
   }
-  if(act==='aw-save'){
-    if(!S.addWfLabel.trim()||!S.addWfSteps.some(s=>s.trim())) return;
-    S.userWorkflows=[...S.userWorkflows,{
-      id:'uwf-'+Date.now(), type:S.addWfType,
-      label:S.addWfLabel.trim(),
-      steps:S.addWfSteps.filter(s=>s.trim()),
+  if(act==='wi-view-close'){S.workItemView=null;render();return;}
+  if(act.startsWith('ft-detail:')){S.ftDetailId=parseInt(act.slice(10));render();return;}
+  if(act==='ft-back'){S.ftDetailId=null;render();return;}
+  if(act==='ft-create-open'){S.ftCreateOpen=true;S.ftCreateName='';S.ftCreateDesc='';S.ftCreateContent='';S.ftCreatePrompt='';render();return;}
+  if(act==='ft-create-close'){S.ftCreateOpen=false;render();return;}
+  if(act==='ft-create-save'){
+    if(!S.ftCreateName.trim()||!S.ftCreateContent.trim()) return;
+    const id='uft-'+Date.now();
+    const placeholders=[...new Set([...S.ftCreateContent.matchAll(/\{([^}]+)\}/g)].map(m=>m[1]))];
+    S.userFtTemplates=[...S.userFtTemplates,{
+      id, num:'', title:S.ftCreateName.trim(), hint:S.ftCreateDesc.trim(),
+      rawContent:S.ftCreateContent, prompt:S.ftCreatePrompt,
     }];
-    S.addWfOpen=false;S.addWfLabel='';S.addWfSteps=[''];
-    showToast('Workflow saved');render();return;
+    S.ftCreateOpen=false;
+    showToast('Template saved');render();return;
   }
   if(act==='at-open'){S.addTmplOpen=true;S.addTmplLabel='';S.addTmplContent='';S.addTmplType='note';render();return;}
   if(act==='at-close'){S.addTmplOpen=false;render();return;}
@@ -2137,6 +3220,14 @@ document.getElementById('app').addEventListener('click',e=>{
 });
 
 document.addEventListener('click', e => {
+  if(!S.clinicDrop) return;
+  const dd = document.getElementById('clinic-dropdown');
+  if(dd && !dd.contains(e.target) && !e.target.closest('[data-action="clinic-drop"]')){
+    S.clinicDrop = false; render();
+  }
+});
+
+document.addEventListener('click', e => {
   if(!S.newTaskOpen) return;
   const dd = document.getElementById('nt-dropdown');
   if(dd && !dd.contains(e.target) && !e.target.closest('[data-action="toggle-new-task"]')){
@@ -2173,12 +3264,32 @@ document.addEventListener('click', e => {
     const overlay=document.getElementById('aw-overlay');
     if(overlay && e.target===overlay){S.addWfOpen=false;render();}
   }
+  if(S.billingOpen && S.billingLoaded){
+    const overlay=document.getElementById('billing-overlay');
+    if(overlay && e.target===overlay){S.billingOpen=false;S.billingLoaded=false;render();}
+  }
+  if(S.carePlanOpen){
+    const overlay=document.getElementById('care-plan-overlay');
+    if(overlay && e.target===overlay){S.carePlanOpen=false;render();}
+  }
+  if(S.workItemView){
+    const overlay=document.getElementById('wi-view-overlay');
+    if(overlay && e.target===overlay){S.workItemView=null;render();}
+  }
+  if(S.ftCreateOpen){
+    const overlay=document.getElementById('ft-create-overlay');
+    if(overlay && e.target===overlay){S.ftCreateOpen=false;render();}
+  }
 });
 
 // ── Keyboard shortcuts ────────────────────────────────────────────────────
 window.addEventListener('keydown',e=>{
   if((e.metaKey||e.ctrlKey)&&(e.key==='k'||e.key==='K')){e.preventDefault();S.cmd=!S.cmd;S.query='';render();}
   if(e.key==='Escape'){
+    if(S.workItemView){S.workItemView=null;render();return;}
+    if(S.ftCreateOpen){S.ftCreateOpen=false;render();return;}
+    if(S.carePlanOpen){S.carePlanOpen=false;render();return;}
+    if(S.billingOpen){S.billingOpen=false;S.billingLoaded=false;render();return;}
     if(S.addWfOpen){S.addWfOpen=false;render();return;}
     if(S.addTmplOpen){S.addTmplOpen=false;render();return;}
     if(S.templateOpen){S.templateOpen=false;S.templateId=null;render();return;}
