@@ -552,7 +552,7 @@ export default function Home() {
                   </a>
                 </div>
               </div>
-              <div className="flex flex-col">
+              <div className="flex flex-col mt-8 lg:mt-0">
                 <div className="overflow-hidden rounded-2xl border border-[#0d1b4d]/12 shadow-[0_8px_40px_rgba(13,27,77,0.12)]">
                   <img src={heroGraphic} alt="Doctor using Sapiens Health AI assistant" className="block w-full object-cover" />
                 </div>
