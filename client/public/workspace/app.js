@@ -2839,17 +2839,11 @@ function renderCarePlanOverlay(){
   // ── Add-input dropdown ──
   const cpInputMenu=S.cpInputMenu?`
     <div style="position:absolute;bottom:calc(100% + 6px);left:0;background:#fff;border:1.5px solid #e5e7eb;border-radius:11px;box-shadow:0 8px 28px rgba(0,0,0,.13);overflow:hidden;min-width:220px;z-index:10;">
-      <button data-action="cp-add-transcript" style="display:flex;align-items:center;gap:10px;width:100%;padding:11px 14px;background:none;border:none;cursor:pointer;text-align:left;border-bottom:1px solid #f0f0f0;">
+      <button data-action="cp-add-transcript" style="display:flex;align-items:center;gap:10px;width:100%;padding:11px 14px;background:none;border:none;cursor:pointer;text-align:left;">
         <div style="width:26px;height:26px;border-radius:6px;background:rgba(124,58,237,.1);display:flex;align-items:center;justify-content:center;flex:none;">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
         </div>
         <div><div style="font-size:12px;font-weight:600;color:#111;">Visit Transcript</div><div style="font-size:10.5px;color:#aaa;">Audio recording or transcript</div></div>
-      </button>
-      <button data-action="cp-add-note" style="display:flex;align-items:center;gap:10px;width:100%;padding:11px 14px;background:none;border:none;cursor:pointer;text-align:left;">
-        <div style="width:26px;height:26px;border-radius:6px;background:rgba(59,130,246,.1);display:flex;align-items:center;justify-content:center;flex:none;">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-        </div>
-        <div><div style="font-size:12px;font-weight:600;color:#111;">Call Notes</div><div style="font-size:10.5px;color:#aaa;">Nurse or coordinator notes</div></div>
       </button>
     </div>`:'';
 
@@ -2880,7 +2874,10 @@ function renderCarePlanOverlay(){
           <div style="padding:7px 13px;border-bottom:1px solid #f0f0f0;background:#fafafa;">
             <span style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#9ca3af;">Notes</span>
           </div>
-          <textarea id="cp-prompt-input" placeholder="Add context for the AI…" rows="2" style="width:100%;padding:8px 11px;font-size:12px;border:none;resize:none;background:#fff;color:#111;font-family:inherit;outline:none;line-height:1.5;box-sizing:border-box;">${S.cpPrompt}</textarea>
+          <textarea id="cp-prompt-input" placeholder="Type call notes…" rows="3" style="width:100%;padding:8px 11px;font-size:12px;border:none;resize:none;background:#fff;color:#111;font-family:inherit;outline:none;line-height:1.5;box-sizing:border-box;">${S.cpPrompt}</textarea>
+          <div style="padding:6px 10px;border-top:1px solid #f0f0f0;background:#fafafa;display:flex;justify-content:flex-end;">
+            <button data-action="cp-add-note" style="padding:5px 14px;border-radius:7px;background:${S.cpPrompt.trim()?'#111':'#e5e7eb'};color:${S.cpPrompt.trim()?'#fff':'#bbb'};font-size:11px;font-weight:700;cursor:${S.cpPrompt.trim()?'pointer':'default'};border:none;transition:background .15s;">Add</button>
+          </div>
         </div>`:''}
       </div>
       <!-- Add input button -->
@@ -3594,9 +3591,9 @@ document.getElementById('app').addEventListener('click',e=>{
     S.cpInputMenu=false;render();return;
   }
   if(act==='cp-add-note'){
-    const note=S.cpPrompt.trim()||'Monthly check-in — patient reports stable symptoms, compliant with medications. BP 128/82. No new complaints. Medication refills requested.';
+    const note=S.cpPrompt.trim(); if(!note) return;
     S.cpInputs=[...S.cpInputs,{type:'note',label:'Call Notes',content:note,id:Date.now()}];
-    S.cpInputMenu=false;render();return;
+    S.cpInputMenu=false;S.cpPrompt='';render();return;
   }
   if(act.startsWith('cp-remove-input:')){
     const idx=parseInt(act.slice(16));
