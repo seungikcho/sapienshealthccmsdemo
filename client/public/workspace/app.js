@@ -25,7 +25,7 @@ const S = {
   clinic: 'cypress', clinicDrop: false,
   ccmCareType: 'CCM', ccmSignOff: 'All', ccmInsurance: 'All', practicesOpen: false,
   carePlanOpen: false, billingOpen: false,
-  billingLoaded: false,
+  billingPhase: 'input', billingPrompt: '', billingInputs: [], billingInputMenu: false,
   carePlanStep: 'select', selectedTemplate: null, carePlanLoaded: false,
   ptStatus: 'all', ptSort: 'name', ptProvider: 'all',
   workItemView: null,
@@ -1858,148 +1858,415 @@ function renderPatient(){
   </div>`;
 }
 
+// ── Billing static content ────────────────────────────────────────────────
+const VISIT_TRANSCRIPT=`[0:04] Hello, my name is Jamie Ellis, I'm one of the GP registrars here and I'm just going to find out a little bit about the problem you've come in with. Will that be alright?
+[0:22] Well, I've been getting some diarrhoea really, for the last sort of two or three weeks. Before that, no problems.
+[0:52] It's runnier, looser than normal. I don't think there's any change in colour. But I'm going a lot more often. Do you have any blood in it at all? Yes — it's worrying me. Is it difficult to flush? No. Any undigested food? No.
+[1:22] How many times a day? Probably up to about eight times — yesterday was about eight. Do you have to get up at night? Yes, and I've never had to before. I'm losing sleep over it.
+[1:49] Any tummy pain? Yes, crampy, mainly just before I go to the toilet, eases afterwards. Eating can make it worse. Around the middle — about a four out of ten.
+[2:58] Any difficulty chewing, mouth ulcers, difficulty swallowing? No. Any headaches? Occasional headaches for a few years, not getting worse. I sometimes get weakness in my arm with a headache. Any chest or waterworks problems? No.
+[4:27] Any skin problems? I've had a rash that comes and goes. No joint problems. Periods? I'm on the pill, regular, no changes.
+[5:18] Any weight loss? I think I probably have lost weight — my trousers feel looser. I don't weigh myself so not sure how much.
+[5:41] Operations? Yes, appendix removed at fifteen. Medications: the pill and paracetamol. No allergies except penicillin — I get a rash.
+[6:56] Working? Yes, I'm a teaching assistant. Has this affected work? I've been worried about passing it to the children if it's an infection.
+[8:01] Alcohol? Not much during the week, but at weekends roughly twenty units — above recommended. Who's at home? I live with my partner, Sam.
+[9:19] Family history? My aunt had something to do with her tummy but I'm not sure what — not cancer. What do you think is going on? Probably an infection. Other concerns? A friend's sister has bowel cancer and she's only thirty, so the bleeding has really worried me.
+[10:25] Tests needed? Some tests, I think. And I'm hoping I won't need a colonoscopy. Recent travel? Not recently — I went to South Africa and Zimbabwe about three years ago. Fine while there.`;
+
+const REFERRAL_LETTER=`Orthopedic Referral Letter
+Date: 2026-03-06
+
+Referring Clinician: Primary Care Clinic, Copenhagen, Denmark
+
+Re: Referral to Orthopedic Clinic — Evaluation of Chronic Knee Pain
+
+Dear Orthopedic Colleague,
+
+I am referring a 62-year-old male patient for orthopedic evaluation of persistent right knee pain and functional limitation.
+
+History of Present Illness:
+The patient reports progressive right knee pain for approximately 8 months. The pain is described as aching with intermittent sharp exacerbations during weight-bearing activities such as walking, stair climbing, and rising from a seated position. Symptoms have gradually worsened and now limit daily activities, including walking distances greater than 500 meters.
+
+He also reports morning stiffness lasting approximately 20–30 minutes and occasional swelling of the knee joint. There is no history of acute trauma, locking, or mechanical instability. OTC analgesics (paracetamol and intermittent NSAIDs) provide only partial relief.
+
+Past Medical History: Hypertension, Hyperlipidemia
+Medications: Lisinopril 10mg daily, Atorvastatin 20mg daily, Paracetamol PRN
+
+Physical Examination (2026-03-01):
+- Mild joint effusion of the right knee
+- Tenderness along the medial joint line
+- Reduced range of motion due to pain
+- No ligamentous instability detected
+- Antalgic gait observed
+
+Investigations:
+Plain radiographs of the right knee (2026-02-25) demonstrate medial compartment joint space narrowing with osteophyte formation consistent with degenerative osteoarthritis.
+
+Assessment: Chronic right knee pain consistent with medial compartment osteoarthritis.
+
+Reason for Referral: Given persistent symptoms despite conservative measures, evaluation for advanced nonoperative therapies or possible surgical intervention.
+
+Please let me know if any additional information is required.
+
+Kind regards, Primary Care Clinician — Copenhagen, Denmark`;
+
 // ── Billing Code Match Overlay ────────────────────────────────────────────
 function renderBillingMatchOverlay(){
   if(!S.billingOpen) return '';
   const p=PATIENTS.find(pt=>pt.id===S.patientId); if(!p) return '';
+  const cl=currentClinic();
   const totalMin=p.activities.reduce((s,a)=>s+a.minutes,0);
+  const phase=S.billingPhase; // 'input' | 'running' | 'done'
 
-  if(!S.billingLoaded){
-    return `
-    <style>
-      @keyframes sap-spin{to{transform:rotate(360deg)}}
-      @keyframes sap-pulse{0%,100%{opacity:1}50%{opacity:.35}}
-      @keyframes sap-bar{from{width:0}to{width:${Math.min(100,Math.round(totalMin/60*100))}%}}
-    </style>
-    <div id="billing-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;display:flex;align-items:center;justify-content:center;">
-      <div style="background:var(--bg);border-radius:24px;box-shadow:0 32px 100px rgba(0,0,0,.4);width:420px;padding:48px 40px;text-align:center;">
-        <div style="position:relative;width:72px;height:72px;margin:0 auto 28px;">
-          <div style="position:absolute;inset:0;border:3px solid var(--accent-line);border-radius:50%;"></div>
-          <div style="position:absolute;inset:0;border:3px solid transparent;border-top-color:var(--accent);border-radius:50%;animation:sap-spin .9s linear infinite;"></div>
-          <div style="position:absolute;inset:10px;background:var(--accent-soft);border-radius:50%;display:flex;align-items:center;justify-content:center;">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
-          </div>
-        </div>
-        <div style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:8px;">Analyzing chart data…</div>
-        <div style="font-size:13px;color:var(--text-3);margin-bottom:28px;animation:sap-pulse 1.8s ease infinite;">Cross-referencing ${totalMin} documented minutes against Medicare billing rules</div>
-        <div style="height:6px;background:var(--border);border-radius:99px;overflow:hidden;">
-          <div style="height:100%;background:var(--accent);border-radius:99px;animation:sap-bar 1.8s ease-out forwards;"></div>
-        </div>
-        <div style="font-size:11.5px;color:var(--text-3);margin-top:12px;">CPT code lookup · Revenue projection · Activity audit</div>
-      </div>
-    </div>`;
-  }
-
+  // Determine codes + evidence
   const codes=[];
   if(totalMin>=60){
-    codes.push({cpt:'99487',desc:'Complex Chronic Care Management',sub:'60+ min/month · complex conditions',rate:132.93,eligible:true});
+    codes.push({
+      cpt:'99487',desc:'Complex Chronic Care Management',
+      sub:'60+ min/month · 2+ complex chronic conditions',rate:132.93,eligible:true,
+      evidence:[
+        `"${p.conditions.slice(0,2).join(', ')}"`,
+        `"Total documented: ${totalMin} minutes this month"`,
+        `"${p.activities.length} care encounters on file"`,
+      ],
+      alts:['99490 — Standard CCM (20+ min)','99491 — CCM, physician direct time (30+ min)'],
+    });
     const addOns=Math.floor((totalMin-60)/30);
-    for(let i=0;i<addOns;i++) codes.push({cpt:'99489',desc:'Complex CCM Add-on',sub:'Each additional 30 min',rate:68.02,eligible:true});
+    for(let i=0;i<Math.min(addOns,2);i++) codes.push({
+      cpt:'99489',desc:'Complex CCM Add-on',
+      sub:`Additional 30-min block #${i+1}`,rate:68.02,eligible:true,
+      evidence:[`"Activity log shows ${totalMin} total minutes across ${p.activities.length} encounters"`],
+      alts:['99439 — Standard CCM add-on (20 min)'],
+    });
   } else if(totalMin>=20){
-    codes.push({cpt:'99490',desc:'Chronic Care Management',sub:'20+ min/month · standard CCM',rate:62.71,eligible:true});
+    codes.push({
+      cpt:'99490',desc:'Chronic Care Management',
+      sub:'20+ min/month · standard CCM',rate:62.71,eligible:true,
+      evidence:[
+        `"${p.conditions[0]}"`,
+        `"Total documented: ${totalMin} minutes this month"`,
+      ],
+      alts:['99487 — Complex CCM (60+ min)','99491 — CCM, physician direct time'],
+    });
     const addOns=Math.min(2,Math.floor((totalMin-20)/20));
-    for(let i=0;i<addOns;i++) codes.push({cpt:'99439',desc:'CCM Add-on',sub:'Each additional 20 min (max 2)',rate:47.34,eligible:true});
+    for(let i=0;i<addOns;i++) codes.push({
+      cpt:'99439',desc:'CCM Add-on',
+      sub:'Each additional 20 min (max 2)',rate:47.34,eligible:true,
+      evidence:[`"${p.activities[i]?p.activities[i].desc.slice(0,55)+'…':'Follow-up activity documented'}"`],
+      alts:['99489 — Complex CCM add-on'],
+    });
   } else {
-    codes.push({cpt:'99490',desc:'Chronic Care Management',sub:`Need ${20-totalMin} more min to qualify`,rate:62.71,eligible:false});
+    codes.push({
+      cpt:'99490',desc:'Chronic Care Management',
+      sub:`Need ${20-totalMin} more minutes to qualify`,rate:62.71,eligible:false,
+      evidence:[],alts:[],
+    });
   }
 
   const totalRev=codes.filter(c=>c.eligible).reduce((s,c)=>s+c.rate,0);
-  const annualProj=(totalRev*12).toFixed(2);
 
-  // minutes bar: thresholds at 20, 40, 60
-  const barMax=Math.max(60,totalMin);
-  const barPct=Math.min(100,(totalMin/barMax*100)).toFixed(1);
-  const t20=Math.round(20/barMax*100);
-  const t40=Math.round(40/barMax*100);
-  const t60=Math.round(60/barMax*100);
+  // ── Chart HTML (raw = no highlights, used during input/running) ──
+  const line=(t,dim)=>`<div style="font-family:'SF Mono',ui-monospace,monospace;font-size:11.5px;line-height:1.8;color:${dim?'#bbb':'#333'};min-height:1.1em;white-space:pre-wrap;">${t||'&nbsp;'}</div>`;
+  const chartRawLines=[
+    line(`&lt;CCM_CHART  patient="${p.mrn}"&gt;`,true),
+    line(`Date: ${new Date().toLocaleDateString('en-US',{year:'numeric',month:'2-digit',day:'2-digit'})}  |  Provider: ${p.provider}`,true),
+    line(''),
+    line(`<span style="color:#1a56cc;font-weight:700;">Chief Complaint:</span> ${p.conditions[0]||'Chronic condition management'} follow-up`),
+    line(''),
+    line(`<span style="color:#555;font-weight:600;">Patient:</span>  ${p.name}   DOB: ${p.dob}   ${p.age}yo ${p.sex}`),
+    line(`<span style="color:#555;font-weight:600;">MRN:</span>     ${p.mrn}   Insurance: Medicare   Clinic: ${cl.short}`),
+    line(''),
+    line(`<span style="color:#1a56cc;font-weight:700;">Past Medical History:</span>`),
+    ...p.conditions.map(c=>line(`  — ${c}`)),
+    line(''),
+    line(`<span style="color:#1a56cc;font-weight:700;">Current Medications:</span>`),
+    ...p.medications.map(m=>line(`  — ${m}`)),
+    line(''),
+    line(`<span style="color:#1a56cc;font-weight:700;">CCM Activity Log — ${new Date().toLocaleString('en-US',{month:'long',year:'numeric'})}:</span>`),
+    ...p.activities.map(a=>line(`  [${a.date}]  ${a.desc.length>54?a.desc.slice(0,54)+'…':a.desc}  —  ${a.minutes} min`)),
+    ...(p.activities.length===0?[line(`  No activities recorded this month`)]:[]),
+    line(''),
+    line(`Total Documented: ${totalMin} minutes this month   (threshold: 20 min = eligible)`),
+    line(''),
+    line(`&lt;/CCM_CHART&gt;`,true),
+  ];
+  const chartHtmlRaw=chartRawLines.join('');
 
-  const codeCards=codes.map(c=>`
-    <div style="display:flex;align-items:center;gap:16px;padding:16px 20px;border-bottom:1px solid var(--border);">
-      <div style="width:52px;height:52px;border-radius:12px;background:${c.eligible?'var(--accent-soft)':'var(--panel-2)'};display:flex;align-items:center;justify-content:center;flex:none;">
-        <span style="font-size:11px;font-weight:900;font-family:monospace;color:${c.eligible?'var(--accent)':'var(--text-3)'};">${c.cpt}</span>
+  // ── Chart HTML (highlighted = shown in done phase, highlights fade in) ──
+  const mkHL=(text,delay=0)=>`<mark style="background:rgba(80,180,40,.22);color:#1a6b10;font-weight:700;border-radius:3px;padding:0 3px;animation:hl-appear .4s ease ${delay}s both;">${text}</mark>`;
+  let hlDelay=0;
+  const chartHLLines=[
+    line(`&lt;CCM_CHART  patient="${p.mrn}"&gt;`,true),
+    line(`Date: ${new Date().toLocaleDateString('en-US',{year:'numeric',month:'2-digit',day:'2-digit'})}  |  Provider: ${p.provider}`,true),
+    line(''),
+    line(`<span style="color:#1a56cc;font-weight:700;">Chief Complaint:</span> ${p.conditions[0]||'Chronic condition management'} follow-up`),
+    line(''),
+    line(`<span style="color:#555;font-weight:600;">Patient:</span>  ${p.name}   DOB: ${p.dob}   ${p.age}yo ${p.sex}`),
+    line(`<span style="color:#555;font-weight:600;">MRN:</span>     ${p.mrn}   Insurance: Medicare   Clinic: ${cl.short}`),
+    line(''),
+    line(`<span style="color:#1a56cc;font-weight:700;">Past Medical History:</span>`),
+    ...p.conditions.map(c=>line(`  — ${mkHL(c,(hlDelay+=.08).toFixed(2))}`)),
+    line(''),
+    line(`<span style="color:#1a56cc;font-weight:700;">Current Medications:</span>`),
+    ...p.medications.map(m=>line(`  — ${m}`)),
+    line(''),
+    line(`<span style="color:#1a56cc;font-weight:700;">CCM Activity Log — ${new Date().toLocaleString('en-US',{month:'long',year:'numeric'})}:</span>`),
+    ...p.activities.map(a=>line(`  [${a.date}]  ${a.desc.length>54?a.desc.slice(0,54)+'…':a.desc}  —  ${mkHL(a.minutes+' min',(hlDelay+=.1).toFixed(2))}`)),
+    ...(p.activities.length===0?[line(`  No activities recorded this month`)]:[]),
+    line(''),
+    line(`${mkHL('Total Documented: '+totalMin+' minutes this month',(hlDelay+=.12).toFixed(2))}   <span style="color:#888;">(threshold: 20 min = eligible)</span>`),
+    line(''),
+    line(`&lt;/CCM_CHART&gt;`,true),
+  ];
+  const chartHtmlHL=chartHLLines.join('');
+
+  // ── Input card builder ──
+  const mkInputCard=(inp,i,highlighted)=>{
+    const styles={
+      note:    {accent:'#3b82f6',bg:'rgba(59,130,246,.05)', border:'rgba(59,130,246,.25)'},
+      referral:{accent:'#d97706',bg:'rgba(217,119,6,.05)',  border:'rgba(217,119,6,.25)'},
+      transcript:{accent:'#7c3aed',bg:'rgba(124,58,237,.05)',border:'rgba(124,58,237,.25)'},
+      'audio-loading':{accent:'#7c3aed',bg:'rgba(124,58,237,.05)',border:'rgba(124,58,237,.25)'},
+    };
+    const s=styles[inp.type]||styles.note;
+    const cardBorder=highlighted?`rgba(34,139,24,.35)`:s.border;
+
+    if(inp.type==='audio-loading'){
+      return `<div style="border:1.5px solid ${s.border};border-radius:12px;overflow:hidden;background:#fff;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:${s.bg};border-bottom:1px solid ${s.border};">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="width:7px;height:7px;border-radius:50%;background:${s.accent};flex:none;animation:sap-pulse .8s ease infinite;"></div>
+            <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:${s.accent};">Input ${i+2} — Visit Transcript</span>
+          </div>
+          <button data-action="billing-remove-input:${i}" style="font-size:14px;color:#bbb;background:none;border:none;cursor:pointer;padding:0;">×</button>
+        </div>
+        <div style="padding:20px 16px;display:flex;flex-direction:column;align-items:center;gap:14px;">
+          <div style="display:flex;align-items:center;gap:6px;height:32px;">
+            ${Array.from({length:18},(_,k)=>`<div style="width:3px;border-radius:2px;background:${s.accent};opacity:.7;animation:wave-bar .9s ease ${(k*.05).toFixed(2)}s infinite alternate;height:${8+Math.sin(k*.7)*14}px;"></div>`).join('')}
+          </div>
+          <div style="font-size:12px;color:#7c3aed;font-weight:600;animation:sap-pulse 1.2s ease infinite;">Processing audio transcript…</div>
+          <div style="width:100%;height:4px;background:#f0f0f0;border-radius:99px;overflow:hidden;">
+            <div style="height:100%;background:${s.accent};border-radius:99px;animation:audio-progress 2.2s ease-out forwards;"></div>
+          </div>
+        </div>
+      </div>`;
+    }
+
+    return `<div style="border:1.5px solid ${cardBorder};border-radius:12px;overflow:hidden;background:#fff;transition:border-color .4s;">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:${s.bg};border-bottom:1px solid ${s.border};">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="width:7px;height:7px;border-radius:50%;background:${s.accent};flex:none;"></div>
+          <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:${s.accent};">Input ${i+2} — ${inp.label}</span>
+        </div>
+        <button data-action="billing-remove-input:${i}" style="font-size:14px;color:#bbb;background:none;border:none;cursor:pointer;padding:0;">×</button>
       </div>
-      <div style="flex:1;">
-        <div style="font-size:14px;font-weight:700;color:${c.eligible?'var(--text)':'var(--text-3)'};">${c.desc}</div>
-        <div style="font-size:12px;color:var(--text-3);margin-top:2px;">${c.sub}</div>
+      <div style="padding:14px 16px;font-family:'SF Mono',monospace;font-size:11.5px;color:#333;line-height:1.75;white-space:pre-wrap;max-height:190px;overflow-y:auto;">${inp.content.replace(/</g,'&lt;')}</div>
+    </div>`;
+  };
+
+  // ── Code cards ──
+  const codeCards=codes.map((c,i)=>`
+    <div style="border:1.5px solid ${c.eligible?'rgba(34,139,24,.3)':'#e5e7eb'};border-radius:13px;background:#fff;overflow:hidden;animation:bill-rise .32s ease ${i*.11}s both;box-shadow:0 1px 6px rgba(0,0,0,.06);">
+      <div style="display:flex;align-items:center;gap:10px;padding:13px 15px;${c.evidence.length||c.alts.length?'border-bottom:1px solid #f0f0f0;':''}background:${c.eligible?'rgba(34,139,24,.04)':'#fafafa'};">
+        <div style="padding:5px 10px;border-radius:8px;background:${c.eligible?'rgba(34,139,24,.12)':'#f0f0f0'};border:1.5px solid ${c.eligible?'rgba(34,139,24,.35)':'#ddd'};">
+          <span style="font-size:11.5px;font-weight:900;font-family:monospace;color:${c.eligible?'#1a7a10':'#888'};">${c.cpt}</span>
+        </div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:13px;font-weight:700;color:${c.eligible?'#111':'#888'};">${c.desc}</div>
+          <div style="font-size:11px;color:#888;margin-top:2px;">${c.sub}</div>
+        </div>
+        ${c.eligible?`<div style="font-size:17px;font-weight:900;color:#1a7a10;flex:none;">$${c.rate.toFixed(2)}</div>`:`<div style="font-size:11px;font-weight:600;color:#aaa;background:#f4f4f4;padding:4px 10px;border-radius:7px;">Not eligible</div>`}
       </div>
-      <div style="text-align:right;flex:none;">
-        ${c.eligible
-          ? `<div style="font-size:20px;font-weight:900;color:var(--good);">$${c.rate.toFixed(2)}</div><div style="font-size:10.5px;color:var(--text-3);">per month</div>`
-          : `<div style="font-size:12px;font-weight:600;color:var(--text-3);background:var(--panel-2);padding:4px 10px;border-radius:8px;">Not eligible</div>`}
-      </div>
+      ${c.evidence.length?`
+      <div style="padding:10px 15px;${c.alts.length?'border-bottom:1px solid #f0f0f0;':''}">
+        <div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#888;margin-bottom:6px;">Evidence</div>
+        ${c.evidence.map(e=>`<div style="font-size:11.5px;color:#333;font-style:italic;padding:6px 10px;background:rgba(80,180,40,.07);border-radius:7px;border-left:2.5px solid rgba(34,139,24,.4);margin-bottom:4px;line-height:1.5;">${e}</div>`).join('')}
+      </div>`:''}
+      ${c.alts.length?`
+      <div style="padding:10px 15px;">
+        <div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#888;margin-bottom:6px;">Alternatives</div>
+        ${c.alts.map(a=>`<div style="padding:5px 10px;border-radius:7px;border:1px solid #eee;font-size:11.5px;color:#666;margin-bottom:4px;background:#fafafa;">${a}</div>`).join('')}
+      </div>`:''}
     </div>`).join('');
 
-  return `
-  <style>@keyframes sap-grow{from{width:0}to{width:${barPct}%}}</style>
-  <div id="billing-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;">
-    <div style="background:var(--bg);border-radius:20px;box-shadow:0 28px 90px rgba(0,0,0,.4);width:100%;max-width:600px;max-height:90vh;overflow-y:auto;display:flex;flex-direction:column;">
+  // ── "Add another input" dropdown menu ──
+  const inputMenuHtml=S.billingInputMenu?`
+    <div style="position:absolute;bottom:calc(100% + 6px);left:0;background:#fff;border:1.5px solid #e5e7eb;border-radius:11px;box-shadow:0 8px 28px rgba(0,0,0,.13);overflow:hidden;min-width:230px;z-index:10;">
+      <button data-action="billing-add-transcript" style="display:flex;align-items:center;gap:10px;width:100%;padding:11px 14px;background:none;border:none;cursor:pointer;text-align:left;border-bottom:1px solid #f0f0f0;">
+        <div style="width:28px;height:28px;border-radius:7px;background:rgba(124,58,237,.1);display:flex;align-items:center;justify-content:center;flex:none;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+        </div>
+        <div>
+          <div style="font-size:12.5px;font-weight:600;color:#111;">Visit Transcript</div>
+          <div style="font-size:11px;color:#888;">Upload audio file · auto-transcribe</div>
+        </div>
+      </button>
+      <button data-action="billing-add-referral" style="display:flex;align-items:center;gap:10px;width:100%;padding:11px 14px;background:none;border:none;cursor:pointer;text-align:left;border-bottom:1px solid #f0f0f0;">
+        <div style="width:28px;height:28px;border-radius:7px;background:rgba(217,119,6,.1);display:flex;align-items:center;justify-content:center;flex:none;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        </div>
+        <div>
+          <div style="font-size:12.5px;font-weight:600;color:#111;">Referral Letter</div>
+          <div style="font-size:11px;color:#888;">Import referral document</div>
+        </div>
+      </button>
+      <button data-action="stop" style="display:flex;align-items:center;gap:10px;width:100%;padding:11px 14px;background:none;border:none;cursor:not-allowed;text-align:left;opacity:.38;">
+        <div style="width:28px;height:28px;border-radius:7px;background:#f4f4f4;display:flex;align-items:center;justify-content:center;flex:none;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        </div>
+        <div>
+          <div style="font-size:12.5px;font-weight:600;color:#888;">Upload Document</div>
+          <div style="font-size:11px;color:#bbb;">PDF, DOCX — coming soon</div>
+        </div>
+      </button>
+    </div>`:'';
 
+  // ── Left panel ──
+  const leftPanel=(scanning,highlighted)=>`
+    <div style="display:flex;flex-direction:column;border-right:1.5px solid #e5e7eb;overflow:hidden;background:#f3f4f6;">
       <!-- Header -->
-      <div style="padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--panel);z-index:1;">
-        <div>
-          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);margin-bottom:3px;">Billing Code Match</div>
-          <div style="font-size:17px;font-weight:800;">${p.name}</div>
-        </div>
-        <button data-action="billing-close" style="width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:var(--panel-2);font-size:17px;cursor:pointer;color:var(--text-3);">×</button>
+      <div style="padding:12px 16px;border-bottom:1px solid #e5e7eb;background:#fff;display:flex;align-items:center;gap:8px;flex:none;">
+        <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;">Input</span>
+        <span style="color:#e5e7eb;">·</span>
+        <span style="font-size:12px;font-weight:600;color:#111;">${p.name}</span>
+        <span style="color:#e5e7eb;">·</span>
+        <span style="font-size:11px;color:#9ca3af;">${cl.emr} · Medicare</span>
+        <div style="flex:1;"></div>
+        <button data-action="billing-close" style="width:24px;height:24px;border-radius:50%;border:1px solid #e5e7eb;background:#f9fafb;font-size:14px;cursor:pointer;color:#9ca3af;display:flex;align-items:center;justify-content:center;line-height:1;">×</button>
       </div>
 
-      <div style="padding:20px 24px;display:flex;flex-direction:column;gap:20px;">
-        <!-- Minutes bar -->
-        <div>
-          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;">
-            <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);">Documented Minutes This Month</span>
-            <span style="font-size:22px;font-weight:900;color:${totalMin>=20?'var(--accent)':'var(--text-3)'};">${totalMin} <span style="font-size:13px;font-weight:600;color:var(--text-3);">min</span></span>
+      <!-- Stacked input cards — scanner spans the whole container -->
+      <div style="flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;position:relative;">
+        ${scanning?`<div style="position:absolute;left:0;right:0;height:3px;z-index:5;background:linear-gradient(90deg,transparent,rgba(34,139,24,.9) 30%,rgba(34,139,24,.9) 70%,transparent);animation:bill-scan 1.6s ease-in-out infinite;top:0;pointer-events:none;box-shadow:0 0 16px rgba(34,139,24,.5);"></div>
+        <div style="position:absolute;left:0;right:0;height:100px;z-index:4;background:linear-gradient(180deg,rgba(34,139,24,.05),transparent);animation:bill-scan 1.6s ease-in-out infinite;top:0;pointer-events:none;"></div>`:''}
+
+        <!-- Card 1: Patient Chart -->
+        <div style="border:1.5px solid ${highlighted?'rgba(34,139,24,.35)':'#e5e7eb'};border-radius:12px;overflow:hidden;background:#fff;transition:border-color .5s;">
+          <div style="padding:8px 14px;background:#f9fafb;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;gap:8px;">
+            <div style="width:7px;height:7px;border-radius:50%;background:#374151;flex:none;"></div>
+            <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#374151;">Input 1 — Patient Chart</span>
           </div>
-          <div style="position:relative;height:12px;background:var(--panel-2);border-radius:99px;overflow:hidden;border:1px solid var(--border);">
-            <div style="position:absolute;left:0;top:0;bottom:0;background:${totalMin>=20?'var(--accent)':'var(--ready)'};border-radius:99px;animation:sap-grow .8s ease-out forwards;"></div>
-          </div>
-          <div style="position:relative;height:20px;margin-top:4px;">
-            <div style="position:absolute;left:${t20}%;transform:translateX(-50%);font-size:10px;color:var(--text-3);">20 min</div>
-            ${barMax>40?`<div style="position:absolute;left:${t40}%;transform:translateX(-50%);font-size:10px;color:var(--text-3);">40 min</div>`:''}
-            ${barMax>60?`<div style="position:absolute;left:${t60}%;transform:translateX(-50%);font-size:10px;color:var(--text-3);">60 min</div>`:''}
+          <div style="padding:14px 16px;max-height:300px;overflow-y:auto;${scanning?'opacity:.45;':''}">
+            ${highlighted?chartHtmlHL:chartHtmlRaw}
           </div>
         </div>
 
-        <!-- Revenue cards -->
-        ${totalRev>0?`
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-          <div style="padding:18px;border-radius:14px;background:var(--good-soft);border:1px solid var(--good-soft);text-align:center;">
-            <div style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--good);margin-bottom:6px;">This Month</div>
-            <div style="font-size:28px;font-weight:900;color:var(--good);">$${totalRev.toFixed(2)}</div>
-          </div>
-          <div style="padding:18px;border-radius:14px;background:var(--panel-2);border:1px solid var(--border);text-align:center;">
-            <div style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);margin-bottom:6px;">Annual Projection</div>
-            <div style="font-size:28px;font-weight:900;color:var(--text);">$${annualProj}</div>
-          </div>
-        </div>`:''}
-
-        <!-- CPT codes -->
-        <div>
-          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);margin-bottom:10px;">Recommended CPT Codes</div>
-          <div style="border:1px solid var(--border);border-radius:14px;overflow:hidden;background:var(--panel);">${codeCards}</div>
-        </div>
-
-        <!-- Activity log -->
-        <div>
-          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);margin-bottom:8px;">Minutes Log</div>
-          <div style="border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--panel);">
-            ${p.activities.map(a=>`
-            <div style="display:flex;align-items:center;padding:10px 16px;border-bottom:1px solid var(--border);gap:10px;">
-              <div style="font-size:11px;color:var(--text-3);width:48px;flex:none;">${a.date}</div>
-              <div style="flex:1;font-size:12.5px;color:var(--text-2);">${a.desc.length>60?a.desc.slice(0,60)+'…':a.desc}</div>
-              <div style="font-size:13px;font-weight:700;color:var(--accent);flex:none;">${a.minutes} min</div>
-            </div>`).join('')}
-            <div style="display:flex;justify-content:space-between;padding:11px 16px;background:var(--panel-2);">
-              <span style="font-size:12px;font-weight:700;color:var(--text);">Total</span>
-              <span style="font-size:13px;font-weight:900;color:var(--accent);">${totalMin} min</span>
-            </div>
-          </div>
-        </div>
-
-        <button data-action="billing-assign" style="width:100%;padding:13px;border-radius:11px;background:var(--accent-2);color:#fff;font-size:14px;font-weight:700;cursor:pointer;">Assign</button>
+        <!-- Additional input cards -->
+        ${S.billingInputs.map((inp,i)=>mkInputCard(inp,i,highlighted)).join('')}
       </div>
+
+      <!-- Bottom bar -->
+      <div style="border-top:1.5px solid #e5e7eb;padding:10px 12px;background:#fff;flex:none;">
+        <div style="display:flex;gap:7px;align-items:flex-end;margin-bottom:8px;">
+          <textarea id="bill-prompt-input" placeholder="Type a note and click Add…" rows="2" style="flex:1;border:1.5px solid #e5e7eb;border-radius:9px;padding:8px 11px;font-size:12px;resize:none;background:#f9fafb;color:#111;font-family:inherit;outline:none;line-height:1.5;">${S.billingPrompt}</textarea>
+          <button data-action="billing-add-note" style="padding:8px 15px;border-radius:9px;background:#3b82f6;color:#fff;font-size:12px;font-weight:700;cursor:pointer;border:none;flex:none;">Add</button>
+        </div>
+        <div style="position:relative;">
+          <button data-action="billing-toggle-input-menu" style="display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;border:1.5px solid #e5e7eb;background:#f9fafb;color:#555;font-size:11.5px;font-weight:600;cursor:pointer;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add another input
+            <svg width="10" height="10" viewBox="0 0 12 12" fill="none" style="transform:rotate(${S.billingInputMenu?'180':'0'}deg);transition:transform .2s;"><path d="M2 4L6 8L10 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </button>
+          ${inputMenuHtml}
+        </div>
+      </div>
+    </div>`;
+
+  // ── Right panel builder ──
+  const rightPanel=(bodyContent,footerContent)=>`
+    <div style="display:flex;flex-direction:column;overflow:hidden;background:#fff;">
+      <div style="padding:12px 16px;border-bottom:1.5px solid #f0f0f0;background:#f9fafb;display:flex;align-items:center;gap:8px;flex:none;">
+        <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;">Output</span>
+        <span style="color:#e5e7eb;">·</span>
+        <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#374151;">CODES</span>
+      </div>
+      <div style="flex:1;overflow-y:auto;">${bodyContent}</div>
+      <div style="border-top:1.5px solid #f0f0f0;padding:14px 16px;background:#f9fafb;flex:none;">${footerContent}</div>
+    </div>`;
+
+  // ── Shared shell ──
+  const overlayShell=(leftContent,rightContent)=>`
+  <style>
+    @keyframes sap-spin{to{transform:rotate(360deg)}}
+    @keyframes sap-pulse{0%,100%{opacity:1}50%{opacity:.3}}
+    @keyframes bill-scan{0%{top:-5%}100%{top:105%}}
+    @keyframes bill-rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+    @keyframes hl-appear{from{background:transparent;color:inherit}to{background:rgba(80,180,40,.22);color:#1a6b10}}
+    @keyframes wave-bar{from{transform:scaleY(.4)}to{transform:scaleY(1)}}
+    @keyframes audio-progress{from{width:0}to{width:88%}}
+  </style>
+  <div id="billing-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:200;display:flex;align-items:center;justify-content:center;padding:24px;">
+    <div style="border-radius:22px;box-shadow:0 36px 120px rgba(0,0,0,.55);width:100%;max-width:1200px;height:87vh;display:grid;grid-template-columns:1fr 400px;overflow:hidden;border:1px solid #e5e7eb;">
+      ${leftContent}${rightContent}
     </div>
   </div>`;
+
+  // ── Match Codes button (shared footer element) ──
+  const matchBtn=(disabled)=>`<button data-action="${disabled?'stop':'billing-run'}" style="width:100%;padding:13px;border-radius:11px;background:${disabled?'#d1d5db':'#111'};color:#fff;font-size:14px;font-weight:700;cursor:${disabled?'default':'pointer'};border:none;letter-spacing:.01em;">${disabled?'Running…':'Match Codes'}</button>`;
+
+  // ── Phase: input ──
+  if(phase==='input'){
+    return overlayShell(
+      leftPanel(false,false),
+      rightPanel(
+        `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:14px;padding:32px;">
+          <div style="width:52px;height:52px;border-radius:14px;background:#f3f4f6;display:flex;align-items:center;justify-content:center;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:13px;font-weight:600;color:#d1d5db;margin-bottom:5px;">No results yet</div>
+            <div style="font-size:11.5px;color:#e5e7eb;line-height:1.6;">Add inputs on the left,<br>then click Match Codes</div>
+          </div>
+        </div>`,
+        matchBtn(false)
+      )
+    );
+  }
+
+  // ── Phase: running ──
+  if(phase==='running'){
+    return overlayShell(
+      leftPanel(true,false),
+      rightPanel(
+        `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:18px;padding:32px;">
+          <div style="position:relative;width:64px;height:64px;">
+            <div style="position:absolute;inset:0;border:2.5px solid #f3f4f6;border-radius:50%;"></div>
+            <div style="position:absolute;inset:0;border:2.5px solid transparent;border-top-color:rgba(34,139,24,.85);border-radius:50%;animation:sap-spin .7s linear infinite;"></div>
+            <div style="position:absolute;inset:11px;background:rgba(34,139,24,.07);border-radius:50%;display:flex;align-items:center;justify-content:center;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(34,139,24,.85)" stroke-width="2.2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+            </div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:14px;font-weight:700;color:#111;margin-bottom:6px;">Analyzing…</div>
+            <div style="font-size:11.5px;color:#9ca3af;line-height:1.7;animation:sap-pulse 1.5s ease infinite;">Cross-referencing ${totalMin} documented<br>minutes against CCM billing rules</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:5px;width:100%;max-width:180px;">
+            ${['CPT code lookup','Revenue projection','Activity audit'].map((s,i)=>`
+            <div style="display:flex;align-items:center;gap:8px;padding:7px 11px;border-radius:8px;background:#f9fafb;animation:sap-pulse 1.5s ease ${i*.28}s infinite;">
+              <div style="width:6px;height:6px;border-radius:50%;background:rgba(34,139,24,.55);flex:none;"></div>
+              <span style="font-size:11.5px;color:#6b7280;">${s}</span>
+            </div>`).join('')}
+          </div>
+        </div>`,
+        matchBtn(true)
+      )
+    );
+  }
+
+  // ── Phase: done ──
+  return overlayShell(
+    leftPanel(false,true),
+    rightPanel(
+      `<div style="padding:12px;display:flex;flex-direction:column;gap:8px;">${codeCards}</div>`,
+      `<div style="display:flex;align-items:center;gap:12px;">
+        <div style="flex:1;">
+          <div style="font-size:10px;color:#9ca3af;margin-bottom:2px;">Monthly Revenue</div>
+          <div style="font-size:20px;font-weight:900;color:#1a7a10;">$${totalRev.toFixed(2)}<span style="font-size:11px;font-weight:500;color:#bbb;margin-left:3px;">/ mo</span></div>
+        </div>
+        <button data-action="billing-assign" style="padding:10px 20px;border-radius:10px;background:#111;color:#fff;font-size:13px;font-weight:700;cursor:pointer;border:none;">Assign Codes</button>
+      </div>`
+    )
+  );
 }
 
 // ── Call Template Overlay ─────────────────────────────────────────────────
@@ -2923,6 +3190,8 @@ function bindInputs(){
   });
   const ftp=document.getElementById('ft-prompt-input');
   if(ftp) filterInput(ftp,v=>{S.ftCreatePrompt=v;});
+  const bp=document.getElementById('bill-prompt-input');
+  if(bp) filterInput(bp,v=>{S.billingPrompt=v;});
 }
 
 // ── Event delegation ──────────────────────────────────────────────────────
@@ -2954,11 +3223,35 @@ document.getElementById('app').addEventListener('click',e=>{
   if(act.startsWith('pt-provider:')){S.ptProvider=act.slice(12);render();return;}
   if(act.startsWith('pt-sort:')){S.ptSort=act.slice(8);render();return;}
   if(act==='billing-open'){
-    S.billingOpen=true;S.billingLoaded=false;render();
-    setTimeout(()=>{if(S.billingOpen){S.billingLoaded=true;render();}},2200);
+    S.billingOpen=true;S.billingPhase='input';S.billingPrompt='';render();
     return;
   }
-  if(act==='billing-close'){S.billingOpen=false;S.billingLoaded=false;render();return;}
+  if(act==='billing-run'){S.billingPhase='running';S.billingInputMenu=false;render();setTimeout(()=>{if(S.billingOpen){S.billingPhase='done';render();}},2000);return;}
+  if(act==='billing-close'){S.billingOpen=false;S.billingPhase='input';S.billingPrompt='';S.billingInputs=[];S.billingInputMenu=false;render();return;}
+  if(act==='billing-add-note'){
+    if(!S.billingPrompt.trim()) return;
+    S.billingInputs=[...S.billingInputs,{type:'note',label:'User Note',content:S.billingPrompt.trim()}];
+    S.billingPrompt='';render();return;
+  }
+  if(act==='billing-toggle-input-menu'){S.billingInputMenu=!S.billingInputMenu;render();return;}
+  if(act==='billing-add-transcript'){
+    const newId=Date.now();
+    S.billingInputs=[...S.billingInputs,{type:'audio-loading',label:'Visit Transcript',content:'',id:newId}];
+    S.billingInputMenu=false;render();
+    setTimeout(()=>{
+      const idx=S.billingInputs.findIndex(x=>x.id===newId);
+      if(idx>=0){S.billingInputs=S.billingInputs.map((x,i)=>i===idx?{...x,type:'transcript',content:VISIT_TRANSCRIPT}:x);render();}
+    },2600);
+    return;
+  }
+  if(act==='billing-add-referral'){
+    S.billingInputs=[...S.billingInputs,{type:'referral',label:'Referral Letter',content:REFERRAL_LETTER,id:Date.now()}];
+    S.billingInputMenu=false;render();return;
+  }
+  if(act.startsWith('billing-remove-input:')){
+    const idx=parseInt(act.slice(21));
+    S.billingInputs=S.billingInputs.filter((_,i)=>i!==idx);render();return;
+  }
   if(act==='billing-assign'){
     const p=PATIENTS.find(pt=>pt.id===S.patientId);
     if(p){
@@ -2973,7 +3266,7 @@ document.getElementById('app').addEventListener('click',e=>{
         date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'}),
       },...S.completedWork];
     }
-    S.billingOpen=false;S.billingLoaded=false;
+    S.billingOpen=false;S.billingPhase='input';S.billingPrompt='';S.billingInputs=[];S.billingInputMenu=false;
     showToast('Billing codes assigned');render();return;
   }
   if(act==='care-plan-open'){S.carePlanOpen=true;S.carePlanStep='select';S.selectedTemplate=null;render();return;}
@@ -3264,9 +3557,9 @@ document.addEventListener('click', e => {
     const overlay=document.getElementById('aw-overlay');
     if(overlay && e.target===overlay){S.addWfOpen=false;render();}
   }
-  if(S.billingOpen && S.billingLoaded){
+  if(S.billingOpen){
     const overlay=document.getElementById('billing-overlay');
-    if(overlay && e.target===overlay){S.billingOpen=false;S.billingLoaded=false;render();}
+    if(overlay && e.target===overlay){S.billingOpen=false;S.billingPhase='input';S.billingPrompt='';S.billingInputs=[];S.billingInputMenu=false;render();}
   }
   if(S.carePlanOpen){
     const overlay=document.getElementById('care-plan-overlay');
@@ -3289,7 +3582,7 @@ window.addEventListener('keydown',e=>{
     if(S.workItemView){S.workItemView=null;render();return;}
     if(S.ftCreateOpen){S.ftCreateOpen=false;render();return;}
     if(S.carePlanOpen){S.carePlanOpen=false;render();return;}
-    if(S.billingOpen){S.billingOpen=false;S.billingLoaded=false;render();return;}
+    if(S.billingOpen){S.billingOpen=false;S.billingPhase='input';S.billingPrompt='';S.billingInputs=[];S.billingInputMenu=false;render();return;}
     if(S.addWfOpen){S.addWfOpen=false;render();return;}
     if(S.addTmplOpen){S.addTmplOpen=false;render();return;}
     if(S.templateOpen){S.templateOpen=false;S.templateId=null;render();return;}
