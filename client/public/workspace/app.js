@@ -245,6 +245,7 @@ function renderSidebar(ma,isDark){
       ||(key==='patients'&&S.view==='patient'&&!S.workItem)
       ||(key==='followup'&&S.workItem==='followup'&&(S.view==='patients'||S.view==='patient'))
       ||(key==='careplan'&&S.workItem==='careplan'&&(S.view==='patients'||S.view==='patient'))
+      ||(key==='billing'&&S.workItem==='billing'&&(S.view==='patients'||S.view==='patient'))
       ||(key===S.capType&&S.view==='cap')
       ||(key==='mem-templates'&&S.view==='mem');
     return `background:${active?'var(--accent-soft)':'transparent'};color:${active?'var(--text)':'var(--text-2)'}`;
@@ -296,6 +297,10 @@ function renderSidebar(ma,isDark){
     <button class="nav-btn" data-action="work:careplan" style="display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:10px;font-size:13.5px;font-weight:600;${nb('careplan')};transition:background .15s;">
       <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 3v4h4"/><path d="M6 3h8l4 4v14H6z"/><path d="M9 12h6M9 16h4"/></svg>
       Care Plan
+    </button>
+    <button class="nav-btn" data-action="work:billing" style="display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:10px;font-size:13.5px;font-weight:600;${nb('billing')};transition:background .15s;">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h3"/></svg>
+      Billing Code
     </button>
   </div>
   <div style="display:flex;flex-direction:column;gap:3px;">
