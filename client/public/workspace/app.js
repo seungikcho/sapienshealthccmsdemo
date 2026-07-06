@@ -25,7 +25,7 @@ const S = {
   clinic: 'cypress', clinicDrop: false,
   ccmCareType: 'CCM', ccmSignOff: 'All', ccmInsurance: 'All', practicesOpen: false,
   carePlanOpen: false, billingOpen: false,
-  billingPhase: 'input', billingPrompt: '', billingInputs: [], billingInputMenu: false, billingReview: {},
+  billingPhase: 'input', billingPrompt: '', billingInputs: [], billingInputMenu: false, billingReview: {}, billingViewingId: null,
   carePlanStep: 'select', selectedTemplate: null, carePlanLoaded: false,
   ptStatus: 'all', ptSort: 'name', ptProvider: 'all',
   workItemView: null,
@@ -129,6 +129,7 @@ const TASKS = [];
 const PROGRESS = [];
 const DONE_SEED = [];
 const ACTIVITY = [];
+const CPT_RATES={'99490':62.71,'99439':47.34,'99487':132.93,'99489':68.02};
 const CAP_META = {
   lab:{title:'Lab panels',desc:'Sapiens builds priced lab panels from visit notes — review and sign off.',cta:'New panel'},
   referral:{title:'Referrals',desc:'Drafted referral letters with the right records already attached.',cta:'New referral'},
@@ -1832,25 +1833,37 @@ function renderPatient(){
             <span style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);">Work Items Done</span>
             <span style="font-size:11px;font-weight:700;color:var(--accent);background:var(--accent-soft);padding:2px 8px;border-radius:99px;">${done.length}</span>
           </div>
-          ${done.map(w=>`
+          ${done.map(w=>{
+            const isBilling=w.type==='billing';
+            const savedRv=w.savedReview||{};
+            const acceptedKeys=Object.entries(savedRv).filter(([,v])=>v==='accepted').map(([k])=>k);
+            const rejectedKeys=Object.entries(savedRv).filter(([,v])=>v==='rejected').map(([k])=>k);
+            const acceptedCPT=acceptedKeys.filter(k=>CPT_RATES[k]);
+            const acceptedICD=acceptedKeys.filter(k=>!CPT_RATES[k]);
+            const codeChips=isBilling?[
+              ...acceptedCPT.map(k=>`<span style="display:inline-block;padding:1px 6px;border-radius:4px;background:rgba(26,122,16,.1);border:1px solid rgba(26,122,16,.25);font-size:9.5px;font-weight:800;font-family:monospace;color:#1a7a10;margin-right:3px;">${k}</span>`),
+              acceptedICD.length?`<span style="display:inline-block;padding:1px 6px;border-radius:4px;background:rgba(29,78,216,.08);border:1px solid rgba(29,78,216,.2);font-size:9.5px;font-weight:700;color:#1d4ed8;margin-right:3px;">+${acceptedICD.length} ICD</span>`:'',
+            ].join(''):'';
+            return `
           <button data-action="wi-view:${w.id}" style="display:flex;align-items:flex-start;padding:12px 14px;border-bottom:1px solid var(--border);gap:10px;width:100%;text-align:left;cursor:pointer;background:transparent;transition:background .12s;" class="action-card">
-            <div style="width:30px;height:30px;border-radius:8px;background:${w.type==='billing'?'var(--good-soft)':'var(--accent-soft)'};display:flex;align-items:center;justify-content:center;flex:none;margin-top:1px;">
-              ${w.type==='billing'
+            <div style="width:30px;height:30px;border-radius:8px;background:${isBilling?'var(--good-soft)':'var(--accent-soft)'};display:flex;align-items:center;justify-content:center;flex:none;margin-top:1px;">
+              ${isBilling
                 ?`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--good)" stroke-width="2.3"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>`
                 :`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.3"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`}
             </div>
             <div style="flex:1;min-width:0;">
-              <div style="font-size:12.5px;font-weight:700;color:var(--text);margin-bottom:2px;">
-                ${w.type==='billing'?'Billing Code Match':w.templateTitle}
+              <div style="font-size:12.5px;font-weight:700;color:var(--text);margin-bottom:4px;">
+                ${isBilling?'Billing Code Match':w.templateTitle}
               </div>
-              <div style="font-size:11.5px;color:var(--text-3);">
-                ${w.type==='billing'?w.codes:'Call Template'}
-              </div>
-              ${w.type==='billing'&&w.revenue!=='—'?`<div style="font-size:12px;font-weight:700;color:var(--good);margin-top:3px;">${w.revenue}</div>`:''}
-              <div style="font-size:10.5px;color:var(--text-3);margin-top:3px;">${w.date}</div>
+              ${isBilling&&codeChips?`<div style="margin-bottom:4px;line-height:1.8;">${codeChips}</div>`:''}
+              ${!isBilling?`<div style="font-size:11.5px;color:var(--text-3);">Call Template</div>`:''}
+              ${isBilling&&w.revenue&&w.revenue!=='—'?`<div style="font-size:12px;font-weight:700;color:var(--good);">${w.revenue}<span style="font-size:10px;font-weight:500;color:var(--text-3);margin-left:3px;">/ mo</span></div>`:''}
+              ${isBilling?`<div style="font-size:9.5px;color:var(--text-3);margin-top:3px;">${acceptedKeys.length} accepted · ${rejectedKeys.length} rejected · ${w.date}</div>`
+              :`<div style="font-size:10.5px;color:var(--text-3);margin-top:3px;">${w.date}</div>`}
             </div>
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2" style="flex:none;margin-top:4px;"><path d="m9 18 6-6-6-6"/></svg>
-          </button>`).join('')}
+          </button>`;
+          }).join('')}
         </div>`;
         })()}
       </div>
@@ -2372,9 +2385,14 @@ function renderBillingMatchOverlay(){
           ${acceptedCPTRev>0?`<div style="font-size:10px;color:#9ca3af;margin-bottom:1px;">Accepted billing</div><div style="font-size:17px;font-weight:900;color:#1a7a10;">$${acceptedCPTRev.toFixed(2)}<span style="font-size:10px;font-weight:500;color:#bbb;margin-left:3px;">/ mo</span></div>`
           :`<div style="font-size:11px;color:#ccc;">Accept codes to see revenue</div>`}
         </div>
-        <button data-action="${acceptedCount>0?'billing-assign':'stop'}" style="padding:10px 18px;border-radius:10px;background:${acceptedCount>0?'#111':'#e5e7eb'};color:${acceptedCount>0?'#fff':'#bbb'};font-size:12.5px;font-weight:700;cursor:${acceptedCount>0?'pointer':'default'};border:none;white-space:nowrap;transition:background .25s;">
-          Assign${acceptedCount>0?` (${acceptedCount})`:''}
-        </button>
+        ${S.billingViewingId
+          ?`<div style="display:flex;align-items:center;gap:6px;padding:10px 14px;border-radius:10px;background:rgba(34,139,24,.08);border:1.5px solid rgba(34,139,24,.2);">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1a7a10" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span style="font-size:12px;font-weight:700;color:#1a7a10;">Assigned</span>
+            </div>`
+          :`<button data-action="${acceptedCount>0?'billing-assign':'stop'}" style="padding:10px 18px;border-radius:10px;background:${acceptedCount>0?'#111':'#e5e7eb'};color:${acceptedCount>0?'#fff':'#bbb'};font-size:12.5px;font-weight:700;cursor:${acceptedCount>0?'pointer':'default'};border:none;white-space:nowrap;transition:background .25s;">
+              Assign${acceptedCount>0?` (${acceptedCount})`:''}
+            </button>`}
       </div>
     </div>`;
   return overlayShell(
@@ -3346,7 +3364,7 @@ document.getElementById('app').addEventListener('click',e=>{
   if(act==='billing-run'){S.billingPhase='running';S.billingInputMenu=false;S.billingReview={};render();setTimeout(()=>{if(S.billingOpen){S.billingPhase='done';render();}},2000);return;}
   if(act.startsWith('billing-accept:')){const id=act.slice(15);S.billingReview={...S.billingReview,[id]:'accepted'};render();return;}
   if(act.startsWith('billing-reject:')){const id=act.slice(15);S.billingReview={...S.billingReview,[id]:'rejected'};render();return;}
-  if(act==='billing-close'){S.billingOpen=false;S.billingPhase='input';S.billingPrompt='';S.billingInputs=[];S.billingInputMenu=false;S.billingReview={};render();return;}
+  if(act==='billing-close'){S.billingOpen=false;S.billingPhase='input';S.billingPrompt='';S.billingInputs=[];S.billingInputMenu=false;S.billingReview={};S.billingViewingId=null;render();return;}
   if(act==='billing-add-note'){
     if(!S.billingPrompt.trim()) return;
     S.billingInputs=[...S.billingInputs,{type:'note',label:'User Note',content:S.billingPrompt.trim()}];
@@ -3374,18 +3392,24 @@ document.getElementById('app').addEventListener('click',e=>{
   if(act==='billing-assign'){
     const p=PATIENTS.find(pt=>pt.id===S.patientId);
     if(p){
-      const totalMin=p.activities.reduce((s,a)=>s+a.minutes,0);
-      const codes=[];
-      if(totalMin>=60){codes.push('99487');const add=Math.floor((totalMin-60)/30);for(let i=0;i<add;i++)codes.push('99489');}
-      else if(totalMin>=20){codes.push('99490');const add=Math.min(2,Math.floor((totalMin-20)/20));for(let i=0;i<add;i++)codes.push('99439');}
-      const rev=codes.includes('99487')?(132.93+(codes.filter(c=>c==='99489').length*68.02)):(codes.includes('99490')?(62.71+(codes.filter(c=>c==='99439').length*47.34)):0);
+      const accepted=Object.entries(S.billingReview).filter(([,v])=>v==='accepted').map(([k])=>k);
+      const acceptedCPT=accepted.filter(k=>CPT_RATES[k]);
+      const acceptedICD=accepted.filter(k=>!CPT_RATES[k]);
+      const cptRev=acceptedCPT.reduce((s,k)=>s+(CPT_RATES[k]||0),0);
+      const codesDisplay=acceptedCPT.length
+        ?acceptedCPT.join(' + ')+(acceptedICD.length?` + ${acceptedICD.length} ICD`:'')
+        :acceptedICD.length?`${acceptedICD.length} ICD codes`:'—';
       S.completedWork=[{
         id:Date.now(), type:'billing', patientId:p.id, patient:p.name, provider:p.provider,
-        codes:codes.join(' + ')||'—', revenue:rev>0?'$'+rev.toFixed(2):'—',
         date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'}),
+        codes:codesDisplay,
+        revenue:cptRev>0?'$'+cptRev.toFixed(2):'—',
+        savedReview:{...S.billingReview},
+        savedInputs:[...S.billingInputs],
+        savedPrompt:S.billingPrompt,
       },...S.completedWork];
     }
-    S.billingOpen=false;S.billingPhase='input';S.billingPrompt='';S.billingInputs=[];S.billingInputMenu=false;
+    S.billingOpen=false;S.billingPhase='input';S.billingPrompt='';S.billingInputs=[];S.billingInputMenu=false;S.billingReview={};S.billingViewingId=null;
     showToast('Billing codes assigned');render();return;
   }
   if(act==='care-plan-open'){S.carePlanOpen=true;S.carePlanStep='select';S.selectedTemplate=null;render();return;}
@@ -3439,8 +3463,18 @@ document.getElementById('app').addEventListener('click',e=>{
   if(act==='labwf-close'){S.labWf=false;S.labWfStep=0;render();return;}
   if(act.startsWith('wi-view:')){
     const id=parseInt(act.slice(8));
-    S.workItemView=S.completedWork.find(w=>w.id===id)||null;
-    render();return;
+    const w=S.completedWork.find(x=>x.id===id)||null;
+    if(!w){render();return;}
+    if(w.type==='billing'){
+      S.view='patient';S.patientId=w.patientId;
+      S.billingOpen=true;S.billingPhase='done';
+      S.billingReview=w.savedReview?{...w.savedReview}:{};
+      S.billingInputs=w.savedInputs?[...w.savedInputs]:[];
+      S.billingPrompt=w.savedPrompt||'';
+      S.billingInputMenu=false;S.billingViewingId=w.id;S.workItemView=null;
+      render();return;
+    }
+    S.workItemView=w;render();return;
   }
   if(act==='wi-view-close'){S.workItemView=null;render();return;}
   if(act.startsWith('ft-detail:')){S.ftDetailId=parseInt(act.slice(10));render();return;}
@@ -3678,7 +3712,7 @@ document.addEventListener('click', e => {
   }
   if(S.billingOpen){
     const overlay=document.getElementById('billing-overlay');
-    if(overlay && e.target===overlay){S.billingOpen=false;S.billingPhase='input';S.billingPrompt='';S.billingInputs=[];S.billingInputMenu=false;render();}
+    if(overlay && e.target===overlay){S.billingOpen=false;S.billingPhase='input';S.billingPrompt='';S.billingInputs=[];S.billingInputMenu=false;S.billingReview={};S.billingViewingId=null;render();}
   }
   if(S.carePlanOpen){
     const overlay=document.getElementById('care-plan-overlay');
@@ -3701,7 +3735,7 @@ window.addEventListener('keydown',e=>{
     if(S.workItemView){S.workItemView=null;render();return;}
     if(S.ftCreateOpen){S.ftCreateOpen=false;render();return;}
     if(S.carePlanOpen){S.carePlanOpen=false;render();return;}
-    if(S.billingOpen){S.billingOpen=false;S.billingPhase='input';S.billingPrompt='';S.billingInputs=[];S.billingInputMenu=false;render();return;}
+    if(S.billingOpen){S.billingOpen=false;S.billingPhase='input';S.billingPrompt='';S.billingInputs=[];S.billingInputMenu=false;S.billingReview={};S.billingViewingId=null;render();return;}
     if(S.addWfOpen){S.addWfOpen=false;render();return;}
     if(S.addTmplOpen){S.addTmplOpen=false;render();return;}
     if(S.templateOpen){S.templateOpen=false;S.templateId=null;render();return;}
