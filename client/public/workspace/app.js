@@ -25,7 +25,7 @@ const S = {
   clinic: 'cypress', clinicDrop: false,
   ccmCareType: 'CCM', ccmSignOff: 'All', ccmInsurance: 'All', practicesOpen: false,
   carePlanOpen: false, billingOpen: false,
-  billingPhase: 'input', billingPrompt: '', billingInputs: [], billingInputMenu: false,
+  billingPhase: 'input', billingPrompt: '', billingInputs: [], billingInputMenu: false, billingReview: {},
   carePlanStep: 'select', selectedTemplate: null, carePlanLoaded: false,
   ptStatus: 'all', ptSort: 'name', ptProvider: 'all',
   workItemView: null,
@@ -1933,21 +1933,21 @@ function renderBillingMatchOverlay(){
   }
   const totalRev=cptCodes.filter(c=>c.eligible).reduce((s,c)=>s+c.rate,0);
 
-  // ── ICD-10 map from condition keywords ──
+  // ── ICD-10 map from condition keywords (with HCC + annual risk value) ──
   const ICD_MAP=[
-    {k:'diabetes',code:'E11.9',desc:'Type 2 diabetes mellitus without complications',alts:['E11.65 — with hyperglycemia','E11.40 — with diabetic neuropathy']},
-    {k:'hypertension',code:'I10',desc:'Essential (primary) hypertension',alts:['I13.10 — Hypertensive heart and CKD']},
-    {k:'chronic kidney',code:'N18.3',desc:'Chronic kidney disease, stage 3',alts:['N18.4 — CKD stage 4']},
-    {k:'heart failure',code:'I50.20',desc:'Unspecified systolic heart failure (HFrEF)',alts:['I50.32 — Chronic systolic HF']},
-    {k:'atrial fibrillation',code:'I48.91',desc:'Unspecified atrial fibrillation',alts:['I48.11 — Longstanding persistent AFib']},
-    {k:'copd',code:'J44.1',desc:'COPD with acute exacerbation',alts:['J44.0 — COPD, acute lower resp infection']},
-    {k:'coronary artery',code:'I25.10',desc:'Atherosclerotic heart disease, native vessel',alts:['I25.110 — With unstable angina']},
-    {k:'peripheral artery',code:'I73.9',desc:'Peripheral vascular disease, unspecified',alts:['I70.209 — Atherosclerosis of native arteries']},
-    {k:'hyperlipidemia',code:'E78.5',desc:'Hyperlipidemia, unspecified',alts:['E78.00 — Pure hypercholesterolemia']},
-    {k:'hypothyroidism',code:'E03.9',desc:'Hypothyroidism, unspecified',alts:['E06.3 — Autoimmune thyroiditis']},
-    {k:'osteoporosis',code:'M81.0',desc:'Age-related osteoporosis without fracture',alts:['M80.00XA — with fracture']},
-    {k:'osteoarthritis',code:'M19.90',desc:'Primary osteoarthritis, unspecified site',alts:['M17.11 — Right knee OA']},
-    {k:'cognitive',code:'G31.84',desc:'Mild cognitive impairment, so stated',alts:['F06.70 — Neurocognitive disorder']},
+    {k:'diabetes',    code:'E11.9', desc:'Type 2 diabetes mellitus without complications',hcc:'HCC 19', val:1418,  alts:['E11.65 — with hyperglycemia','E11.40 — with diabetic neuropathy']},
+    {k:'hypertension',code:'I10',   desc:'Essential (primary) hypertension',              hcc:null,    val:null,  alts:['I13.10 — Hypertensive heart and CKD']},
+    {k:'chronic kidney',code:'N18.3',desc:'Chronic kidney disease, stage 3',             hcc:'HCC 137',val:2836, alts:['N18.4 — CKD stage 4','N18.32 — CKD stage 3b']},
+    {k:'heart failure',code:'I50.20',desc:'Unspecified systolic heart failure (HFrEF)',  hcc:'HCC 85', val:3922,  alts:['I50.32 — Chronic systolic HF','I50.9 — Unspecified HF']},
+    {k:'atrial fibrillation',code:'I48.91',desc:'Unspecified atrial fibrillation',       hcc:'HCC 96', val:3315,  alts:['I48.11 — Longstanding persistent AFib']},
+    {k:'copd',        code:'J44.1', desc:'COPD with (acute) exacerbation',               hcc:'HCC 111',val:3901,  alts:['J44.0 — COPD with acute lower resp. infection']},
+    {k:'coronary artery',code:'I25.10',desc:'Atherosclerotic heart disease, native vessel',hcc:'HCC 88',val:1753, alts:['I25.110 — With unstable angina']},
+    {k:'peripheral artery',code:'I73.9',desc:'Peripheral vascular disease, unspecified', hcc:'HCC 108',val:1607, alts:['I70.209 — Atherosclerosis of native arteries']},
+    {k:'hyperlipidemia',code:'E78.5',desc:'Hyperlipidemia, unspecified',                 hcc:null,    val:null,  alts:['E78.00 — Pure hypercholesterolemia']},
+    {k:'hypothyroidism',code:'E03.9',desc:'Hypothyroidism, unspecified',                 hcc:null,    val:null,  alts:['E06.3 — Autoimmune thyroiditis']},
+    {k:'osteoporosis',code:'M81.0', desc:'Age-related osteoporosis without fracture',    hcc:null,    val:null,  alts:['M80.00XA — with fracture']},
+    {k:'osteoarthritis',code:'M19.90',desc:'Primary osteoarthritis, unspecified site',  hcc:null,    val:null,  alts:['M17.11 — Right knee OA']},
+    {k:'cognitive',   code:'G31.84',desc:'Mild cognitive impairment, so stated',        hcc:'HCC 52', val:2204,  alts:['F06.70 — Neurocognitive disorder']},
   ];
   const icdChart=[];
   p.conditions.forEach(cond=>{
@@ -1960,18 +1960,19 @@ function renderBillingMatchOverlay(){
   // ── Codes from Visit Transcript (if added) ──
   const hasTranscript=S.billingInputs.some(x=>x.type==='transcript');
   const icdTranscript=hasTranscript?[
-    {code:'K59.1',desc:'Functional diarrhea',source:'Visit Transcript',evidence:['"I\'ve been getting some diarrhoea for the last two to three weeks — up to eight times a day"'],alts:['K58.0 — IBS with diarrhea','K57.30 — Diverticulosis']},
-    {code:'K92.1',desc:'Melena / rectal bleeding',source:'Visit Transcript',evidence:['"Yes — blood in stool. Is it difficult to flush? No."'],alts:['K62.5 — Hemorrhoidal disease','K63.5 — Polyp of colon']},
-    {code:'R63.4',desc:'Abnormal weight loss',source:'Visit Transcript',evidence:['"My trousers feel looser — I\'ve lost weight in the last few weeks"'],alts:['R64 — Cachexia']},
-    {code:'R10.9',desc:'Unspecified abdominal pain',source:'Visit Transcript',evidence:['"Crampy pain, mainly before going to the toilet, about 4/10"'],alts:['K58.9 — IBS without diarrhea']},
+    {code:'K59.1', desc:'Functional diarrhea',          hcc:null,      val:null, source:'Visit Transcript',evidence:['"Getting diarrhoea for two to three weeks — up to eight times a day"'],alts:['K58.0 — IBS with diarrhea','K57.30 — Diverticulosis']},
+    {code:'K92.1', desc:'Melena / rectal bleeding',     hcc:'HCC 188', val:960,  source:'Visit Transcript',evidence:['"Blood in stool — worrying me. Difficult to flush? No."'],alts:['K62.5 — Hemorrhoidal disease','K63.5 — Polyp of colon']},
+    {code:'R63.4', desc:'Abnormal weight loss',         hcc:null,      val:null, source:'Visit Transcript',evidence:['"My trousers feel looser — lost weight in the last few weeks"'],alts:['R64 — Cachexia']},
+    {code:'R10.9', desc:'Unspecified abdominal pain',   hcc:null,      val:null, source:'Visit Transcript',evidence:['"Crampy pain before toilet, eases afterwards — 4/10"'],alts:['K58.9 — IBS without diarrhea']},
   ]:[];
 
   // ── Codes from Referral Letter (if added) ──
   const hasReferral=S.billingInputs.some(x=>x.type==='referral');
   const icdReferral=hasReferral?[
-    {code:'M17.11',desc:'Primary osteoarthritis, right knee',source:'Referral Letter',evidence:['"Medial compartment joint space narrowing with osteophyte formation consistent with degenerative OA"'],alts:['M17.31 — Secondary OA, right knee']},
-    {code:'M25.361',desc:'Stiffness of right knee, NEC',source:'Referral Letter',evidence:['"Morning stiffness lasting 20–30 minutes, occasional swelling"'],alts:['M79.621 — Pain in right upper arm']},
-    {code:'M79.621',desc:'Pain in right thigh / functional limitation',source:'Referral Letter',evidence:['"Cannot walk more than 500 meters; antalgic gait observed"'],alts:['Z96.651 — Presence of right knee prosthesis']},
+    {code:'M17.11', desc:'Primary osteoarthritis, right knee', hcc:null,      val:null, source:'Referral Letter',evidence:['"Medial compartment joint space narrowing with osteophyte formation consistent with degenerative OA"'],alts:['M17.31 — Secondary OA, right knee']},
+    {code:'M25.361',desc:'Stiffness of right knee, NEC',       hcc:null,      val:null, source:'Referral Letter',evidence:['"Morning stiffness 20–30 minutes, occasional swelling"'],alts:['M25.369 — Stiffness of unspecified knee']},
+    {code:'R26.9',  desc:'Abnormal gait / functional limitation',hcc:null,    val:null, source:'Referral Letter',evidence:['"Antalgic gait observed; cannot walk >500 meters"'],alts:['R26.89 — Other abnormalities of gait']},
+    {code:'I10',    desc:'Essential hypertension (comorbidity)', hcc:null,     val:null, source:'Referral Letter',evidence:['"Past Medical History: Hypertension — Lisinopril 10 mg daily"'],alts:['I13.10 — Hypertensive heart and CKD']},
   ]:[];
 
   // ── Source colors ──
@@ -2082,12 +2083,49 @@ function renderBillingMatchOverlay(){
     </div>`;
   };
 
+  // ── Review state helpers ──
+  const rv=S.billingReview;
+  const reviewStatus=(id)=>rv[id]||'pending'; // 'pending'|'accepted'|'rejected'
+
+  // ── Accept/Reject action bar ──
+  const mkReviewBar=(id)=>{
+    const st=reviewStatus(id);
+    if(st==='accepted') return `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 13px;background:rgba(34,139,24,.05);border-top:1px solid rgba(34,139,24,.15);">
+        <div style="display:flex;align-items:center;gap:6px;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1a7a10" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          <span style="font-size:11px;font-weight:700;color:#1a7a10;">Accepted</span>
+        </div>
+        <button data-action="billing-reject:${id}" style="font-size:10.5px;color:#aaa;background:none;border:1px solid #e5e7eb;border-radius:6px;padding:3px 8px;cursor:pointer;">Undo</button>
+      </div>`;
+    if(st==='rejected') return `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 13px;background:#fafafa;border-top:1px solid #f0f0f0;">
+        <div style="display:flex;align-items:center;gap:6px;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          <span style="font-size:11px;font-weight:700;color:#dc2626;">Rejected</span>
+        </div>
+        <button data-action="billing-accept:${id}" style="font-size:10.5px;color:#aaa;background:none;border:1px solid #e5e7eb;border-radius:6px;padding:3px 8px;cursor:pointer;">Undo</button>
+      </div>`;
+    return `
+      <div style="display:flex;align-items:center;gap:6px;padding:8px 13px;border-top:1px solid #f5f5f5;background:#fafafa;">
+        <button data-action="billing-accept:${id}" style="flex:1;padding:6px;border-radius:7px;border:1.5px solid rgba(34,139,24,.35);background:rgba(34,139,24,.06);color:#1a7a10;font-size:11.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Accept
+        </button>
+        <button data-action="billing-reject:${id}" style="flex:1;padding:6px;border-radius:7px;border:1.5px solid rgba(220,38,38,.3);background:rgba(220,38,38,.05);color:#dc2626;font-size:11.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Reject
+        </button>
+      </div>`;
+  };
+
   // ── Code card renderers ──
   let cardIdx=0;
   const mkCPTCard=(c)=>{
     const i=cardIdx++;
-    return `<div style="border:1.5px solid ${c.eligible?'rgba(34,139,24,.3)':'#e5e7eb'};border-radius:11px;background:#fff;overflow:hidden;animation:bill-rise .28s ease ${i*.07}s both;">
-      <div style="display:flex;align-items:center;gap:9px;padding:10px 13px;${c.evidence.length?'border-bottom:1px solid #f5f5f5;':''}background:${c.eligible?'rgba(34,139,24,.03)':'#fafafa'};">
+    const id=c.cpt;
+    const st=reviewStatus(id);
+    const dim=st==='rejected';
+    return `<div style="border:1.5px solid ${st==='accepted'?'rgba(34,139,24,.4)':st==='rejected'?'#f0f0f0':c.eligible?'rgba(34,139,24,.25)':'#e5e7eb'};border-radius:11px;background:#fff;overflow:hidden;animation:bill-rise .28s ease ${i*.07}s both;opacity:${dim?.45:1};transition:opacity .25s,border-color .25s;">
+      <div style="display:flex;align-items:center;gap:9px;padding:10px 13px;border-bottom:1px solid #f5f5f5;background:${c.eligible?'rgba(34,139,24,.03)':'#fafafa'};">
         <div style="padding:3px 8px;border-radius:6px;background:${c.eligible?'rgba(34,139,24,.12)':'#f0f0f0'};border:1.5px solid ${c.eligible?'rgba(34,139,24,.35)':'#ddd'};">
           <span style="font-size:10.5px;font-weight:900;font-family:monospace;color:${c.eligible?'#1a7a10':'#999'};">${c.cpt}</span>
         </div>
@@ -2095,54 +2133,73 @@ function renderBillingMatchOverlay(){
           <div style="font-size:12px;font-weight:700;color:${c.eligible?'#111':'#999'};">${c.desc}</div>
           <div style="font-size:10.5px;color:#aaa;margin-top:1px;">${c.sub}</div>
         </div>
-        ${c.eligible?`<div style="font-size:15px;font-weight:900;color:#1a7a10;flex:none;white-space:nowrap;">$${c.rate.toFixed(2)}</div>`:`<div style="font-size:10px;color:#bbb;background:#f4f4f4;padding:3px 8px;border-radius:6px;">Not eligible</div>`}
+        ${c.eligible?`<div style="text-align:right;flex:none;"><div style="font-size:15px;font-weight:900;color:#1a7a10;">$${c.rate.toFixed(2)}</div><div style="font-size:9.5px;color:#bbb;">/ month</div></div>`:`<div style="font-size:10px;color:#bbb;background:#f4f4f4;padding:3px 8px;border-radius:6px;">Not eligible</div>`}
       </div>
-      ${c.evidence.length?`<div style="padding:8px 13px;${c.alts.length?'border-bottom:1px solid #f5f5f5;':''}">
-        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#bbb;margin-bottom:5px;">Evidence</div>
-        ${c.evidence.map(e=>`<div style="font-size:11px;color:#555;font-style:italic;padding:4px 9px;background:rgba(80,180,40,.06);border-radius:6px;border-left:2px solid rgba(34,139,24,.35);margin-bottom:3px;line-height:1.45;">${e}</div>`).join('')}
+      ${c.evidence.length?`<div style="padding:7px 13px;border-bottom:1px solid #f5f5f5;">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#ccc;margin-bottom:4px;">Evidence</div>
+        ${c.evidence.map(e=>`<div style="font-size:10.5px;color:#555;font-style:italic;padding:3px 9px;background:rgba(80,180,40,.05);border-radius:6px;border-left:2px solid rgba(34,139,24,.3);margin-bottom:3px;line-height:1.45;">${e}</div>`).join('')}
       </div>`:''}
-      ${c.alts.length?`<div style="padding:8px 13px;">
-        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#bbb;margin-bottom:5px;">Alternatives</div>
-        ${c.alts.map(a=>`<div style="padding:4px 9px;border-radius:6px;border:1px solid #eee;font-size:10.5px;color:#888;margin-bottom:3px;background:#fafafa;">${a}</div>`).join('')}
+      ${c.alts.length?`<div style="padding:7px 13px;border-bottom:1px solid #f5f5f5;">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#ccc;margin-bottom:4px;">Alternatives</div>
+        ${c.alts.map(a=>`<div style="padding:3px 9px;border-radius:6px;border:1px solid #eee;font-size:10.5px;color:#999;margin-bottom:3px;background:#fafafa;">${a}</div>`).join('')}
       </div>`:''}
+      ${c.eligible?mkReviewBar(id):''}
     </div>`;
   };
+
   const mkICDCard=(c)=>{
     const i=cardIdx++;
+    const id=c.code+(c.source||'');
+    const st=reviewStatus(id);
+    const dim=st==='rejected';
     const sc=srcColor[c.source]||srcColor['Patient Chart'];
-    return `<div style="border:1.5px solid ${sc.border};border-radius:11px;background:#fff;overflow:hidden;animation:bill-rise .28s ease ${i*.07}s both;">
-      <div style="display:flex;align-items:center;gap:9px;padding:10px 13px;${c.evidence.length?'border-bottom:1px solid #f5f5f5;':''}background:${sc.bg};">
+    return `<div style="border:1.5px solid ${st==='accepted'?'rgba(34,139,24,.4)':st==='rejected'?'#f0f0f0':sc.border};border-radius:11px;background:#fff;overflow:hidden;animation:bill-rise .28s ease ${i*.07}s both;opacity:${dim?.45:1};transition:opacity .25s,border-color .25s;">
+      <div style="display:flex;align-items:center;gap:9px;padding:10px 13px;border-bottom:1px solid #f5f5f5;background:${sc.bg};">
         <div style="padding:3px 8px;border-radius:6px;background:${sc.bg};border:1.5px solid ${sc.border};">
           <span style="font-size:10.5px;font-weight:900;font-family:monospace;color:${sc.badge};">${c.code}</span>
         </div>
         <div style="flex:1;min-width:0;">
           <div style="font-size:12px;font-weight:700;color:#111;">${c.desc}</div>
+          ${c.hcc?`<div style="font-size:10px;color:${sc.text};margin-top:2px;">${c.hcc} · Risk adjustment</div>`:''}
         </div>
-        <span style="font-size:9.5px;font-weight:700;color:${sc.text};background:${sc.bg};border:1px solid ${sc.border};border-radius:99px;padding:2px 8px;white-space:nowrap;flex:none;">${c.source}</span>
+        ${c.val?`<div style="text-align:right;flex:none;"><div style="font-size:14px;font-weight:800;color:${sc.badge};">$${c.val.toLocaleString()}</div><div style="font-size:9.5px;color:#bbb;">/ yr RAF</div></div>`:''}
       </div>
-      ${c.evidence.length?`<div style="padding:8px 13px;${c.alts&&c.alts.length?'border-bottom:1px solid #f5f5f5;':''}">
-        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#bbb;margin-bottom:5px;">Evidence</div>
-        ${c.evidence.map(e=>`<div style="font-size:11px;color:#555;font-style:italic;padding:4px 9px;background:${sc.bg};border-radius:6px;border-left:2px solid ${sc.border};margin-bottom:3px;line-height:1.45;">${e}</div>`).join('')}
+      ${c.evidence.length?`<div style="padding:7px 13px;border-bottom:1px solid #f5f5f5;">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#ccc;margin-bottom:4px;">Evidence</div>
+        ${c.evidence.map(e=>`<div style="font-size:10.5px;color:#555;font-style:italic;padding:3px 9px;background:${sc.bg};border-radius:6px;border-left:2px solid ${sc.border};margin-bottom:3px;line-height:1.45;">${e}</div>`).join('')}
       </div>`:''}
-      ${c.alts&&c.alts.length?`<div style="padding:8px 13px;">
-        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#bbb;margin-bottom:5px;">Alternatives</div>
-        ${c.alts.map(a=>`<div style="padding:4px 9px;border-radius:6px;border:1px solid #eee;font-size:10.5px;color:#888;margin-bottom:3px;background:#fafafa;">${a}</div>`).join('')}
+      ${c.alts&&c.alts.length?`<div style="padding:7px 13px;border-bottom:1px solid #f5f5f5;">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#ccc;margin-bottom:4px;">Alternatives</div>
+        ${c.alts.map(a=>`<div style="padding:3px 9px;border-radius:6px;border:1px solid #eee;font-size:10.5px;color:#999;margin-bottom:3px;background:#fafafa;">${a}</div>`).join('')}
       </div>`:''}
+      ${mkReviewBar(id)}
     </div>`;
   };
 
   const mkSection=(label,cards,color='#9ca3af')=>cards.length?`
-    <div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:${color};padding:4px 2px 6px;display:flex;align-items:center;gap:8px;">
+    <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:${color};padding:4px 2px 6px;display:flex;align-items:center;gap:8px;">
       ${label}
-      <span style="font-size:9px;font-weight:700;color:#fff;background:${color};border-radius:99px;padding:1px 7px;">${cards.length}</span>
+      <span style="font-size:8.5px;font-weight:700;color:#fff;background:${color};border-radius:99px;padding:1px 6px;">${cards.length}</span>
     </div>
     ${cards}`:'';
 
+  // Compute accepted summary for footer
+  const allCodeItems=[
+    ...cptCodes.filter(c=>c.eligible).map(c=>({id:c.cpt,label:c.cpt,val:c.rate,unit:'mo',isCPT:true})),
+    ...icdChart.map(c=>({id:c.code+'Patient Chart',label:c.code,val:c.val,unit:'yr RAF',isCPT:false})),
+    ...icdTranscript.map(c=>({id:c.code+'Visit Transcript',label:c.code,val:c.val,unit:'yr RAF',isCPT:false})),
+    ...icdReferral.map(c=>({id:c.code+'Referral Letter',label:c.code,val:c.val,unit:'yr RAF',isCPT:false})),
+  ];
+  const acceptedCount=allCodeItems.filter(x=>reviewStatus(x.id)==='accepted').length;
+  const rejectedCount=allCodeItems.filter(x=>reviewStatus(x.id)==='rejected').length;
+  const pendingCount=allCodeItems.length-acceptedCount-rejectedCount;
+  const acceptedCPTRev=cptCodes.filter(c=>c.eligible&&reviewStatus(c.cpt)==='accepted').reduce((s,c)=>s+c.rate,0);
+
   const codeCards=`
     ${mkSection('Billing Codes (CPT)',cptCodes.map(mkCPTCard).join(''),'#1a7a10')}
-    ${icdChart.length?`<div style="margin-top:6px;">${mkSection('Diagnosis Codes — Patient Chart',icdChart.map(mkICDCard).join(''),'#1d4ed8')}</div>`:''}
-    ${icdTranscript.length?`<div style="margin-top:6px;">${mkSection('Diagnosis Codes — Visit Transcript',icdTranscript.map(mkICDCard).join(''),'#7c3aed')}</div>`:''}
-    ${icdReferral.length?`<div style="margin-top:6px;">${mkSection('Diagnosis Codes — Referral Letter',icdReferral.map(mkICDCard).join(''),'#d97706')}</div>`:''}
+    ${icdChart.length?`<div style="margin-top:8px;">${mkSection('Diagnosis — Patient Chart',icdChart.map(mkICDCard).join(''),'#1d4ed8')}</div>`:''}
+    ${icdTranscript.length?`<div style="margin-top:8px;">${mkSection('Diagnosis — Visit Transcript',icdTranscript.map(mkICDCard).join(''),'#7c3aed')}</div>`:''}
+    ${icdReferral.length?`<div style="margin-top:8px;">${mkSection('Diagnosis — Referral Letter',icdReferral.map(mkICDCard).join(''),'#d97706')}</div>`:''}
   `;
 
   // ── "Add another input" dropdown menu ──
@@ -2311,17 +2368,36 @@ function renderBillingMatchOverlay(){
   }
 
   // ── Phase: done ──
+  const doneFooter=`
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <!-- Review progress bar -->
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+          <span style="font-size:10.5px;font-weight:600;color:#6b7280;">Review progress</span>
+          <span style="font-size:10.5px;color:#9ca3af;">${acceptedCount} accepted · ${rejectedCount} rejected · ${pendingCount} pending</span>
+        </div>
+        <div style="height:5px;background:#f0f0f0;border-radius:99px;overflow:hidden;display:flex;gap:1px;">
+          <div style="flex:${acceptedCount};background:#1a7a10;border-radius:99px;transition:flex .3s;"></div>
+          <div style="flex:${rejectedCount};background:#dc2626;border-radius:99px;transition:flex .3s;"></div>
+          <div style="flex:${pendingCount};background:#f0f0f0;"></div>
+        </div>
+      </div>
+      <!-- Revenue + Assign row -->
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="flex:1;">
+          ${acceptedCPTRev>0?`<div style="font-size:10px;color:#9ca3af;margin-bottom:1px;">Accepted billing</div><div style="font-size:17px;font-weight:900;color:#1a7a10;">$${acceptedCPTRev.toFixed(2)}<span style="font-size:10px;font-weight:500;color:#bbb;margin-left:3px;">/ mo</span></div>`
+          :`<div style="font-size:11px;color:#ccc;">Accept codes to see revenue</div>`}
+        </div>
+        <button data-action="${acceptedCount>0?'billing-assign':'stop'}" style="padding:10px 18px;border-radius:10px;background:${acceptedCount>0?'#111':'#e5e7eb'};color:${acceptedCount>0?'#fff':'#bbb'};font-size:12.5px;font-weight:700;cursor:${acceptedCount>0?'pointer':'default'};border:none;white-space:nowrap;transition:background .25s;">
+          Assign${acceptedCount>0?` (${acceptedCount})`:''}
+        </button>
+      </div>
+    </div>`;
   return overlayShell(
     leftPanel(false,true),
     rightPanel(
       `<div style="padding:12px;display:flex;flex-direction:column;gap:8px;">${codeCards}</div>`,
-      `<div style="display:flex;align-items:center;gap:12px;">
-        <div style="flex:1;">
-          <div style="font-size:10px;color:#9ca3af;margin-bottom:2px;">Monthly Revenue</div>
-          <div style="font-size:20px;font-weight:900;color:#1a7a10;">$${totalRev.toFixed(2)}<span style="font-size:11px;font-weight:500;color:#bbb;margin-left:3px;">/ mo</span></div>
-        </div>
-        <button data-action="billing-assign" style="padding:10px 20px;border-radius:10px;background:#111;color:#fff;font-size:13px;font-weight:700;cursor:pointer;border:none;">Assign Codes</button>
-      </div>`
+      doneFooter
     )
   );
 }
@@ -3283,8 +3359,10 @@ document.getElementById('app').addEventListener('click',e=>{
     S.billingOpen=true;S.billingPhase='input';S.billingPrompt='';render();
     return;
   }
-  if(act==='billing-run'){S.billingPhase='running';S.billingInputMenu=false;render();setTimeout(()=>{if(S.billingOpen){S.billingPhase='done';render();}},2000);return;}
-  if(act==='billing-close'){S.billingOpen=false;S.billingPhase='input';S.billingPrompt='';S.billingInputs=[];S.billingInputMenu=false;render();return;}
+  if(act==='billing-run'){S.billingPhase='running';S.billingInputMenu=false;S.billingReview={};render();setTimeout(()=>{if(S.billingOpen){S.billingPhase='done';render();}},2000);return;}
+  if(act.startsWith('billing-accept:')){const id=act.slice(15);S.billingReview={...S.billingReview,[id]:'accepted'};render();return;}
+  if(act.startsWith('billing-reject:')){const id=act.slice(15);S.billingReview={...S.billingReview,[id]:'rejected'};render();return;}
+  if(act==='billing-close'){S.billingOpen=false;S.billingPhase='input';S.billingPrompt='';S.billingInputs=[];S.billingInputMenu=false;S.billingReview={};render();return;}
   if(act==='billing-add-note'){
     if(!S.billingPrompt.trim()) return;
     S.billingInputs=[...S.billingInputs,{type:'note',label:'User Note',content:S.billingPrompt.trim()}];
