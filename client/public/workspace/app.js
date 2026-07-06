@@ -2085,121 +2085,105 @@ function renderBillingMatchOverlay(){
 
   // ── Review state helpers ──
   const rv=S.billingReview;
-  const reviewStatus=(id)=>rv[id]||'pending'; // 'pending'|'accepted'|'rejected'
+  const reviewStatus=(id)=>rv[id]||'pending';
 
-  // ── Accept/Reject action bar ──
-  const mkReviewBar=(id)=>{
-    const st=reviewStatus(id);
-    if(st==='accepted') return `
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 13px;background:rgba(34,139,24,.05);border-top:1px solid rgba(34,139,24,.15);">
-        <div style="display:flex;align-items:center;gap:6px;">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1a7a10" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-          <span style="font-size:11px;font-weight:700;color:#1a7a10;">Accepted</span>
-        </div>
-        <button data-action="billing-reject:${id}" style="font-size:10.5px;color:#aaa;background:none;border:1px solid #e5e7eb;border-radius:6px;padding:3px 8px;cursor:pointer;">Undo</button>
-      </div>`;
-    if(st==='rejected') return `
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 13px;background:#fafafa;border-top:1px solid #f0f0f0;">
-        <div style="display:flex;align-items:center;gap:6px;">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-          <span style="font-size:11px;font-weight:700;color:#dc2626;">Rejected</span>
-        </div>
-        <button data-action="billing-accept:${id}" style="font-size:10.5px;color:#aaa;background:none;border:1px solid #e5e7eb;border-radius:6px;padding:3px 8px;cursor:pointer;">Undo</button>
-      </div>`;
-    return `
-      <div style="display:flex;align-items:center;gap:6px;padding:8px 13px;border-top:1px solid #f5f5f5;background:#fafafa;">
-        <button data-action="billing-accept:${id}" style="flex:1;padding:6px;border-radius:7px;border:1.5px solid rgba(34,139,24,.35);background:rgba(34,139,24,.06);color:#1a7a10;font-size:11.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Accept
-        </button>
-        <button data-action="billing-reject:${id}" style="flex:1;padding:6px;border-radius:7px;border:1.5px solid rgba(220,38,38,.3);background:rgba(220,38,38,.05);color:#dc2626;font-size:11.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Reject
-        </button>
-      </div>`;
-  };
-
-  // ── Code card renderers ──
-  let cardIdx=0;
-  const mkCPTCard=(c)=>{
-    const i=cardIdx++;
-    const id=c.cpt;
-    const st=reviewStatus(id);
-    const dim=st==='rejected';
-    return `<div style="border:1.5px solid ${st==='accepted'?'rgba(34,139,24,.4)':st==='rejected'?'#f0f0f0':c.eligible?'rgba(34,139,24,.25)':'#e5e7eb'};border-radius:11px;background:#fff;overflow:hidden;animation:bill-rise .28s ease ${i*.07}s both;opacity:${dim?.45:1};transition:opacity .25s,border-color .25s;">
-      <div style="display:flex;align-items:center;gap:9px;padding:10px 13px;border-bottom:1px solid #f5f5f5;background:${c.eligible?'rgba(34,139,24,.03)':'#fafafa'};">
-        <div style="padding:3px 8px;border-radius:6px;background:${c.eligible?'rgba(34,139,24,.12)':'#f0f0f0'};border:1.5px solid ${c.eligible?'rgba(34,139,24,.35)':'#ddd'};">
-          <span style="font-size:10.5px;font-weight:900;font-family:monospace;color:${c.eligible?'#1a7a10':'#999'};">${c.cpt}</span>
-        </div>
-        <div style="flex:1;min-width:0;">
-          <div style="font-size:12px;font-weight:700;color:${c.eligible?'#111':'#999'};">${c.desc}</div>
-          <div style="font-size:10.5px;color:#aaa;margin-top:1px;">${c.sub}</div>
-        </div>
-        ${c.eligible?`<div style="text-align:right;flex:none;"><div style="font-size:15px;font-weight:900;color:#1a7a10;">$${c.rate.toFixed(2)}</div><div style="font-size:9.5px;color:#bbb;">/ month</div></div>`:`<div style="font-size:10px;color:#bbb;background:#f4f4f4;padding:3px 8px;border-radius:6px;">Not eligible</div>`}
-      </div>
-      ${c.evidence.length?`<div style="padding:7px 13px;border-bottom:1px solid #f5f5f5;">
-        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#ccc;margin-bottom:4px;">Evidence</div>
-        ${c.evidence.map(e=>`<div style="font-size:10.5px;color:#555;font-style:italic;padding:3px 9px;background:rgba(80,180,40,.05);border-radius:6px;border-left:2px solid rgba(34,139,24,.3);margin-bottom:3px;line-height:1.45;">${e}</div>`).join('')}
-      </div>`:''}
-      ${c.alts.length?`<div style="padding:7px 13px;border-bottom:1px solid #f5f5f5;">
-        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#ccc;margin-bottom:4px;">Alternatives</div>
-        ${c.alts.map(a=>`<div style="padding:3px 9px;border-radius:6px;border:1px solid #eee;font-size:10.5px;color:#999;margin-bottom:3px;background:#fafafa;">${a}</div>`).join('')}
-      </div>`:''}
-      ${c.eligible?mkReviewBar(id):''}
-    </div>`;
-  };
-
-  const mkICDCard=(c)=>{
-    const i=cardIdx++;
-    const id=c.code+(c.source||'');
-    const st=reviewStatus(id);
-    const dim=st==='rejected';
-    const sc=srcColor[c.source]||srcColor['Patient Chart'];
-    return `<div style="border:1.5px solid ${st==='accepted'?'rgba(34,139,24,.4)':st==='rejected'?'#f0f0f0':sc.border};border-radius:11px;background:#fff;overflow:hidden;animation:bill-rise .28s ease ${i*.07}s both;opacity:${dim?.45:1};transition:opacity .25s,border-color .25s;">
-      <div style="display:flex;align-items:center;gap:9px;padding:10px 13px;border-bottom:1px solid #f5f5f5;background:${sc.bg};">
-        <div style="padding:3px 8px;border-radius:6px;background:${sc.bg};border:1.5px solid ${sc.border};">
-          <span style="font-size:10.5px;font-weight:900;font-family:monospace;color:${sc.badge};">${c.code}</span>
-        </div>
-        <div style="flex:1;min-width:0;">
-          <div style="font-size:12px;font-weight:700;color:#111;">${c.desc}</div>
-          ${c.hcc?`<div style="font-size:10px;color:${sc.text};margin-top:2px;">${c.hcc} · Risk adjustment</div>`:''}
-        </div>
-        ${c.val?`<div style="text-align:right;flex:none;"><div style="font-size:14px;font-weight:800;color:${sc.badge};">$${c.val.toLocaleString()}</div><div style="font-size:9.5px;color:#bbb;">/ yr RAF</div></div>`:''}
-      </div>
-      ${c.evidence.length?`<div style="padding:7px 13px;border-bottom:1px solid #f5f5f5;">
-        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#ccc;margin-bottom:4px;">Evidence</div>
-        ${c.evidence.map(e=>`<div style="font-size:10.5px;color:#555;font-style:italic;padding:3px 9px;background:${sc.bg};border-radius:6px;border-left:2px solid ${sc.border};margin-bottom:3px;line-height:1.45;">${e}</div>`).join('')}
-      </div>`:''}
-      ${c.alts&&c.alts.length?`<div style="padding:7px 13px;border-bottom:1px solid #f5f5f5;">
-        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#ccc;margin-bottom:4px;">Alternatives</div>
-        ${c.alts.map(a=>`<div style="padding:3px 9px;border-radius:6px;border:1px solid #eee;font-size:10.5px;color:#999;margin-bottom:3px;background:#fafafa;">${a}</div>`).join('')}
-      </div>`:''}
-      ${mkReviewBar(id)}
-    </div>`;
-  };
-
-  const mkSection=(label,cards,color='#9ca3af')=>cards.length?`
-    <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:${color};padding:4px 2px 6px;display:flex;align-items:center;gap:8px;">
-      ${label}
-      <span style="font-size:8.5px;font-weight:700;color:#fff;background:${color};border-radius:99px;padding:1px 6px;">${cards.length}</span>
-    </div>
-    ${cards}`:'';
-
-  // Compute accepted summary for footer
-  const allCodeItems=[
-    ...cptCodes.filter(c=>c.eligible).map(c=>({id:c.cpt,label:c.cpt,val:c.rate,unit:'mo',isCPT:true})),
-    ...icdChart.map(c=>({id:c.code+'Patient Chart',label:c.code,val:c.val,unit:'yr RAF',isCPT:false})),
-    ...icdTranscript.map(c=>({id:c.code+'Visit Transcript',label:c.code,val:c.val,unit:'yr RAF',isCPT:false})),
-    ...icdReferral.map(c=>({id:c.code+'Referral Letter',label:c.code,val:c.val,unit:'yr RAF',isCPT:false})),
+  // ── Flatten all reviewable codes in order ──
+  const allFlat=[
+    ...cptCodes.filter(c=>c.eligible).map(c=>({kind:'cpt',id:c.cpt,data:c})),
+    ...icdChart.map(c=>({kind:'icd',id:c.code+'Patient Chart',data:{...c,source:'Patient Chart'}})),
+    ...icdTranscript.map(c=>({kind:'icd',id:c.code+'Visit Transcript',data:{...c,source:'Visit Transcript'}})),
+    ...icdReferral.map(c=>({kind:'icd',id:c.code+'Referral Letter',data:{...c,source:'Referral Letter'}})),
   ];
-  const acceptedCount=allCodeItems.filter(x=>reviewStatus(x.id)==='accepted').length;
-  const rejectedCount=allCodeItems.filter(x=>reviewStatus(x.id)==='rejected').length;
-  const pendingCount=allCodeItems.length-acceptedCount-rejectedCount;
+  const pendingItems=allFlat.filter(x=>reviewStatus(x.id)==='pending');
+  const decidedItems=allFlat.filter(x=>reviewStatus(x.id)!=='pending');
+  const acceptedCount=decidedItems.filter(x=>reviewStatus(x.id)==='accepted').length;
+  const rejectedCount=decidedItems.filter(x=>reviewStatus(x.id)==='rejected').length;
+  const pendingCount=pendingItems.length;
   const acceptedCPTRev=cptCodes.filter(c=>c.eligible&&reviewStatus(c.cpt)==='accepted').reduce((s,c)=>s+c.rate,0);
 
+  // ── Source color lookup ──
+  const getSC=(source)=>srcColor[source]||srcColor['Patient Chart'];
+
+  // ── Full pending card (large, with evidence + accept/reject buttons) ──
+  const mkPendingCard=(item,animIdx)=>{
+    const {id,kind,data}=item;
+    const isCPT=kind==='cpt';
+    const sc=isCPT?{bg:'rgba(34,139,24,.04)',border:'rgba(34,139,24,.25)',badge:'#1a7a10',text:'#1a7a10'}:getSC(data.source);
+    const codeLabel=isCPT?data.cpt:data.code;
+    const desc=data.desc;
+    const sub=isCPT?data.sub:(data.hcc?`${data.hcc} · Risk adjustment`:data.source);
+    const valEl=isCPT?`<div style="text-align:right;flex:none;"><div style="font-size:15px;font-weight:800;color:#1a7a10;">$${data.rate.toFixed(2)}</div><div style="font-size:9px;color:#bbb;">/ mo</div></div>`
+      :data.val?`<div style="text-align:right;flex:none;"><div style="font-size:14px;font-weight:800;color:${sc.badge};">$${data.val.toLocaleString()}</div><div style="font-size:9px;color:#bbb;">/ yr RAF</div></div>`:'';
+    const ev=(data.evidence||[]).map(e=>`<div style="font-size:10.5px;color:#555;font-style:italic;padding:3px 9px;background:${sc.bg};border-radius:6px;border-left:2px solid ${sc.border};margin-bottom:3px;line-height:1.45;">${e}</div>`).join('');
+    const altsHtml=(data.alts||[]).map(a=>`<div style="padding:3px 9px;border-radius:5px;border:1px solid #eee;font-size:10.5px;color:#999;margin-bottom:3px;">${a}</div>`).join('');
+    return `<div style="border:1.5px solid ${sc.border};border-radius:12px;background:#fff;overflow:hidden;animation:bill-rise .22s ease ${animIdx*.06}s both;box-shadow:0 2px 10px rgba(0,0,0,.06);">
+      <div style="display:flex;align-items:center;gap:9px;padding:11px 14px;border-bottom:1px solid #f5f5f5;background:${sc.bg};">
+        <div style="padding:3px 8px;border-radius:6px;background:${sc.bg};border:1.5px solid ${sc.border};flex:none;">
+          <span style="font-size:10.5px;font-weight:900;font-family:monospace;color:${sc.badge};">${codeLabel}</span>
+        </div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:12.5px;font-weight:700;color:#111;">${desc}</div>
+          <div style="font-size:10px;color:#aaa;margin-top:1px;">${sub}</div>
+        </div>
+        ${valEl}
+      </div>
+      ${ev?`<div style="padding:7px 14px;border-bottom:1px solid #f5f5f5;">
+        <div style="font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#ccc;margin-bottom:4px;">Evidence</div>${ev}
+      </div>`:''}
+      ${altsHtml?`<div style="padding:7px 14px;border-bottom:1px solid #f5f5f5;">
+        <div style="font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#ccc;margin-bottom:4px;">Alternatives</div>${altsHtml}
+      </div>`:''}
+      <div style="display:flex;gap:6px;padding:9px 14px;background:#fafafa;">
+        <button data-action="billing-accept:${id}" style="flex:1;padding:7px;border-radius:8px;border:1.5px solid rgba(34,139,24,.35);background:rgba(34,139,24,.06);color:#1a7a10;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Accept
+        </button>
+        <button data-action="billing-reject:${id}" style="flex:1;padding:7px;border-radius:8px;border:1.5px solid rgba(220,38,38,.28);background:rgba(220,38,38,.04);color:#dc2626;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Reject
+        </button>
+      </div>
+    </div>`;
+  };
+
+  // ── Compact decided row (accepted or rejected) ──
+  const mkDecidedRow=(item,animIdx)=>{
+    const {id,kind,data}=item;
+    const accepted=reviewStatus(id)==='accepted';
+    const isCPT=kind==='cpt';
+    const sc=isCPT?{bg:'rgba(34,139,24,.06)',border:'rgba(34,139,24,.2)',badge:'#1a7a10'}:getSC(data.source);
+    const codeLabel=isCPT?data.cpt:data.code;
+    const valStr=accepted?(isCPT?`$${data.rate.toFixed(2)}/mo`:data.val?`$${data.val.toLocaleString()}/yr`:''):'';
+    return `<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:9px;background:${accepted?'rgba(34,139,24,.03)':'#fafafa'};border:1px solid ${accepted?'rgba(34,139,24,.18)':'#f0f0f0'};animation:bill-rise .18s ease ${animIdx*.04}s both;">
+      <div style="padding:2px 7px;border-radius:5px;background:${accepted?sc.bg:'#f4f4f4'};border:1.5px solid ${accepted?sc.border:'#eee'};flex:none;">
+        <span style="font-size:10px;font-weight:900;font-family:monospace;color:${accepted?sc.badge:'#bbb'};">${codeLabel}</span>
+      </div>
+      <span style="flex:1;font-size:11.5px;color:${accepted?'#333':'#aaa'};font-weight:500;text-decoration:${accepted?'none':'line-through'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${data.desc}</span>
+      ${valStr?`<span style="font-size:11px;font-weight:700;color:${isCPT?'#1a7a10':sc.badge};flex:none;">${valStr}</span>`:''}
+      <div style="display:flex;align-items:center;gap:5px;flex:none;">
+        <span style="font-size:11px;font-weight:700;color:${accepted?'#1a7a10':'#dc2626'};">${accepted?'✓':'✗'}</span>
+        <button data-action="${accepted?'billing-reject':'billing-accept'}:${id}" style="font-size:10px;color:#bbb;background:none;border:1px solid #e5e7eb;border-radius:5px;padding:2px 7px;cursor:pointer;">Undo</button>
+      </div>
+    </div>`;
+  };
+
   const codeCards=`
-    ${mkSection('Billing Codes (CPT)',cptCodes.map(mkCPTCard).join(''),'#1a7a10')}
-    ${icdChart.length?`<div style="margin-top:8px;">${mkSection('Diagnosis — Patient Chart',icdChart.map(mkICDCard).join(''),'#1d4ed8')}</div>`:''}
-    ${icdTranscript.length?`<div style="margin-top:8px;">${mkSection('Diagnosis — Visit Transcript',icdTranscript.map(mkICDCard).join(''),'#7c3aed')}</div>`:''}
-    ${icdReferral.length?`<div style="margin-top:8px;">${mkSection('Diagnosis — Referral Letter',icdReferral.map(mkICDCard).join(''),'#d97706')}</div>`:''}
+    ${pendingItems.length?`
+      <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#374151;padding:2px 2px 8px;display:flex;align-items:center;gap:8px;">
+        To Review
+        <span style="font-size:8.5px;font-weight:700;color:#fff;background:#374151;border-radius:99px;padding:1px 7px;">${pendingCount}</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        ${pendingItems.map((x,i)=>mkPendingCard(x,i)).join('')}
+      </div>
+    `:`<div style="text-align:center;padding:18px 0 8px;font-size:12px;color:#aaa;font-weight:600;">All codes reviewed</div>`}
+    ${decidedItems.length?`
+      <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;padding:${pendingItems.length?'14px':'4px'} 2px 7px;${pendingItems.length?'border-top:1px solid #f0f0f0;margin-top:10px;':''}display:flex;align-items:center;gap:8px;">
+        Decided
+        <span style="font-size:8.5px;font-weight:700;color:#fff;background:#9ca3af;border-radius:99px;padding:1px 7px;">${decidedItems.length}</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:5px;">
+        ${decidedItems.map((x,i)=>mkDecidedRow(x,i)).join('')}
+      </div>
+    `:''}
   `;
 
   // ── "Add another input" dropdown menu ──
