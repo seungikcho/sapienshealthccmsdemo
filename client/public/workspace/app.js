@@ -32,6 +32,7 @@ const S = {
   workItemView: null,
   ftDetailId: null,
   ftCreateOpen: false, ftCreateName: '', ftCreateDesc: '', ftCreateContent: '', ftCreatePrompt: '',
+  ftCreateType: null, ftCreateStep: 'type', ftEditId: null,
   userFtTemplates: [],
 };
 
@@ -1567,12 +1568,20 @@ function renderMem(){
       return `<div style="font-size:13px;color:var(--text-2);">${line}</div>`;
     }).join('');
 
+    const typesMeta2={
+      followup:{label:'Followup Call',color:'var(--accent)',bg:'var(--accent-soft)',icon:phoneIcon},
+      careplan:{label:'Care Plan',color:'var(--info)',bg:'var(--info-soft)',icon:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="13" y2="15"/></svg>`},
+      billing:{label:'Billing Code',color:'var(--good)',bg:'var(--good-soft)',icon:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>`},
+    };
+    const dtm=tmpl._builtin?typesMeta2['followup']:(typesMeta2[tmpl.type||'followup']);
+    const dtypeBadge=`<span style="display:inline-flex;align-items:center;gap:6px;padding:4px 11px;border-radius:20px;background:${dtm.bg};color:${dtm.color};font-size:12px;font-weight:700;">${dtm.icon.replace(/stroke="currentColor"/g,`stroke="${dtm.color}"`)} @ ${dtm.label}</span>`;
     templatesBody=`
     <div style="padding:0;">
       <div style="padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;background:var(--panel-2);">
         <button data-action="ft-back" style="display:flex;align-items:center;gap:5px;font-size:12.5px;font-weight:600;color:var(--text-3);cursor:pointer;background:none;border:none;">${I.back.replace('stroke="currentColor"','stroke="var(--text-3)"')} Back</button>
-        <span style="display:inline-flex;align-items:center;gap:6px;padding:4px 11px;border-radius:20px;background:var(--accent-soft);color:var(--accent);font-size:12px;font-weight:700;">${phoneIcon.replace('stroke="currentColor"','stroke="var(--accent)"')} @ Followup Call</span>
+        ${dtypeBadge}
         <span style="font-size:13.5px;font-weight:700;color:var(--text);">${tmpl.title}</span>
+        ${!tmpl._builtin?`<button data-action="ft-edit:${tmpl.id}" class="edit-btn" style="margin-left:auto;display:flex;align-items:center;gap:6px;padding:6px 14px;border-radius:9px;border:1px solid var(--border);background:var(--panel-2);color:var(--text-2);font-size:12.5px;font-weight:600;cursor:pointer;transition:all .15s;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Edit</button>`:''}
       </div>
       <div style="display:flex;gap:0;height:100%;">
         <!-- Template content preview -->
@@ -1591,22 +1600,37 @@ function renderMem(){
     </div>`;
   } else {
     // ── List view ────────────────────────────────────────────────────────
-    const cards=allFtTemplates.map(t=>`
+    const listTypesMeta={
+      followup:{label:'Followup Call',color:'var(--accent)',bg:'var(--accent-soft)',icon:phoneIcon},
+      careplan:{label:'Care Plan',color:'var(--info)',bg:'var(--info-soft)',icon:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="13" y2="15"/></svg>`},
+      billing:{label:'Billing Code',color:'var(--good)',bg:'var(--good-soft)',icon:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>`},
+    };
+    const cards=allFtTemplates.map(t=>{
+      const ltm=t._builtin?listTypesMeta['followup']:(listTypesMeta[t.type||'followup']);
+      return `
       <button data-action="ft-detail:${t.id}" class="action-card"
         style="display:flex;align-items:center;gap:14px;padding:14px 18px;border:1px solid var(--border);border-radius:13px;background:var(--panel-2);text-align:left;cursor:pointer;transition:all .15s;width:100%;">
-        <div style="width:36px;height:36px;border-radius:10px;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;flex:none;font-size:11px;font-weight:800;color:var(--accent);">${t.num||'+'}</div>
+        <div style="width:36px;height:36px;border-radius:10px;background:${ltm.bg};display:flex;align-items:center;justify-content:center;flex:none;font-size:11px;font-weight:800;color:${ltm.color};">${t.num||ltm.icon.replace(/stroke="currentColor"/g,`stroke="${ltm.color}"`)}</div>
         <div style="flex:1;min-width:0;">
           <div style="font-size:13.5px;font-weight:700;color:var(--text);">${t.title}</div>
           <div style="font-size:12px;color:var(--text-3);margin-top:2px;">${t.hint||''}</div>
         </div>
+        ${!t._builtin?`<span style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;background:${ltm.bg};color:${ltm.color};flex:none;">Custom</span>`:''}
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
-      </button>`).join('');
+      </button>`;
+    }).join('');
 
     templatesBody=`
     <div style="padding:24px;">
-      <div style="margin-bottom:12px;">
+      <div style="margin-bottom:16px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
         <span style="display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;background:var(--accent-soft);color:var(--accent);font-size:12px;font-weight:700;">
           ${phoneIcon.replace('stroke="currentColor"','stroke="var(--accent)"')} @ Followup Call
+        </span>
+        <span style="display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;background:var(--info-soft);color:var(--info);font-size:12px;font-weight:700;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--info)" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="13" y2="15"/></svg> @ Care Plan
+        </span>
+        <span style="display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;background:var(--good-soft);color:var(--good);font-size:12px;font-weight:700;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--good)" stroke-width="1.8"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> @ Billing Code
         </span>
       </div>
       <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">${cards}</div>
@@ -3301,32 +3325,75 @@ function renderWorkItemViewOverlay(){
 // ── Followup Template Create Overlay ─────────────────────────────────────
 function renderFtCreateOverlay(){
   if(!S.ftCreateOpen) return '';
+
+  const typesMeta={
+    followup:{label:'Followup Call',color:'var(--accent)',bg:'var(--accent-soft)',icon:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.63A2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"/></svg>`},
+    careplan:{label:'Care Plan',color:'var(--info)',bg:'var(--info-soft)',icon:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="13" y2="15"/></svg>`},
+    billing:{label:'Billing Code',color:'var(--good)',bg:'var(--good-soft)',icon:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>`},
+  };
+  const tm=S.ftCreateType?typesMeta[S.ftCreateType]:null;
+
+  if(S.ftCreateStep==='type'){
+    const typeCard=(key)=>{
+      const m=typesMeta[key];
+      return `<button data-action="ft-create-type:${key}"
+        style="display:flex;align-items:center;gap:16px;padding:20px 24px;border:1.5px solid var(--border);border-radius:16px;background:var(--panel-2);text-align:left;cursor:pointer;transition:all .15s;width:100%;" class="action-card">
+        <div style="width:44px;height:44px;border-radius:13px;background:${m.bg};display:flex;align-items:center;justify-content:center;flex:none;">
+          ${m.icon.replace('stroke="currentColor"',`stroke="${m.color}"`)}
+        </div>
+        <div>
+          <div style="font-size:13px;font-weight:700;letter-spacing:.01em;color:var(--text-3);margin-bottom:3px;">@</div>
+          <div style="font-size:15.5px;font-weight:800;color:var(--text);">${m.label}</div>
+        </div>
+        <svg style="margin-left:auto;flex:none;" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+      </button>`;
+    };
+    return `
+    <div id="ft-create-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:300;display:flex;align-items:center;justify-content:center;padding:20px;">
+      <div style="background:var(--bg);border-radius:20px;box-shadow:0 28px 90px rgba(0,0,0,.4);width:100%;max-width:480px;display:flex;flex-direction:column;">
+        <div style="padding:22px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+          <div>
+            <div style="font-size:18px;font-weight:800;">Create template</div>
+            <div style="font-size:12.5px;color:var(--text-3);margin-top:3px;">Choose the template type</div>
+          </div>
+          <button data-action="ft-create-close" style="width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:var(--panel-2);font-size:17px;cursor:pointer;color:var(--text-3);">×</button>
+        </div>
+        <div style="padding:20px 24px 24px;display:flex;flex-direction:column;gap:10px;">
+          ${typeCard('followup')}
+          ${typeCard('careplan')}
+          ${typeCard('billing')}
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // ── Step: form ────────────────────────────────────────────────────────────
   const content=S.ftCreateContent;
   const placeholders=[...new Set([...content.matchAll(/\{([^}]+)\}/g)].map(m=>m[1]))];
   const fieldRows=placeholders.map(k=>`
     <div style="border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--panel-2);">
-      <div style="display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;margin-bottom:8px;">
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);">Key</div>
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);">Type</div>
-      </div>
       <div style="display:grid;grid-template-columns:1fr 110px;gap:8px;align-items:center;margin-bottom:8px;">
         <div style="padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;background:var(--panel);font-size:13px;color:var(--text);font-family:monospace;">${k}</div>
         <div style="padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;background:var(--panel);font-size:13px;color:var(--text);display:flex;align-items:center;justify-content:space-between;">String<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></div>
       </div>
-      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);margin-bottom:4px;">Description</div>
-      <input placeholder="" style="width:100%;padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;background:var(--panel);color:var(--text);font-size:13px;font-family:inherit;box-sizing:border-box;"/>
     </div>`).join('');
 
   const canSave=!!(S.ftCreateName.trim()&&S.ftCreateContent.trim());
+  const typeBadge=tm?`<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;background:${tm.bg};color:${tm.color};font-size:12px;font-weight:700;">${tm.icon.replace('stroke="currentColor"',`stroke="${tm.color}"`)} @ ${tm.label}</span>`:'' ;
+  const titleLabel=S.ftEditId?'Edit template':'Create template';
+
   return `
   <div id="ft-create-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:300;display:flex;align-items:center;justify-content:center;padding:20px;">
     <div style="background:var(--bg);border-radius:20px;box-shadow:0 28px 90px rgba(0,0,0,.4);width:100%;max-width:900px;max-height:92vh;display:flex;flex-direction:column;">
-      <div style="padding:18px 24px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
-        <div>
-          <div style="font-size:18px;font-weight:800;">Create template</div>
-          <div style="font-size:12.5px;color:var(--text-3);margin-top:2px;">Build a reusable medical document template.</div>
+      <div style="padding:18px 24px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px;">
+        <div style="display:flex;align-items:center;gap:12px;flex:1;min-width:0;">
+          ${!S.ftEditId?`<button data-action="ft-create-step-back" style="display:flex;align-items:center;gap:5px;font-size:12.5px;font-weight:600;color:var(--text-3);cursor:pointer;background:none;border:none;flex:none;">${I.back.replace('stroke="currentColor"','stroke="var(--text-3)"')}</button>`:''}
+          <div>
+            <div style="font-size:18px;font-weight:800;">${titleLabel}</div>
+            <div style="margin-top:4px;">${typeBadge}</div>
+          </div>
         </div>
-        <button data-action="ft-create-close" style="width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:var(--panel-2);font-size:17px;cursor:pointer;color:var(--text-3);">×</button>
+        <button data-action="ft-create-close" style="width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:var(--panel-2);font-size:17px;cursor:pointer;color:var(--text-3);flex:none;">×</button>
       </div>
       <div style="flex:1;display:flex;overflow:hidden;">
         <!-- Left: form -->
@@ -3355,7 +3422,7 @@ function renderFtCreateOverlay(){
           </div>
         </div>
         <!-- Right: auto-detected fields -->
-        <div style="width:300px;flex:none;padding:20px;display:flex;flex-direction:column;gap:12px;overflow-y:auto;">
+        <div style="width:280px;flex:none;padding:20px;display:flex;flex-direction:column;gap:12px;overflow-y:auto;">
           <div style="display:flex;align-items:center;justify-content:space-between;">
             <div style="font-size:14px;font-weight:700;">Fields</div>
             <div style="font-size:12px;color:var(--text-3);">${placeholders.length} detected</div>
@@ -3368,7 +3435,7 @@ function renderFtCreateOverlay(){
       </div>
       <div style="padding:14px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;">
         <button data-action="ft-create-close" style="padding:10px 22px;border-radius:11px;border:1.5px solid var(--border);background:var(--panel-2);color:var(--text-2);font-size:13.5px;font-weight:600;cursor:pointer;">Cancel</button>
-        <button data-action="ft-create-save" style="padding:10px 22px;border-radius:11px;background:${canSave?'var(--accent-2)':'var(--panel-2)'};color:${canSave?'#fff':'var(--text-3)'};font-size:13.5px;font-weight:700;cursor:pointer;">Save</button>
+        <button data-action="ft-create-save" style="padding:10px 22px;border-radius:11px;background:${canSave?'var(--accent-2)':'var(--panel-2)'};color:${canSave?'#fff':'var(--text-3)'};font-size:13.5px;font-weight:700;cursor:pointer;">${S.ftEditId?'Update':'Save'}</button>
       </div>
     </div>
   </div>`;
@@ -3680,20 +3747,34 @@ document.getElementById('app').addEventListener('click',e=>{
     S.workItemView=w;render();return;
   }
   if(act==='wi-view-close'){S.workItemView=null;render();return;}
-  if(act.startsWith('ft-detail:')){S.ftDetailId=parseInt(act.slice(10));render();return;}
+  if(act.startsWith('ft-detail:')){const raw=act.slice(10);S.ftDetailId=raw.startsWith('uft-')?raw:parseInt(raw);render();return;}
   if(act==='ft-back'){S.ftDetailId=null;render();return;}
-  if(act==='ft-create-open'){S.ftCreateOpen=true;S.ftCreateName='';S.ftCreateDesc='';S.ftCreateContent='';S.ftCreatePrompt='';render();return;}
-  if(act==='ft-create-close'){S.ftCreateOpen=false;render();return;}
+  if(act==='ft-create-open'){S.ftCreateOpen=true;S.ftCreateName='';S.ftCreateDesc='';S.ftCreateContent='';S.ftCreatePrompt='';S.ftCreateType=null;S.ftCreateStep='type';S.ftEditId=null;render();return;}
+  if(act.startsWith('ft-create-type:')){S.ftCreateType=act.slice(15);S.ftCreateStep='form';render();return;}
+  if(act.startsWith('ft-edit:')){
+    const eid=act.slice(8);
+    const etmpl=S.userFtTemplates.find(t=>t.id===eid);
+    if(!etmpl) return;
+    S.ftCreateOpen=true;S.ftEditId=eid;S.ftCreateStep='form';
+    S.ftCreateType=etmpl.type||'followup';
+    S.ftCreateName=etmpl.title||'';S.ftCreateDesc=etmpl.hint||'';
+    S.ftCreateContent=etmpl.rawContent||'';S.ftCreatePrompt=etmpl.prompt||'';
+    render();return;
+  }
+  if(act==='ft-create-close'){S.ftCreateOpen=false;S.ftEditId=null;render();return;}
+  if(act==='ft-create-step-back'){S.ftCreateStep='type';S.ftCreateType=null;render();return;}
   if(act==='ft-create-save'){
     if(!S.ftCreateName.trim()||!S.ftCreateContent.trim()) return;
-    const id='uft-'+Date.now();
-    const placeholders=[...new Set([...S.ftCreateContent.matchAll(/\{([^}]+)\}/g)].map(m=>m[1]))];
-    S.userFtTemplates=[...S.userFtTemplates,{
-      id, num:'', title:S.ftCreateName.trim(), hint:S.ftCreateDesc.trim(),
-      rawContent:S.ftCreateContent, prompt:S.ftCreatePrompt,
-    }];
+    const tdata={title:S.ftCreateName.trim(),hint:S.ftCreateDesc.trim(),rawContent:S.ftCreateContent,prompt:S.ftCreatePrompt,type:S.ftCreateType||'followup',num:''};
+    const wasEdit=!!S.ftEditId;
+    if(wasEdit){
+      S.userFtTemplates=S.userFtTemplates.map(t=>t.id===S.ftEditId?{...t,...tdata}:t);
+      S.ftEditId=null;
+    } else {
+      S.userFtTemplates=[...S.userFtTemplates,{id:'uft-'+Date.now(),...tdata}];
+    }
     S.ftCreateOpen=false;
-    showToast('Template saved');render();return;
+    showToast(wasEdit?'Template updated':'Template saved');render();return;
   }
   if(act==='at-open'){S.addTmplOpen=true;S.addTmplLabel='';S.addTmplContent='';S.addTmplType='note';render();return;}
   if(act==='at-close'){S.addTmplOpen=false;render();return;}
@@ -3927,7 +4008,7 @@ document.addEventListener('click', e => {
   }
   if(S.ftCreateOpen){
     const overlay=document.getElementById('ft-create-overlay');
-    if(overlay && e.target===overlay){S.ftCreateOpen=false;render();}
+    if(overlay && e.target===overlay){S.ftCreateOpen=false;S.ftEditId=null;render();}
   }
 });
 
@@ -3936,7 +4017,7 @@ window.addEventListener('keydown',e=>{
   if((e.metaKey||e.ctrlKey)&&(e.key==='k'||e.key==='K')){e.preventDefault();S.cmd=!S.cmd;S.query='';render();}
   if(e.key==='Escape'){
     if(S.workItemView){S.workItemView=null;render();return;}
-    if(S.ftCreateOpen){S.ftCreateOpen=false;render();return;}
+    if(S.ftCreateOpen){S.ftCreateOpen=false;S.ftEditId=null;render();return;}
     if(S.carePlanOpen){S.carePlanOpen=false;S.cpPhase='input';S.cpTemplate=null;S.cpInputs=[];S.cpInputMenu=false;S.cpPrompt='';S.cpViewingId=null;render();return;}
     if(S.billingOpen){S.billingOpen=false;S.billingPhase='input';S.billingPrompt='';S.billingInputs=[];S.billingInputMenu=false;S.billingReview={};S.billingViewingId=null;render();return;}
     if(S.addWfOpen){S.addWfOpen=false;render();return;}
