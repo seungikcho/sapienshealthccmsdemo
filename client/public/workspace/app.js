@@ -1766,14 +1766,36 @@ function renderPatient(){
           <h1 style="font-size:21px;font-weight:800;letter-spacing:-.02em;margin:0;">${p.name}</h1>
         </div>
       </div>
-      <div style="display:flex;gap:8px;flex:none;">
-        <button data-action="billing-open" style="display:flex;align-items:center;gap:6px;padding:9px 15px;border-radius:10px;border:1.5px solid var(--accent-line);background:var(--accent-soft);color:var(--accent);font-size:12.5px;font-weight:700;cursor:pointer;">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
-          Billing Code Match
+      <div style="display:flex;gap:7px;flex:none;">
+        <button data-action="billing-open" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:13px;border:1.5px solid rgba(26,122,16,.2);background:#fff;cursor:pointer;text-align:left;box-shadow:0 1px 5px rgba(0,0,0,.06);min-width:0;transition:box-shadow .15s,border-color .15s;" class="wi-action-card">
+          <div style="width:34px;height:34px;border-radius:9px;background:rgba(26,122,16,.1);display:flex;align-items:center;justify-content:center;flex:none;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1a7a10" stroke-width="2.3"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/><path d="M14 15h4"/></svg>
+          </div>
+          <div style="min-width:0;">
+            <div style="font-size:12px;font-weight:700;color:#111;white-space:nowrap;">Billing Code Match</div>
+            <div style="font-size:10px;color:#9ca3af;margin-top:1px;">CPT · ICD-10 · HCC</div>
+          </div>
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" stroke-width="2.5" style="flex:none;"><path d="m9 18 6-6-6-6"/></svg>
         </button>
-        <button data-action="care-plan-open" style="display:flex;align-items:center;gap:6px;padding:9px 15px;border-radius:10px;background:var(--accent-2);color:#fff;font-size:12.5px;font-weight:700;cursor:pointer;">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-          Fill Call Template
+        <button data-action="care-plan-open" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:13px;border:1.5px solid rgba(99,102,241,.2);background:#fff;cursor:pointer;text-align:left;box-shadow:0 1px 5px rgba(0,0,0,.06);min-width:0;transition:box-shadow .15s,border-color .15s;" class="wi-action-card">
+          <div style="width:34px;height:34px;border-radius:9px;background:rgba(99,102,241,.1);display:flex;align-items:center;justify-content:center;flex:none;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2.3"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          </div>
+          <div style="min-width:0;">
+            <div style="font-size:12px;font-weight:700;color:#111;white-space:nowrap;">Fill Call Template</div>
+            <div style="font-size:10px;color:#9ca3af;margin-top:1px;">11 templates</div>
+          </div>
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" stroke-width="2.5" style="flex:none;"><path d="m9 18 6-6-6-6"/></svg>
+        </button>
+        <button data-action="lab-wf-start" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:13px;border:1.5px solid rgba(14,165,233,.2);background:#fff;cursor:pointer;text-align:left;box-shadow:0 1px 5px rgba(0,0,0,.06);min-width:0;transition:box-shadow .15s,border-color .15s;" class="wi-action-card">
+          <div style="width:34px;height:34px;border-radius:9px;background:rgba(14,165,233,.1);display:flex;align-items:center;justify-content:center;flex:none;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="2.3"><path d="M6 2v6l-3 8a2 2 0 001.9 2.7h14.2A2 2 0 0021 16l-3-8V2"/><path d="M6 2h12"/><path d="M9 12h6"/></svg>
+          </div>
+          <div style="min-width:0;">
+            <div style="font-size:12px;font-weight:700;color:#111;white-space:nowrap;">Lab Panel</div>
+            <div style="font-size:10px;color:#9ca3af;margin-top:1px;">Order · Compare · Sign</div>
+          </div>
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" stroke-width="2.5" style="flex:none;"><path d="m9 18 6-6-6-6"/></svg>
         </button>
       </div>
     </div>
