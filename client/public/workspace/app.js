@@ -1918,52 +1918,70 @@ function renderBillingMatchOverlay(){
   const totalMin=p.activities.reduce((s,a)=>s+a.minutes,0);
   const phase=S.billingPhase; // 'input' | 'running' | 'done'
 
-  // Determine codes + evidence
-  const codes=[];
+  // ── CPT billing codes ──
+  const cptCodes=[];
   if(totalMin>=60){
-    codes.push({
-      cpt:'99487',desc:'Complex Chronic Care Management',
-      sub:'60+ min/month · 2+ complex chronic conditions',rate:132.93,eligible:true,
-      evidence:[
-        `"${p.conditions.slice(0,2).join(', ')}"`,
-        `"Total documented: ${totalMin} minutes this month"`,
-        `"${p.activities.length} care encounters on file"`,
-      ],
-      alts:['99490 — Standard CCM (20+ min)','99491 — CCM, physician direct time (30+ min)'],
-    });
-    const addOns=Math.floor((totalMin-60)/30);
-    for(let i=0;i<Math.min(addOns,2);i++) codes.push({
-      cpt:'99489',desc:'Complex CCM Add-on',
-      sub:`Additional 30-min block #${i+1}`,rate:68.02,eligible:true,
-      evidence:[`"Activity log shows ${totalMin} total minutes across ${p.activities.length} encounters"`],
-      alts:['99439 — Standard CCM add-on (20 min)'],
-    });
+    cptCodes.push({cpt:'99487',desc:'Complex Chronic Care Management',sub:'60+ min/month · 2+ complex conditions',rate:132.93,eligible:true,evidence:[`"${p.conditions.slice(0,2).join(', ')}"`,`"Total documented: ${totalMin} minutes this month"`],alts:['99490 — Standard CCM (20+ min)','99491 — CCM, physician direct time']});
+    const ao=Math.floor((totalMin-60)/30);
+    for(let i=0;i<Math.min(ao,2);i++) cptCodes.push({cpt:'99489',desc:'Complex CCM Add-on',sub:`Add-on 30-min block #${i+1}`,rate:68.02,eligible:true,evidence:[`"${totalMin} total minutes across ${p.activities.length} encounters"`],alts:['99439 — Standard CCM add-on']});
   } else if(totalMin>=20){
-    codes.push({
-      cpt:'99490',desc:'Chronic Care Management',
-      sub:'20+ min/month · standard CCM',rate:62.71,eligible:true,
-      evidence:[
-        `"${p.conditions[0]}"`,
-        `"Total documented: ${totalMin} minutes this month"`,
-      ],
-      alts:['99487 — Complex CCM (60+ min)','99491 — CCM, physician direct time'],
-    });
-    const addOns=Math.min(2,Math.floor((totalMin-20)/20));
-    for(let i=0;i<addOns;i++) codes.push({
-      cpt:'99439',desc:'CCM Add-on',
-      sub:'Each additional 20 min (max 2)',rate:47.34,eligible:true,
-      evidence:[`"${p.activities[i]?p.activities[i].desc.slice(0,55)+'…':'Follow-up activity documented'}"`],
-      alts:['99489 — Complex CCM add-on'],
-    });
+    cptCodes.push({cpt:'99490',desc:'Chronic Care Management',sub:'20+ min/month · standard CCM',rate:62.71,eligible:true,evidence:[`"${p.conditions[0]}"`,`"Total documented: ${totalMin} minutes"`],alts:['99487 — Complex CCM (60+ min)']});
+    const ao=Math.min(2,Math.floor((totalMin-20)/20));
+    for(let i=0;i<ao;i++) cptCodes.push({cpt:'99439',desc:'CCM Add-on',sub:'Each additional 20 min (max 2)',rate:47.34,eligible:true,evidence:[`"${p.activities[i]?p.activities[i].desc.slice(0,50)+'…':'Follow-up documented'}"`],alts:['99489 — Complex CCM add-on']});
   } else {
-    codes.push({
-      cpt:'99490',desc:'Chronic Care Management',
-      sub:`Need ${20-totalMin} more minutes to qualify`,rate:62.71,eligible:false,
-      evidence:[],alts:[],
-    });
+    cptCodes.push({cpt:'99490',desc:'Chronic Care Management',sub:`Need ${20-totalMin} more minutes`,rate:62.71,eligible:false,evidence:[],alts:[]});
   }
+  const totalRev=cptCodes.filter(c=>c.eligible).reduce((s,c)=>s+c.rate,0);
 
-  const totalRev=codes.filter(c=>c.eligible).reduce((s,c)=>s+c.rate,0);
+  // ── ICD-10 map from condition keywords ──
+  const ICD_MAP=[
+    {k:'diabetes',code:'E11.9',desc:'Type 2 diabetes mellitus without complications',alts:['E11.65 — with hyperglycemia','E11.40 — with diabetic neuropathy']},
+    {k:'hypertension',code:'I10',desc:'Essential (primary) hypertension',alts:['I13.10 — Hypertensive heart and CKD']},
+    {k:'chronic kidney',code:'N18.3',desc:'Chronic kidney disease, stage 3',alts:['N18.4 — CKD stage 4']},
+    {k:'heart failure',code:'I50.20',desc:'Unspecified systolic heart failure (HFrEF)',alts:['I50.32 — Chronic systolic HF']},
+    {k:'atrial fibrillation',code:'I48.91',desc:'Unspecified atrial fibrillation',alts:['I48.11 — Longstanding persistent AFib']},
+    {k:'copd',code:'J44.1',desc:'COPD with acute exacerbation',alts:['J44.0 — COPD, acute lower resp infection']},
+    {k:'coronary artery',code:'I25.10',desc:'Atherosclerotic heart disease, native vessel',alts:['I25.110 — With unstable angina']},
+    {k:'peripheral artery',code:'I73.9',desc:'Peripheral vascular disease, unspecified',alts:['I70.209 — Atherosclerosis of native arteries']},
+    {k:'hyperlipidemia',code:'E78.5',desc:'Hyperlipidemia, unspecified',alts:['E78.00 — Pure hypercholesterolemia']},
+    {k:'hypothyroidism',code:'E03.9',desc:'Hypothyroidism, unspecified',alts:['E06.3 — Autoimmune thyroiditis']},
+    {k:'osteoporosis',code:'M81.0',desc:'Age-related osteoporosis without fracture',alts:['M80.00XA — with fracture']},
+    {k:'osteoarthritis',code:'M19.90',desc:'Primary osteoarthritis, unspecified site',alts:['M17.11 — Right knee OA']},
+    {k:'cognitive',code:'G31.84',desc:'Mild cognitive impairment, so stated',alts:['F06.70 — Neurocognitive disorder']},
+  ];
+  const icdChart=[];
+  p.conditions.forEach(cond=>{
+    const match=ICD_MAP.find(m=>cond.toLowerCase().includes(m.k));
+    if(match && !icdChart.find(x=>x.code===match.code)){
+      icdChart.push({...match,source:'Patient Chart',evidence:[`"${cond}"`]});
+    }
+  });
+
+  // ── Codes from Visit Transcript (if added) ──
+  const hasTranscript=S.billingInputs.some(x=>x.type==='transcript');
+  const icdTranscript=hasTranscript?[
+    {code:'K59.1',desc:'Functional diarrhea',source:'Visit Transcript',evidence:['"I\'ve been getting some diarrhoea for the last two to three weeks — up to eight times a day"'],alts:['K58.0 — IBS with diarrhea','K57.30 — Diverticulosis']},
+    {code:'K92.1',desc:'Melena / rectal bleeding',source:'Visit Transcript',evidence:['"Yes — blood in stool. Is it difficult to flush? No."'],alts:['K62.5 — Hemorrhoidal disease','K63.5 — Polyp of colon']},
+    {code:'R63.4',desc:'Abnormal weight loss',source:'Visit Transcript',evidence:['"My trousers feel looser — I\'ve lost weight in the last few weeks"'],alts:['R64 — Cachexia']},
+    {code:'R10.9',desc:'Unspecified abdominal pain',source:'Visit Transcript',evidence:['"Crampy pain, mainly before going to the toilet, about 4/10"'],alts:['K58.9 — IBS without diarrhea']},
+  ]:[];
+
+  // ── Codes from Referral Letter (if added) ──
+  const hasReferral=S.billingInputs.some(x=>x.type==='referral');
+  const icdReferral=hasReferral?[
+    {code:'M17.11',desc:'Primary osteoarthritis, right knee',source:'Referral Letter',evidence:['"Medial compartment joint space narrowing with osteophyte formation consistent with degenerative OA"'],alts:['M17.31 — Secondary OA, right knee']},
+    {code:'M25.361',desc:'Stiffness of right knee, NEC',source:'Referral Letter',evidence:['"Morning stiffness lasting 20–30 minutes, occasional swelling"'],alts:['M79.621 — Pain in right upper arm']},
+    {code:'M79.621',desc:'Pain in right thigh / functional limitation',source:'Referral Letter',evidence:['"Cannot walk more than 500 meters; antalgic gait observed"'],alts:['Z96.651 — Presence of right knee prosthesis']},
+  ]:[];
+
+  // ── Source colors ──
+  const srcColor={
+    'Patient Chart': {bg:'rgba(29,78,216,.09)',border:'rgba(29,78,216,.3)',text:'#1d4ed8',badge:'#1d4ed8'},
+    'Visit Transcript':{bg:'rgba(124,58,237,.09)',border:'rgba(124,58,237,.3)',text:'#7c3aed',badge:'#7c3aed'},
+    'Referral Letter': {bg:'rgba(217,119,6,.09)',border:'rgba(217,119,6,.3)',text:'#d97706',badge:'#d97706'},
+  };
+
+  const totalCodeCount=cptCodes.length+icdChart.length+icdTranscript.length+icdReferral.length;
 
   // ── Chart HTML (raw = no highlights, used during input/running) ──
   const line=(t,dim)=>`<div style="font-family:'SF Mono',ui-monospace,monospace;font-size:11.5px;line-height:1.8;color:${dim?'#bbb':'#333'};min-height:1.1em;white-space:pre-wrap;">${t||'&nbsp;'}</div>`;
@@ -2064,30 +2082,68 @@ function renderBillingMatchOverlay(){
     </div>`;
   };
 
-  // ── Code cards ──
-  const codeCards=codes.map((c,i)=>`
-    <div style="border:1.5px solid ${c.eligible?'rgba(34,139,24,.3)':'#e5e7eb'};border-radius:13px;background:#fff;overflow:hidden;animation:bill-rise .32s ease ${i*.11}s both;box-shadow:0 1px 6px rgba(0,0,0,.06);">
-      <div style="display:flex;align-items:center;gap:10px;padding:13px 15px;${c.evidence.length||c.alts.length?'border-bottom:1px solid #f0f0f0;':''}background:${c.eligible?'rgba(34,139,24,.04)':'#fafafa'};">
-        <div style="padding:5px 10px;border-radius:8px;background:${c.eligible?'rgba(34,139,24,.12)':'#f0f0f0'};border:1.5px solid ${c.eligible?'rgba(34,139,24,.35)':'#ddd'};">
-          <span style="font-size:11.5px;font-weight:900;font-family:monospace;color:${c.eligible?'#1a7a10':'#888'};">${c.cpt}</span>
+  // ── Code card renderers ──
+  let cardIdx=0;
+  const mkCPTCard=(c)=>{
+    const i=cardIdx++;
+    return `<div style="border:1.5px solid ${c.eligible?'rgba(34,139,24,.3)':'#e5e7eb'};border-radius:11px;background:#fff;overflow:hidden;animation:bill-rise .28s ease ${i*.07}s both;">
+      <div style="display:flex;align-items:center;gap:9px;padding:10px 13px;${c.evidence.length?'border-bottom:1px solid #f5f5f5;':''}background:${c.eligible?'rgba(34,139,24,.03)':'#fafafa'};">
+        <div style="padding:3px 8px;border-radius:6px;background:${c.eligible?'rgba(34,139,24,.12)':'#f0f0f0'};border:1.5px solid ${c.eligible?'rgba(34,139,24,.35)':'#ddd'};">
+          <span style="font-size:10.5px;font-weight:900;font-family:monospace;color:${c.eligible?'#1a7a10':'#999'};">${c.cpt}</span>
         </div>
         <div style="flex:1;min-width:0;">
-          <div style="font-size:13px;font-weight:700;color:${c.eligible?'#111':'#888'};">${c.desc}</div>
-          <div style="font-size:11px;color:#888;margin-top:2px;">${c.sub}</div>
+          <div style="font-size:12px;font-weight:700;color:${c.eligible?'#111':'#999'};">${c.desc}</div>
+          <div style="font-size:10.5px;color:#aaa;margin-top:1px;">${c.sub}</div>
         </div>
-        ${c.eligible?`<div style="font-size:17px;font-weight:900;color:#1a7a10;flex:none;">$${c.rate.toFixed(2)}</div>`:`<div style="font-size:11px;font-weight:600;color:#aaa;background:#f4f4f4;padding:4px 10px;border-radius:7px;">Not eligible</div>`}
+        ${c.eligible?`<div style="font-size:15px;font-weight:900;color:#1a7a10;flex:none;white-space:nowrap;">$${c.rate.toFixed(2)}</div>`:`<div style="font-size:10px;color:#bbb;background:#f4f4f4;padding:3px 8px;border-radius:6px;">Not eligible</div>`}
       </div>
-      ${c.evidence.length?`
-      <div style="padding:10px 15px;${c.alts.length?'border-bottom:1px solid #f0f0f0;':''}">
-        <div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#888;margin-bottom:6px;">Evidence</div>
-        ${c.evidence.map(e=>`<div style="font-size:11.5px;color:#333;font-style:italic;padding:6px 10px;background:rgba(80,180,40,.07);border-radius:7px;border-left:2.5px solid rgba(34,139,24,.4);margin-bottom:4px;line-height:1.5;">${e}</div>`).join('')}
+      ${c.evidence.length?`<div style="padding:8px 13px;${c.alts.length?'border-bottom:1px solid #f5f5f5;':''}">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#bbb;margin-bottom:5px;">Evidence</div>
+        ${c.evidence.map(e=>`<div style="font-size:11px;color:#555;font-style:italic;padding:4px 9px;background:rgba(80,180,40,.06);border-radius:6px;border-left:2px solid rgba(34,139,24,.35);margin-bottom:3px;line-height:1.45;">${e}</div>`).join('')}
       </div>`:''}
-      ${c.alts.length?`
-      <div style="padding:10px 15px;">
-        <div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#888;margin-bottom:6px;">Alternatives</div>
-        ${c.alts.map(a=>`<div style="padding:5px 10px;border-radius:7px;border:1px solid #eee;font-size:11.5px;color:#666;margin-bottom:4px;background:#fafafa;">${a}</div>`).join('')}
+      ${c.alts.length?`<div style="padding:8px 13px;">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#bbb;margin-bottom:5px;">Alternatives</div>
+        ${c.alts.map(a=>`<div style="padding:4px 9px;border-radius:6px;border:1px solid #eee;font-size:10.5px;color:#888;margin-bottom:3px;background:#fafafa;">${a}</div>`).join('')}
       </div>`:''}
-    </div>`).join('');
+    </div>`;
+  };
+  const mkICDCard=(c)=>{
+    const i=cardIdx++;
+    const sc=srcColor[c.source]||srcColor['Patient Chart'];
+    return `<div style="border:1.5px solid ${sc.border};border-radius:11px;background:#fff;overflow:hidden;animation:bill-rise .28s ease ${i*.07}s both;">
+      <div style="display:flex;align-items:center;gap:9px;padding:10px 13px;${c.evidence.length?'border-bottom:1px solid #f5f5f5;':''}background:${sc.bg};">
+        <div style="padding:3px 8px;border-radius:6px;background:${sc.bg};border:1.5px solid ${sc.border};">
+          <span style="font-size:10.5px;font-weight:900;font-family:monospace;color:${sc.badge};">${c.code}</span>
+        </div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:12px;font-weight:700;color:#111;">${c.desc}</div>
+        </div>
+        <span style="font-size:9.5px;font-weight:700;color:${sc.text};background:${sc.bg};border:1px solid ${sc.border};border-radius:99px;padding:2px 8px;white-space:nowrap;flex:none;">${c.source}</span>
+      </div>
+      ${c.evidence.length?`<div style="padding:8px 13px;${c.alts&&c.alts.length?'border-bottom:1px solid #f5f5f5;':''}">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#bbb;margin-bottom:5px;">Evidence</div>
+        ${c.evidence.map(e=>`<div style="font-size:11px;color:#555;font-style:italic;padding:4px 9px;background:${sc.bg};border-radius:6px;border-left:2px solid ${sc.border};margin-bottom:3px;line-height:1.45;">${e}</div>`).join('')}
+      </div>`:''}
+      ${c.alts&&c.alts.length?`<div style="padding:8px 13px;">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#bbb;margin-bottom:5px;">Alternatives</div>
+        ${c.alts.map(a=>`<div style="padding:4px 9px;border-radius:6px;border:1px solid #eee;font-size:10.5px;color:#888;margin-bottom:3px;background:#fafafa;">${a}</div>`).join('')}
+      </div>`:''}
+    </div>`;
+  };
+
+  const mkSection=(label,cards,color='#9ca3af')=>cards.length?`
+    <div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:${color};padding:4px 2px 6px;display:flex;align-items:center;gap:8px;">
+      ${label}
+      <span style="font-size:9px;font-weight:700;color:#fff;background:${color};border-radius:99px;padding:1px 7px;">${cards.length}</span>
+    </div>
+    ${cards}`:'';
+
+  const codeCards=`
+    ${mkSection('Billing Codes (CPT)',cptCodes.map(mkCPTCard).join(''),'#1a7a10')}
+    ${icdChart.length?`<div style="margin-top:6px;">${mkSection('Diagnosis Codes — Patient Chart',icdChart.map(mkICDCard).join(''),'#1d4ed8')}</div>`:''}
+    ${icdTranscript.length?`<div style="margin-top:6px;">${mkSection('Diagnosis Codes — Visit Transcript',icdTranscript.map(mkICDCard).join(''),'#7c3aed')}</div>`:''}
+    ${icdReferral.length?`<div style="margin-top:6px;">${mkSection('Diagnosis Codes — Referral Letter',icdReferral.map(mkICDCard).join(''),'#d97706')}</div>`:''}
+  `;
 
   // ── "Add another input" dropdown menu ──
   const inputMenuHtml=S.billingInputMenu?`
@@ -2179,6 +2235,7 @@ function renderBillingMatchOverlay(){
         <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;">Output</span>
         <span style="color:#e5e7eb;">·</span>
         <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#374151;">CODES</span>
+        ${phase==='done'?`<span style="font-size:11px;font-weight:700;background:#111;color:#fff;border-radius:99px;padding:1px 8px;">${totalCodeCount}</span>`:''}
       </div>
       <div style="flex:1;overflow-y:auto;">${bodyContent}</div>
       <div style="border-top:1.5px solid #f0f0f0;padding:14px 16px;background:#f9fafb;flex:none;">${footerContent}</div>
