@@ -27,6 +27,7 @@ const S = {
   carePlanOpen: false, billingOpen: false,
   billingPhase: 'input', billingPrompt: '', billingInputs: [], billingInputMenu: false, billingReview: {}, billingViewingId: null,
   carePlanStep: 'select', selectedTemplate: null, carePlanLoaded: false,
+  cpPhase: 'input', cpTemplate: null, cpInputs: [], cpInputMenu: false, cpPrompt: '', cpViewingId: null,
   ptStatus: 'all', ptSort: 'name', ptProvider: 'all',
   workItemView: null,
   ftDetailId: null,
@@ -1856,10 +1857,11 @@ function renderPatient(){
                 ${isBilling?'Billing Code Match':w.templateTitle}
               </div>
               ${isBilling&&codeChips?`<div style="margin-bottom:4px;line-height:1.8;">${codeChips}</div>`:''}
-              ${!isBilling?`<div style="font-size:11.5px;color:var(--text-3);">Call Template</div>`:''}
+              ${!isBilling?`<div style="display:flex;align-items:center;gap:5px;margin-bottom:3px;"><span style="font-size:9.5px;font-weight:800;color:#6366f1;background:rgba(99,102,241,.1);padding:1px 7px;border-radius:5px;font-family:monospace;">${w.templateNum}</span><span style="font-size:11.5px;color:var(--text-2);font-weight:600;">${w.templateTitle||'Call Template'}</span></div>`:''}
+              ${isBilling&&codeChips?`<div style="margin-bottom:4px;line-height:1.8;">${codeChips}</div>`:''}
               ${isBilling&&w.revenue&&w.revenue!=='—'?`<div style="font-size:12px;font-weight:700;color:var(--good);">${w.revenue}<span style="font-size:10px;font-weight:500;color:var(--text-3);margin-left:3px;">/ mo</span></div>`:''}
               ${isBilling?`<div style="font-size:9.5px;color:var(--text-3);margin-top:3px;">${acceptedKeys.length} accepted · ${rejectedKeys.length} rejected · ${w.date}</div>`
-              :`<div style="font-size:10.5px;color:var(--text-3);margin-top:3px;">${w.date}</div>`}
+              :`<div style="font-size:10px;color:var(--text-3);margin-top:2px;">${w.date}</div>`}
             </div>
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2" style="flex:none;margin-top:4px;"><path d="m9 18 6-6-6-6"/></svg>
           </button>`;
@@ -2782,96 +2784,251 @@ function buildFilledTemplate(p){
 function renderCarePlanOverlay(){
   if(!S.carePlanOpen) return '';
   const p=PATIENTS.find(pt=>pt.id===S.patientId); if(!p) return '';
+  const phase=S.cpPhase||'input';
+  const totalMin=p.activities.reduce((s,a)=>s+a.minutes,0);
+  const cl=currentClinic();
+  const selTmpl=CALL_TEMPLATES.find(t=>t.id===S.cpTemplate)||null;
 
-  // ── Step 1: Template selection ──────────────────────────────────────────
-  if(S.carePlanStep==='select'){
-    const cards=CALL_TEMPLATES.map(t=>`
-      <button data-action="care-plan-select:${t.id}" style="text-align:left;padding:14px 16px;border:1px solid var(--border);border-radius:12px;background:var(--panel);cursor:pointer;transition:border-color .15s,background .15s;width:100%;">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
-          <span style="width:28px;height:28px;border-radius:8px;background:var(--accent-soft);color:var(--accent);font-size:10.5px;font-weight:800;display:flex;align-items:center;justify-content:center;flex:none;">${t.num}</span>
-          <span style="font-size:13px;font-weight:700;color:var(--text);">${t.title}</span>
-        </div>
-        <div style="font-size:11.5px;color:var(--text-3);padding-left:38px;">${t.hint}</div>
-      </button>`).join('');
+  // ── Chart content lines ──
+  const cpLine=(t,dim)=>`<div style="font-family:'SF Mono',ui-monospace,monospace;font-size:11px;line-height:1.8;color:${dim?'#bbb':'#333'};white-space:pre-wrap;">${t||'&nbsp;'}</div>`;
+  const cpHL=(text,delay=0)=>`<mark style="background:rgba(99,102,241,.18);color:#4338ca;font-weight:700;border-radius:3px;padding:0 3px;animation:hl-appear .4s ease ${delay}s both;">${text}</mark>`;
+  const highlighted=phase==='done';
+  let hd=0;
+  const chartLines=[
+    cpLine(`&lt;CCM_CHART  patient="${p.mrn}"&gt;`,true),
+    cpLine(`Date: ${new Date().toLocaleDateString('en-US',{year:'numeric',month:'2-digit',day:'2-digit'})}  |  Provider: ${p.provider}`,true),
+    cpLine(''),
+    cpLine(`<span style="color:#1a56cc;font-weight:700;">Chief Complaint:</span> ${p.conditions[0]||'Chronic condition management'} follow-up`),
+    cpLine(''),
+    cpLine(`<span style="color:#555;font-weight:600;">Patient:</span>  ${p.name}   DOB: ${p.dob}   ${p.age}yo ${p.sex}`),
+    cpLine(`<span style="color:#555;font-weight:600;">MRN:</span>     ${p.mrn}   Clinic: ${cl.short}`),
+    cpLine(''),
+    cpLine(`<span style="color:#1a56cc;font-weight:700;">Conditions:</span>`),
+    ...p.conditions.map(c=>cpLine(`  — ${highlighted?cpHL(c,(hd+=.07).toFixed(2)):c}`)),
+    cpLine(''),
+    cpLine(`<span style="color:#1a56cc;font-weight:700;">Medications:</span>`),
+    ...p.medications.map(m=>cpLine(`  — ${m}`)),
+    cpLine(''),
+    cpLine(`<span style="color:#1a56cc;font-weight:700;">CCM Activity:</span>`),
+    ...p.activities.map(a=>cpLine(`  [${a.date}]  ${a.desc.slice(0,50)}  —  ${highlighted?cpHL(a.minutes+' min',(hd+=.08).toFixed(2)):a.minutes+' min'}`)),
+    cpLine(''),
+    cpLine(`${highlighted?cpHL('Total: '+totalMin+' min this month',(hd+=.1).toFixed(2)):'Total: '+totalMin+' min this month'}`,false),
+    cpLine(`&lt;/CCM_CHART&gt;`,true),
+  ];
+  const chartHtml=chartLines.join('');
 
-    return `
-    <div id="care-plan-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;">
-      <div style="background:var(--bg);border-radius:20px;box-shadow:0 28px 90px rgba(0,0,0,.4);width:100%;max-width:580px;max-height:88vh;overflow-y:auto;display:flex;flex-direction:column;">
-        <div style="padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--bg);z-index:1;">
-          <div>
-            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);margin-bottom:3px;">Fill Call Template</div>
-            <div style="font-size:17px;font-weight:800;">${p.name}</div>
-            <div style="font-size:12px;color:var(--text-3);margin-top:2px;">Select a template — Sapiens will fill it using the patient's chart</div>
-          </div>
-          <button data-action="care-plan-close" style="width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:var(--panel-2);font-size:17px;cursor:pointer;color:var(--text-3);">×</button>
+  // ── Input card builder (re-uses same style as billing) ──
+  const cpStyles={
+    note:    {accent:'#3b82f6',bg:'rgba(59,130,246,.05)', border:'rgba(59,130,246,.25)'},
+    transcript:{accent:'#7c3aed',bg:'rgba(124,58,237,.05)',border:'rgba(124,58,237,.25)'},
+  };
+  const mkCPInputCard=(inp,i)=>{
+    const s=cpStyles[inp.type]||cpStyles.note;
+    return `<div style="border:1.5px solid ${s.border};border-radius:11px;overflow:hidden;background:#fff;">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 13px;background:${s.bg};border-bottom:1px solid ${s.border};">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="width:6px;height:6px;border-radius:50%;background:${s.accent};flex:none;"></div>
+          <span style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:${s.accent};">Input ${i+2} — ${inp.label}</span>
         </div>
-        <div style="padding:16px 20px;display:flex;flex-direction:column;gap:8px;">${cards}</div>
+        <button data-action="cp-remove-input:${i}" style="font-size:14px;color:#bbb;background:none;border:none;cursor:pointer;padding:0;">×</button>
       </div>
+      <div style="padding:12px 14px;font-family:'SF Mono',monospace;font-size:11px;color:#333;line-height:1.7;white-space:pre-wrap;max-height:160px;overflow-y:auto;">${inp.content.replace(/</g,'&lt;')}</div>
     </div>`;
-  }
+  };
 
-  // ── Step 2: Loading animation ───────────────────────────────────────────
-  if(S.carePlanStep==='loading'){
-    const tmpl=CALL_TEMPLATES.find(t=>t.id===S.selectedTemplate)||CALL_TEMPLATES[0];
-    return `
-    <style>
-      @keyframes sap-spin{to{transform:rotate(360deg)}}
-      @keyframes sap-blink{0%,100%{opacity:1}50%{opacity:.2}}
-      @keyframes sap-slide{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-    </style>
-    <div id="care-plan-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;display:flex;align-items:center;justify-content:center;">
-      <div style="background:var(--bg);border-radius:24px;box-shadow:0 32px 100px rgba(0,0,0,.4);width:440px;padding:48px 40px;text-align:center;">
-        <div style="position:relative;width:72px;height:72px;margin:0 auto 28px;">
-          <div style="position:absolute;inset:0;border:3px solid var(--accent-line);border-radius:50%;"></div>
-          <div style="position:absolute;inset:0;border:3px solid transparent;border-top-color:var(--accent);border-radius:50%;animation:sap-spin .8s linear infinite;"></div>
-          <div style="position:absolute;inset:10px;background:var(--accent-soft);border-radius:50%;display:flex;align-items:center;justify-content:center;">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+  // ── Add-input dropdown ──
+  const cpInputMenu=S.cpInputMenu?`
+    <div style="position:absolute;bottom:calc(100% + 6px);left:0;background:#fff;border:1.5px solid #e5e7eb;border-radius:11px;box-shadow:0 8px 28px rgba(0,0,0,.13);overflow:hidden;min-width:220px;z-index:10;">
+      <button data-action="cp-add-transcript" style="display:flex;align-items:center;gap:10px;width:100%;padding:11px 14px;background:none;border:none;cursor:pointer;text-align:left;border-bottom:1px solid #f0f0f0;">
+        <div style="width:26px;height:26px;border-radius:6px;background:rgba(124,58,237,.1);display:flex;align-items:center;justify-content:center;flex:none;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
+        </div>
+        <div><div style="font-size:12px;font-weight:600;color:#111;">Visit Transcript</div><div style="font-size:10.5px;color:#aaa;">Audio recording or transcript</div></div>
+      </button>
+      <button data-action="cp-add-note" style="display:flex;align-items:center;gap:10px;width:100%;padding:11px 14px;background:none;border:none;cursor:pointer;text-align:left;">
+        <div style="width:26px;height:26px;border-radius:6px;background:rgba(59,130,246,.1);display:flex;align-items:center;justify-content:center;flex:none;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        </div>
+        <div><div style="font-size:12px;font-weight:600;color:#111;">Call Notes</div><div style="font-size:10.5px;color:#aaa;">Nurse or coordinator notes</div></div>
+      </button>
+    </div>`:'';
+
+  // ── Left panel ──
+  const scanning=phase==='running';
+  const leftPanel=`
+    <div style="width:340px;flex:none;border-right:1.5px solid #f0f0f0;display:flex;flex-direction:column;overflow:hidden;">
+      <div style="flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;">
+        <!-- Chart card -->
+        <div style="border:1.5px solid ${highlighted?'rgba(99,102,241,.35)':'rgba(29,78,216,.2)'};border-radius:12px;overflow:hidden;position:relative;">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 13px;background:rgba(29,78,216,.06);border-bottom:1px solid rgba(29,78,216,.15);">
+            <div style="display:flex;align-items:center;gap:7px;">
+              <div style="width:6px;height:6px;border-radius:50%;background:#1d4ed8;"></div>
+              <span style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#1d4ed8;">Input 1 — Patient Chart</span>
+            </div>
+            <span style="font-size:9.5px;color:#bbb;">${p.mrn}</span>
+          </div>
+          ${scanning?`<div style="position:absolute;left:0;right:0;height:3px;z-index:5;background:linear-gradient(90deg,transparent,rgba(99,102,241,.9) 30%,rgba(99,102,241,.9) 70%,transparent);animation:cp-scan 1.6s ease-in-out infinite;top:0;pointer-events:none;box-shadow:0 0 16px rgba(99,102,241,.5);"></div><div style="position:absolute;left:0;right:0;height:80px;z-index:4;background:linear-gradient(180deg,rgba(99,102,241,.06),transparent);animation:cp-scan 1.6s ease-in-out infinite;top:0;pointer-events:none;"></div>`:''}
+          <div style="padding:10px 14px;max-height:240px;overflow-y:auto;">${chartHtml}</div>
+        </div>
+        <!-- User input cards -->
+        ${scanning?`<div style="position:relative;display:flex;flex-direction:column;gap:8px;">
+          <div style="position:absolute;left:0;right:0;height:3px;z-index:5;background:linear-gradient(90deg,transparent,rgba(99,102,241,.9) 30%,rgba(99,102,241,.9) 70%,transparent);animation:cp-scan 1.6s ease-in-out .4s infinite;top:0;pointer-events:none;box-shadow:0 0 16px rgba(99,102,241,.5);"></div>
+          ${S.cpInputs.map((inp,i)=>mkCPInputCard(inp,i)).join('')}
+        </div>`:S.cpInputs.map((inp,i)=>mkCPInputCard(inp,i)).join('')}
+        <!-- Prompt input -->
+        ${phase==='input'?`<div style="border:1.5px solid #e5e7eb;border-radius:11px;overflow:hidden;background:#fff;">
+          <div style="padding:7px 13px;border-bottom:1px solid #f0f0f0;background:#fafafa;">
+            <span style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#9ca3af;">Notes</span>
+          </div>
+          <textarea id="cp-prompt-input" placeholder="Add context for the AI…" rows="2" style="width:100%;padding:8px 11px;font-size:12px;border:none;resize:none;background:#fff;color:#111;font-family:inherit;outline:none;line-height:1.5;box-sizing:border-box;">${S.cpPrompt}</textarea>
+        </div>`:''}
+      </div>
+      <!-- Add input button -->
+      ${phase==='input'?`<div style="padding:10px 12px;border-top:1px solid #f5f5f5;position:relative;">
+        ${cpInputMenu}
+        <button data-action="cp-input-menu" style="width:100%;padding:8px;border-radius:9px;border:1.5px dashed #e5e7eb;background:transparent;font-size:11.5px;font-weight:600;color:#9ca3af;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add another input
+        </button>
+      </div>`:''}
+    </div>`;
+
+  // ── Right panel ──
+  let rightContent='';
+
+  if(phase==='input'){
+    // Template selection list + preview
+    const tmplRows=CALL_TEMPLATES.map(t=>{
+      const sel=S.cpTemplate===t.id;
+      return `<button data-action="cp-select:${t.id}" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;border:1.5px solid ${sel?'rgba(99,102,241,.45)':'#f0f0f0'};background:${sel?'rgba(99,102,241,.05)':'transparent'};cursor:pointer;text-align:left;width:100%;transition:border-color .12s,background .12s;margin-bottom:4px;">
+        <div style="width:26px;height:26px;border-radius:7px;background:${sel?'rgba(99,102,241,.15)':'rgba(99,102,241,.06)'};color:#6366f1;font-size:9.5px;font-weight:800;display:flex;align-items:center;justify-content:center;flex:none;">${t.num}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:12px;font-weight:${sel?700:600};color:${sel?'#4338ca':'#374151'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.title}</div>
+          <div style="font-size:10.5px;color:#9ca3af;margin-top:1px;">${t.hint}</div>
+        </div>
+        ${sel?`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`:''}
+      </button>`;
+    }).join('');
+
+    const previewHtml=selTmpl?`
+      <div style="border-top:1.5px solid #f0f0f0;padding:14px 16px 14px;">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;margin-bottom:10px;display:flex;align-items:center;gap:7px;">
+          Preview — Template ${selTmpl.num}
+          <span style="background:rgba(99,102,241,.1);color:#6366f1;padding:1px 7px;border-radius:99px;font-size:8.5px;">Raw</span>
+        </div>
+        <div style="font-family:'SF Mono',ui-monospace,monospace;font-size:10.5px;line-height:1.8;color:#555;white-space:pre-wrap;background:#f9fafb;border:1px solid #f0f0f0;border-radius:10px;padding:12px 14px;max-height:220px;overflow-y:auto;">${selTmpl.rawContent.replace(/</g,'&lt;')}</div>
+      </div>`:'<div style="padding:32px 20px;text-align:center;color:#d1d5db;font-size:12px;">Select a template to preview</div>';
+
+    rightContent=`
+      <div style="display:flex;flex-direction:column;height:100%;overflow:hidden;">
+        <div style="flex:1;overflow-y:auto;padding:12px 14px;">
+          <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#374151;margin-bottom:8px;">Select Template</div>
+          ${tmplRows}
+        </div>
+        ${previewHtml}
+        <div style="padding:10px 14px;border-top:1px solid #f0f0f0;flex:none;">
+          <button data-action="${selTmpl?'cp-run':'stop'}" style="width:100%;padding:11px;border-radius:10px;background:${selTmpl?'#111':'#e5e7eb'};color:${selTmpl?'#fff':'#bbb'};font-size:13px;font-weight:700;cursor:${selTmpl?'pointer':'default'};border:none;display:flex;align-items:center;justify-content:center;gap:7px;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M9.5 9.5l5 2.5-5 2.5V9.5z"/></svg>
+            Fill Template${selTmpl?` — ${selTmpl.title}`:''}
+          </button>
+        </div>
+      </div>`;
+  } else if(phase==='running'){
+    const steps=['Reading patient chart from eMDs','Cross-referencing CCM activity log','Matching conditions to template sections','Populating vitals and medications','Drafting quality metrics & actions','Finalizing call notes'];
+    rightContent=`
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:24px;padding:24px;">
+        <div style="position:relative;width:60px;height:60px;">
+          <div style="position:absolute;inset:0;border:3px solid rgba(99,102,241,.15);border-radius:50%;"></div>
+          <div style="position:absolute;inset:0;border:3px solid transparent;border-top-color:#6366f1;border-radius:50%;animation:sap-spin .8s linear infinite;"></div>
+          <div style="position:absolute;inset:9px;background:rgba(99,102,241,.1);border-radius:50%;display:flex;align-items:center;justify-content:center;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2.2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
           </div>
         </div>
-        <div style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:8px;">Filling template…</div>
-        <div style="font-size:13px;color:var(--text-3);margin-bottom:28px;">Template ${tmpl.num} · ${tmpl.title}</div>
-        <div style="display:flex;flex-direction:column;gap:8px;text-align:left;">
-          ${['Reading patient chart from eMDs','Cross-referencing CCM activity log','Matching conditions to template sections','Populating vitals and medications','Drafting quality metrics','Finalizing call notes'].map((step,i)=>`
-          <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--panel-2);border-radius:9px;animation:sap-slide .3s ease ${i*.12}s both;">
-            <div style="width:7px;height:7px;border-radius:50%;background:var(--accent);animation:sap-blink 1.4s ease ${i*.2}s infinite;flex:none;"></div>
-            <span style="font-size:12px;color:var(--text-2);">${step}</span>
+        <div style="text-align:center;">
+          <div style="font-size:14px;font-weight:700;color:#111;margin-bottom:5px;">Filling template…</div>
+          <div style="font-size:11.5px;color:#9ca3af;animation:sap-pulse 1.5s ease infinite;">Template ${selTmpl?selTmpl.num:'I'} · ${selTmpl?selTmpl.title:'Monthly Follow-Up'}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;width:100%;max-width:260px;">
+          ${steps.map((s,i)=>`<div style="display:flex;align-items:center;gap:8px;padding:7px 11px;background:#f9fafb;border-radius:8px;animation:sap-pulse 1.5s ease ${(i*.22).toFixed(2)}s infinite;">
+            <div style="width:6px;height:6px;border-radius:50%;background:rgba(99,102,241,.6);flex:none;"></div>
+            <span style="font-size:11.5px;color:#6b7280;">${s}</span>
           </div>`).join('')}
         </div>
-      </div>
-    </div>`;
+      </div>`;
+  } else {
+    // done phase — filled template sections
+    const tmpl=selTmpl||CALL_TEMPLATES[0];
+    const sections=buildFilledTemplate(p);
+    const sectionBlocks=sections.map((s,i)=>`
+      <div style="animation:cp-rise .25s ease ${(i*.08).toFixed(2)}s both;">
+        <div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#6366f1;margin-bottom:5px;display:flex;align-items:center;gap:7px;">
+          ${s.label}
+          <span style="font-size:8.5px;font-weight:700;background:rgba(99,102,241,.1);color:#6366f1;padding:1px 7px;border-radius:99px;">AI filled</span>
+        </div>
+        <div style="font-family:'SF Mono','Menlo','Consolas',monospace;font-size:11.5px;line-height:1.8;color:#333;white-space:pre-line;padding:12px 14px;background:#f9fafb;border-radius:10px;border:1px solid #f0f0f0;margin-bottom:12px;">${s.content}</div>
+      </div>`).join('');
+
+    const assignFooter=`
+      <div style="padding:12px 16px;border-top:1px solid #f0f0f0;background:#fff;flex:none;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="flex:1;">
+            <div style="font-size:10px;color:#9ca3af;margin-bottom:2px;">Template ${tmpl.num} — ${tmpl.title}</div>
+            <div style="font-size:12px;font-weight:700;color:#374151;">${sections.length} sections filled</div>
+          </div>
+          ${S.cpViewingId
+            ?`<div style="display:flex;align-items:center;gap:6px;padding:10px 14px;border-radius:10px;background:rgba(99,102,241,.08);border:1.5px solid rgba(99,102,241,.2);">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                <span style="font-size:12px;font-weight:700;color:#6366f1;">Assigned</span>
+              </div>`
+            :`<button data-action="care-plan-sign" style="padding:10px 20px;border-radius:10px;background:#111;color:#fff;font-size:12.5px;font-weight:700;cursor:pointer;border:none;">Assign</button>`}
+        </div>
+      </div>`;
+
+    rightContent=`
+      <div style="display:flex;flex-direction:column;height:100%;overflow:hidden;">
+        <div style="flex:1;overflow-y:auto;padding:14px 16px;">${sectionBlocks}</div>
+        ${assignFooter}
+      </div>`;
   }
 
-  // ── Step 3: Filled template ─────────────────────────────────────────────
-  const tmpl=CALL_TEMPLATES.find(t=>t.id===S.selectedTemplate)||CALL_TEMPLATES[0];
-  const sections=buildFilledTemplate(p);
-  const sectionBlocks=sections.map(s=>`
-    <div style="margin-bottom:16px;">
-      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--accent);margin-bottom:6px;display:flex;align-items:center;gap:8px;">
-        ${s.label}
-        <span style="font-size:9.5px;font-weight:700;background:var(--accent-soft);color:var(--accent);padding:1px 7px;border-radius:99px;letter-spacing:.05em;">AI filled</span>
+  const rightPanel=`
+    <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;background:#fff;">
+      <div style="padding:10px 16px;border-bottom:1px solid #f5f5f5;display:flex;align-items:center;justify-content:space-between;flex:none;">
+        <div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;">
+          ${phase==='input'?'Output · Template':`Output · ${selTmpl?selTmpl.title:'Template'}`}
+        </div>
+        ${phase==='done'?`<div style="display:flex;align-items:center;gap:5px;"><div style="width:6px;height:6px;border-radius:50%;background:#6366f1;"></div><span style="font-size:10.5px;color:#6366f1;font-weight:600;">Template filled</span></div>`
+        :phase==='running'?`<div style="display:flex;align-items:center;gap:5px;"><div style="width:6px;height:6px;border-radius:50%;background:#f59e0b;animation:sap-pulse .8s ease infinite;"></div><span style="font-size:10.5px;color:#f59e0b;font-weight:600;">Filling…</span></div>`
+        :''}
       </div>
-      <div style="font-family:'SF Mono','Menlo','Consolas',monospace;font-size:12.5px;line-height:1.8;color:var(--text-2);white-space:pre-line;padding:14px 16px;background:var(--panel-2);border-radius:10px;border:1px solid var(--border);">${s.content}</div>
-    </div>`).join('');
+      ${rightContent}
+    </div>`;
 
   return `
-  <div id="care-plan-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;">
-    <div style="background:var(--bg);border-radius:20px;box-shadow:0 28px 90px rgba(0,0,0,.4);width:100%;max-width:680px;max-height:90vh;overflow-y:auto;display:flex;flex-direction:column;">
-      <div style="padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--bg);z-index:1;">
-        <div>
-          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);margin-bottom:3px;">Template ${tmpl.num} — ${tmpl.title}</div>
-          <div style="font-size:17px;font-weight:800;">${p.name}</div>
+  <style>
+    @keyframes cp-rise{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes cp-scan{0%{top:-5%}100%{top:105%}}
+    @keyframes sap-spin{to{transform:rotate(360deg)}}
+    @keyframes sap-pulse{0%,100%{opacity:1}50%{opacity:.4}}
+    @keyframes hl-appear{from{opacity:0;background:rgba(99,102,241,.0)}to{opacity:1;background:rgba(99,102,241,.18)}}
+  </style>
+  <div id="care-plan-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;">
+    <div style="background:#fff;border-radius:20px;width:100%;max-width:960px;height:min(92vh,680px);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 28px 90px rgba(0,0,0,.4);">
+      <!-- Header -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 20px;border-bottom:1.5px solid #f0f0f0;background:#fff;flex:none;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div>
+            <div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#6366f1;margin-bottom:2px;">Fill Call Template</div>
+            <div style="font-size:15px;font-weight:800;color:#111;">${p.name}</div>
+          </div>
+          <div style="font-size:10px;color:#9ca3af;background:#f9fafb;padding:3px 10px;border-radius:99px;border:1px solid #eee;">Jun 2026 · ${cl.short}</div>
         </div>
-        <div style="display:flex;gap:8px;align-items:center;">
-          <button data-action="care-plan-back" style="font-size:12px;font-weight:600;color:var(--text-3);background:var(--panel-2);border:1px solid var(--border);border-radius:8px;padding:6px 12px;cursor:pointer;">← Back</button>
-          <button data-action="care-plan-close" style="width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:var(--panel-2);font-size:17px;cursor:pointer;color:var(--text-3);">×</button>
-        </div>
+        <button data-action="care-plan-close" style="width:26px;height:26px;border-radius:50%;border:1px solid #e5e7eb;background:#f9fafb;font-size:14px;cursor:pointer;color:#9ca3af;display:flex;align-items:center;justify-content:center;line-height:1;">×</button>
       </div>
-      <div style="padding:20px 24px;">
-        ${sectionBlocks}
-        <div style="display:flex;gap:10px;margin-top:8px;">
-          <button data-action="care-plan-close" style="flex:1;padding:12px;border-radius:10px;border:1px solid var(--border);font-size:13px;font-weight:600;color:var(--text-2);background:var(--panel);cursor:pointer;">Discard</button>
-          <button data-action="care-plan-sign" style="flex:2;padding:12px;border-radius:10px;background:var(--accent-2);color:#fff;font-size:13.5px;font-weight:700;cursor:pointer;">Assign</button>
-        </div>
+      <!-- Body -->
+      <div style="display:flex;flex:1;overflow:hidden;">
+        ${leftPanel}
+        ${rightPanel}
       </div>
     </div>
   </div>`;
@@ -3327,6 +3484,8 @@ function bindInputs(){
   if(ftp) filterInput(ftp,v=>{S.ftCreatePrompt=v;});
   const bp=document.getElementById('bill-prompt-input');
   if(bp) filterInput(bp,v=>{S.billingPrompt=v;});
+  const cp=document.getElementById('cp-prompt-input');
+  if(cp) filterInput(cp,v=>{S.cpPrompt=v;});
 }
 
 // ── Event delegation ──────────────────────────────────────────────────────
@@ -3412,28 +3571,61 @@ document.getElementById('app').addEventListener('click',e=>{
     S.billingOpen=false;S.billingPhase='input';S.billingPrompt='';S.billingInputs=[];S.billingInputMenu=false;S.billingReview={};S.billingViewingId=null;
     showToast('Billing codes assigned');render();return;
   }
-  if(act==='care-plan-open'){S.carePlanOpen=true;S.carePlanStep='select';S.selectedTemplate=null;render();return;}
-  if(act==='care-plan-close'){S.carePlanOpen=false;render();return;}
-  if(act==='care-plan-back'){S.carePlanStep='select';S.selectedTemplate=null;render();return;}
-  if(act.startsWith('care-plan-select:')){
-    S.selectedTemplate=parseInt(act.slice(17));
-    S.carePlanStep='loading';render();
-    setTimeout(()=>{if(S.carePlanOpen){S.carePlanStep='filled';render();}},2600);
+  if(act==='care-plan-open'){
+    S.carePlanOpen=true;S.cpPhase='input';S.cpTemplate=null;S.cpInputs=[];S.cpInputMenu=false;S.cpPrompt='';S.cpViewingId=null;
+    render();return;
+  }
+  if(act==='care-plan-close'){
+    S.carePlanOpen=false;S.cpPhase='input';S.cpTemplate=null;S.cpInputs=[];S.cpInputMenu=false;S.cpPrompt='';S.cpViewingId=null;
+    render();return;
+  }
+  if(act.startsWith('cp-select:')){
+    S.cpTemplate=parseInt(act.slice(10));S.cpInputMenu=false;render();return;
+  }
+  if(act==='cp-run'){
+    if(!S.cpTemplate) return;
+    S.cpPhase='running';S.cpInputMenu=false;render();
+    setTimeout(()=>{if(S.carePlanOpen){S.cpPhase='done';render();}},2600);
     return;
+  }
+  if(act==='cp-input-menu'){S.cpInputMenu=!S.cpInputMenu;render();return;}
+  if(act==='cp-add-transcript'){
+    S.cpInputs=[...S.cpInputs,{type:'transcript',label:'Visit Transcript',content:VISIT_TRANSCRIPT,id:Date.now()}];
+    S.cpInputMenu=false;render();return;
+  }
+  if(act==='cp-add-note'){
+    const note=S.cpPrompt.trim()||'Monthly check-in — patient reports stable symptoms, compliant with medications. BP 128/82. No new complaints. Medication refills requested.';
+    S.cpInputs=[...S.cpInputs,{type:'note',label:'Call Notes',content:note,id:Date.now()}];
+    S.cpInputMenu=false;render();return;
+  }
+  if(act.startsWith('cp-remove-input:')){
+    const idx=parseInt(act.slice(16));
+    S.cpInputs=S.cpInputs.filter((_,i)=>i!==idx);render();return;
   }
   if(act==='care-plan-sign'){
     const p=PATIENTS.find(pt=>pt.id===S.patientId);
-    const tmpl=CALL_TEMPLATES.find(t=>t.id===S.selectedTemplate)||CALL_TEMPLATES[0];
+    const tmpl=CALL_TEMPLATES.find(t=>t.id===S.cpTemplate)||CALL_TEMPLATES[0];
     if(p){
+      const filled=buildFilledTemplate(p);
       S.completedWork=[{
         id:Date.now(), type:'template', patientId:p.id, patient:p.name, provider:p.provider,
         templateNum:tmpl.num, templateTitle:tmpl.title, templateId:tmpl.id,
-        filledSections:buildFilledTemplate(p),
+        filledSections:filled,
         date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'}),
+        savedCpTemplate:S.cpTemplate,
+        savedCpInputs:[...S.cpInputs],
+        savedCpPrompt:S.cpPrompt,
       },...S.completedWork];
     }
-    S.carePlanOpen=false;
+    S.carePlanOpen=false;S.cpPhase='input';S.cpTemplate=null;S.cpInputs=[];S.cpInputMenu=false;S.cpPrompt='';S.cpViewingId=null;
     showToast('Template assigned');render();return;
+  }
+  // legacy compat
+  if(act==='care-plan-back'){S.cpPhase='input';S.cpTemplate=null;render();return;}
+  if(act.startsWith('care-plan-select:')){
+    S.cpTemplate=parseInt(act.slice(17));S.cpPhase='running';render();
+    setTimeout(()=>{if(S.carePlanOpen){S.cpPhase='done';render();}},2600);
+    return;
   }
   if(act==='clinic-drop'){S.clinicDrop=!S.clinicDrop;render();return;}
   if(act.startsWith('clinic-select:')){
@@ -3472,6 +3664,15 @@ document.getElementById('app').addEventListener('click',e=>{
       S.billingInputs=w.savedInputs?[...w.savedInputs]:[];
       S.billingPrompt=w.savedPrompt||'';
       S.billingInputMenu=false;S.billingViewingId=w.id;S.workItemView=null;
+      render();return;
+    }
+    if(w.type==='template'){
+      S.view='patient';S.patientId=w.patientId;
+      S.carePlanOpen=true;S.cpPhase='done';
+      S.cpTemplate=w.savedCpTemplate||w.templateId||1;
+      S.cpInputs=w.savedCpInputs?[...w.savedCpInputs]:[];
+      S.cpPrompt=w.savedCpPrompt||'';
+      S.cpInputMenu=false;S.cpViewingId=w.id;S.workItemView=null;
       render();return;
     }
     S.workItemView=w;render();return;
@@ -3716,7 +3917,7 @@ document.addEventListener('click', e => {
   }
   if(S.carePlanOpen){
     const overlay=document.getElementById('care-plan-overlay');
-    if(overlay && e.target===overlay){S.carePlanOpen=false;render();}
+    if(overlay && e.target===overlay){S.carePlanOpen=false;S.cpPhase='input';S.cpTemplate=null;S.cpInputs=[];S.cpInputMenu=false;S.cpPrompt='';S.cpViewingId=null;render();}
   }
   if(S.workItemView){
     const overlay=document.getElementById('wi-view-overlay');
@@ -3734,7 +3935,7 @@ window.addEventListener('keydown',e=>{
   if(e.key==='Escape'){
     if(S.workItemView){S.workItemView=null;render();return;}
     if(S.ftCreateOpen){S.ftCreateOpen=false;render();return;}
-    if(S.carePlanOpen){S.carePlanOpen=false;render();return;}
+    if(S.carePlanOpen){S.carePlanOpen=false;S.cpPhase='input';S.cpTemplate=null;S.cpInputs=[];S.cpInputMenu=false;S.cpPrompt='';S.cpViewingId=null;render();return;}
     if(S.billingOpen){S.billingOpen=false;S.billingPhase='input';S.billingPrompt='';S.billingInputs=[];S.billingInputMenu=false;S.billingReview={};S.billingViewingId=null;render();return;}
     if(S.addWfOpen){S.addWfOpen=false;render();return;}
     if(S.addTmplOpen){S.addTmplOpen=false;render();return;}
