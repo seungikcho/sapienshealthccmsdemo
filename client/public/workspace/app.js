@@ -1871,42 +1871,19 @@ function renderPatients(){
           </button>
           ${S.ptExportMenu?`
           <div data-action="pt-export-close" style="position:fixed;inset:0;z-index:98;"></div>
-          <div style="position:absolute;top:calc(100% + 6px);right:0;z-index:99;background:var(--panel);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);min-width:196px;padding:5px;overflow:hidden;">
-            ${someSelected?`
-            <div style="padding:5px 10px 3px;font-size:10.5px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.07em;">Selected · ${selIds.length}</div>
-            <button data-action="pt-export-csv" style="width:100%;display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;background:transparent;color:var(--text);font-size:13px;font-weight:600;cursor:pointer;text-align:left;" class="cmd-btn">
+          <div style="position:absolute;top:calc(100% + 6px);right:0;z-index:99;background:var(--panel);border:1px solid var(--border);border-radius:11px;box-shadow:var(--shadow);padding:4px;min-width:140px;overflow:hidden;">
+            <button data-action="pt-export-csv" style="width:100%;display:flex;align-items:center;gap:9px;padding:8px 12px;border-radius:8px;background:transparent;color:var(--text);font-size:13px;font-weight:600;cursor:pointer;text-align:left;" class="cmd-btn">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              Export as CSV
+              CSV
             </button>
-            <button data-action="pt-export-pdf" style="width:100%;display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;background:transparent;color:var(--text);font-size:13px;font-weight:600;cursor:pointer;text-align:left;" class="cmd-btn">
+            <button data-action="pt-export-pdf" style="width:100%;display:flex;align-items:center;gap:9px;padding:8px 12px;border-radius:8px;background:transparent;color:var(--text);font-size:13px;font-weight:600;cursor:pointer;text-align:left;" class="cmd-btn">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-              Export as PDF
-            </button>
-            <div style="height:1px;background:var(--border);margin:4px 0;"></div>`:''}
-            <div style="padding:5px 10px 3px;font-size:10.5px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.07em;">All Patients · ${PATIENTS.length}</div>
-            <button data-action="pt-export-csv-all" style="width:100%;display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;background:transparent;color:var(--text);font-size:13px;font-weight:600;cursor:pointer;text-align:left;" class="cmd-btn">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              Export as CSV
-            </button>
-            <button data-action="pt-export-pdf-all" style="width:100%;display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;background:transparent;color:var(--text);font-size:13px;font-weight:600;cursor:pointer;text-align:left;" class="cmd-btn">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-              Export as PDF
+              PDF
             </button>
           </div>`:''}
         </div>
       </div>
     </div>
-
-    <!-- Selection toolbar (shown when any patients selected) -->
-    ${someSelected?`
-    <div style="display:flex;align-items:center;gap:10px;padding:9px 14px;border-radius:11px;background:var(--accent-soft);border:1px solid var(--accent-line);margin-bottom:12px;">
-      <div style="display:flex;align-items:center;gap:7px;flex:1;">
-        <div style="width:20px;height:20px;border-radius:5px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;font-weight:800;">${selIds.length}</div>
-        <span style="font-size:13px;font-weight:600;color:var(--accent);">${selIds.length} patient${selIds.length>1?'s':''} selected — use the Export button above to download</span>
-      </div>
-      <button data-action="pt-deselect-all" style="padding:6px 12px;border-radius:9px;border:1px solid var(--accent-line);background:transparent;color:var(--accent);font-size:12.5px;font-weight:600;cursor:pointer;">Clear</button>
-    </div>`:''}
-
 
     <!-- Filter bar -->
     <div style="display:flex;flex-direction:column;gap:8px;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:var(--panel);margin-bottom:14px;">
@@ -3888,14 +3865,14 @@ document.getElementById('app').addEventListener('click',e=>{
     S.ptSelected=next;render();return;
   }
   if(act==='pt-deselect-all'){S.ptSelected={};render();return;}
-  if(act==='pt-export-csv'||act==='pt-export-csv-all'){
-    const ids=act==='pt-export-csv'?Object.keys(S.ptSelected).filter(id=>S.ptSelected[id]):null;
-    const pts=ids?PATIENTS.filter(p=>ids.includes(p.id)):PATIENTS;
+  if(act==='pt-export-csv'){
+    const ids=Object.keys(S.ptSelected).filter(id=>S.ptSelected[id]);
+    const pts=ids.length?PATIENTS.filter(p=>ids.includes(p.id)):PATIENTS;
     exportPatientsCSV(pts);render();return;
   }
-  if(act==='pt-export-pdf'||act==='pt-export-pdf-all'){
-    const ids=act==='pt-export-pdf'?Object.keys(S.ptSelected).filter(id=>S.ptSelected[id]):null;
-    const pts=ids?PATIENTS.filter(p=>ids.includes(p.id)):PATIENTS;
+  if(act==='pt-export-pdf'){
+    const ids=Object.keys(S.ptSelected).filter(id=>S.ptSelected[id]);
+    const pts=ids.length?PATIENTS.filter(p=>ids.includes(p.id)):PATIENTS;
     exportPatientsPDF(pts);render();return;
   }
   if(act==='billing-open'){
