@@ -28,7 +28,7 @@ const S = {
   billingPhase: 'input', billingPrompt: '', billingInputs: [], billingInputMenu: false, billingReview: {}, billingViewingId: null,
   carePlanStep: 'select', selectedTemplate: null, carePlanLoaded: false,
   cpPhase: 'input', cpTemplate: null, cpInputs: [], cpInputMenu: false, cpPrompt: '', cpViewingId: null,
-  ptStatus: 'all', ptSort: 'name', ptProvider: 'all',
+  ptStatus: 'all', ptSort: 'name', ptProvider: 'all', ptSelected: {},
   workItemView: null,
   ftDetailId: null,
   ftCreateOpen: false, ftCreateName: '', ftCreateDesc: '', ftCreateContent: '', ftCreatePrompt: '',
@@ -142,6 +142,70 @@ const CAP_META = {
 };
 
 // ── Helpers ───────────────────────────────────────────────────────────────
+function exportPatientsCSV(patients){
+  const esc=v=>`"${String(v||'').replace(/"/g,'""')}"`;
+  const headers=['Name','MRN','DOB','Age','Sex','Provider','Plan','Risk','CCM Status','Care Plan','Min/Mo','Last Call','Conditions','Medications'];
+  const rows=patients.map(p=>[
+    p.name,p.mrn,p.dob,p.age,p.sex,p.provider,p.plan,p.risk,
+    effectiveStatus(p),effectiveCpStatus(p),
+    p.activities.reduce((s,a)=>s+a.minutes,0),
+    p.lastCall,
+    p.conditions.join('; '),
+    p.medications.join('; '),
+  ].map(esc).join(','));
+  const csv=[headers.join(','),...rows].join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download=`ccm-patients-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+}
+function exportPatientsPDF(patients){
+  const statusLabel={
+    'signed-off':'Signed Off','ready':'Ready to Bill',
+    'in-progress':'In Progress','needs-call':'Needs Call',
+  };
+  const cpLabel={'complete':'Complete','in-progress':'In Progress','none':'Not Started'};
+  const rows=patients.map(p=>`
+    <tr>
+      <td>${p.name}</td><td>${p.mrn}</td><td>${p.dob}</td><td>Dr. ${p.provider}</td>
+      <td>${p.plan}</td>
+      <td class="st-${effectiveStatus(p)}">${statusLabel[effectiveStatus(p)]||'—'}</td>
+      <td>${cpLabel[effectiveCpStatus(p)]||'—'}</td>
+      <td style="text-align:center;font-weight:700;">${p.activities.reduce((s,a)=>s+a.minutes,0)}</td>
+      <td>${p.lastCall}</td>
+      <td style="font-size:11px;">${p.conditions.join('<br>')}</td>
+    </tr>`).join('');
+  const html=`<!DOCTYPE html><html><head><meta charset="utf-8"><title>CCM Patient Report — Jun 2026</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:system-ui,sans-serif;font-size:12px;color:#111;padding:24px;}
+    h1{font-size:17px;font-weight:800;margin-bottom:4px;}
+    .meta{font-size:11px;color:#666;margin-bottom:16px;}
+    table{width:100%;border-collapse:collapse;}
+    th{background:#f5f0ff;color:#4c3a99;font-size:10px;text-transform:uppercase;letter-spacing:.06em;padding:7px 10px;border-bottom:2px solid #d8cfff;text-align:left;}
+    td{padding:7px 10px;border-bottom:1px solid #eee;vertical-align:top;}
+    tr:nth-child(even) td{background:#fafafa;}
+    .st-signed-off{color:#1a7a45;font-weight:700;}
+    .st-ready{color:#b86200;font-weight:700;}
+    .st-in-progress{color:#1d5eb8;}
+    .st-needs-call{color:#888;}
+    @media print{body{padding:0;}@page{margin:1.5cm;}}
+  </style></head><body>
+  <h1>CCM Patient Report — Cypress Physicians Association</h1>
+  <div class="meta">Generated ${new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})} · ${patients.length} patients</div>
+  <table>
+    <thead><tr>
+      <th>Patient</th><th>MRN</th><th>DOB</th><th>Provider</th>
+      <th>Plan</th><th>Status</th><th>Care Plan</th><th>Min/Mo</th><th>Last Call</th><th>Active Conditions</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table>
+  <script>window.onload=()=>{window.print();}<\/script>
+  </body></html>`;
+  const w=window.open('','_blank','width=1000,height=700');
+  if(w){w.document.write(html);w.document.close();}
+}
+
 const money = n => '$'+n.toFixed(2);
 const initials = name => name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
 const first = name => name.split(' ')[0];
@@ -1747,6 +1811,11 @@ function renderPatients(){
     pill('Last Call', 'pt-sort:last-call',S.ptSort==='last-call'),
   ].join('');
 
+  const selIds=Object.keys(S.ptSelected).filter(id=>S.ptSelected[id]);
+  const allVisibleIds=list.map(p=>p.id);
+  const allVisibleSelected=allVisibleIds.length>0&&allVisibleIds.every(id=>S.ptSelected[id]);
+  const someSelected=selIds.length>0;
+
   const rows=list.map(p=>{
     const es=effectiveStatus(p);
     const sm=statusMeta[es]||statusMeta['needs-call'];
@@ -1754,8 +1823,12 @@ function renderPatients(){
     const minColor=totalMin>=20?'var(--good)':totalMin>=10?'var(--ready)':'var(--danger)';
     const cpSt=effectiveCpStatus(p);
     const cpDot=cpSt==='complete'?'var(--good)':cpSt==='in-progress'?'var(--ready)':'var(--text-3)';
+    const isSel=!!S.ptSelected[p.id];
     return `
-    <div class="table-row" data-action="patient:${p.id}" style="display:flex;align-items:center;padding:13px 20px;border-bottom:1px solid var(--border);transition:background .14s;gap:0;">
+    <div class="table-row" data-action="patient:${p.id}" style="display:flex;align-items:center;padding:13px 20px;border-bottom:1px solid var(--border);transition:background .14s;gap:0;background:${isSel?'var(--accent-soft)':''};">
+      <span style="width:36px;flex:none;" data-action="pt-select:${p.id}">
+        <span style="display:flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:5px;border:1.5px solid ${isSel?'var(--accent)':'var(--border-2)'};background:${isSel?'var(--accent)':'transparent'};color:#fff;font-size:10px;font-weight:800;cursor:pointer;transition:all .12s;">${isSel?'✓':''}</span>
+      </span>
       <span style="flex:1;display:flex;align-items:center;gap:12px;min-width:0;">
         <span style="position:relative;flex:none;">
           <span style="width:34px;height:34px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;">${initials(p.name)}</span>
@@ -1781,14 +1854,43 @@ function renderPatients(){
     </div>`}).join('');
 
   return `
-  <div style="padding:20px 30px 70px;max-width:1100px;margin:0 auto;width:100%;">
+  <div style="padding:20px 30px 70px;max-width:1140px;margin:0 auto;width:100%;">
     <!-- Header row -->
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:10px;">
       <h1 style="font-size:20px;font-weight:800;letter-spacing:-.02em;color:var(--text);margin:0;">Patients</h1>
-      <div style="display:flex;align-items:center;gap:8px;padding:7px 13px;border:1px solid var(--border);border-radius:10px;background:var(--panel);">
-        ${I.search}<input id="pq-input" value="${S.pq}" placeholder="Search patients…" style="border:none;background:transparent;color:var(--text);font-size:13px;font-family:inherit;outline:none;width:170px;"/>
+      <div style="display:flex;align-items:center;gap:8px;flex:1;justify-content:flex-end;">
+        <div style="display:flex;align-items:center;gap:8px;padding:7px 13px;border:1px solid var(--border);border-radius:10px;background:var(--panel);">
+          ${I.search}<input id="pq-input" value="${S.pq}" placeholder="Search patients…" style="border:none;background:transparent;color:var(--text);font-size:13px;font-family:inherit;outline:none;width:160px;"/>
+        </div>
+        <button data-action="pt-export-csv-all" style="display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:10px;border:1px solid var(--border);background:var(--panel);color:var(--text-2);font-size:12.5px;font-weight:600;cursor:pointer;" class="edit-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          CSV
+        </button>
+        <button data-action="pt-export-pdf-all" style="display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:10px;border:1px solid var(--border);background:var(--panel);color:var(--text-2);font-size:12.5px;font-weight:600;cursor:pointer;" class="edit-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          PDF
+        </button>
       </div>
     </div>
+
+    <!-- Selection toolbar (shown when any patients selected) -->
+    ${someSelected?`
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:11px;background:var(--accent-soft);border:1px solid var(--accent-line);margin-bottom:12px;">
+      <div style="display:flex;align-items:center;gap:7px;flex:1;">
+        <div style="width:20px;height:20px;border-radius:5px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;font-weight:800;">${selIds.length}</div>
+        <span style="font-size:13px;font-weight:600;color:var(--accent);">${selIds.length} patient${selIds.length>1?'s':''} selected</span>
+      </div>
+      <button data-action="pt-export-csv" style="display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:9px;background:var(--accent);color:#fff;font-size:12.5px;font-weight:700;border:none;cursor:pointer;" class="approve-btn">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export CSV
+      </button>
+      <button data-action="pt-export-pdf" style="display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:9px;background:var(--accent);color:#fff;font-size:12.5px;font-weight:700;border:none;cursor:pointer;" class="approve-btn">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Export PDF
+      </button>
+      <button data-action="pt-deselect-all" style="padding:7px 12px;border-radius:9px;border:1px solid var(--accent-line);background:transparent;color:var(--accent);font-size:12.5px;font-weight:600;cursor:pointer;">Clear</button>
+    </div>`:''}
+
 
     <!-- Filter bar -->
     <div style="display:flex;flex-direction:column;gap:8px;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:var(--panel);margin-bottom:14px;">
@@ -1811,6 +1913,9 @@ function renderPatients(){
     <!-- Table -->
     <div style="border:1px solid var(--border);border-radius:14px;overflow:hidden;background:var(--panel);box-shadow:var(--shadow);">
       <div style="display:flex;align-items:center;padding:10px 20px;border-bottom:1px solid var(--border);background:var(--panel-2);">
+        <span style="width:36px;flex:none;" data-action="pt-select-all">
+          <span style="display:flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:5px;border:1.5px solid ${allVisibleSelected?'var(--accent)':'var(--border-2)'};background:${allVisibleSelected?'var(--accent)':'transparent'};color:#fff;font-size:10px;font-weight:800;cursor:pointer;transition:all .12s;">${allVisibleSelected?'✓':''}</span>
+        </span>
         <span style="flex:1;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);">Patient</span>
         <span style="width:110px;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);">Provider</span>
         <span style="width:100px;text-align:center;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);">Min / Mo</span>
@@ -3746,6 +3851,34 @@ document.getElementById('app').addEventListener('click',e=>{
   if(act.startsWith('pt-status:')){S.ptStatus=act.slice(10);render();return;}
   if(act.startsWith('pt-provider:')){S.ptProvider=act.slice(12);render();return;}
   if(act.startsWith('pt-sort:')){S.ptSort=act.slice(8);render();return;}
+  if(act.startsWith('pt-select:')){
+    const pid=act.slice(10);
+    S.ptSelected={...S.ptSelected,[pid]:!S.ptSelected[pid]};
+    render();return;
+  }
+  if(act==='pt-select-all'){
+    const visibleIds=PATIENTS.filter(p=>{
+      if(S.pq&&!p.name.toLowerCase().includes(S.pq.toLowerCase())) return false;
+      if(S.ptStatus!=='all'&&effectiveStatus(p)!==S.ptStatus) return false;
+      if(S.ptProvider!=='all'&&p.provider!==S.ptProvider) return false;
+      return true;
+    }).map(p=>p.id);
+    const allSel=visibleIds.every(id=>S.ptSelected[id]);
+    const next={...S.ptSelected};
+    visibleIds.forEach(id=>{next[id]=!allSel;});
+    S.ptSelected=next;render();return;
+  }
+  if(act==='pt-deselect-all'){S.ptSelected={};render();return;}
+  if(act==='pt-export-csv'||act==='pt-export-csv-all'){
+    const ids=act==='pt-export-csv'?Object.keys(S.ptSelected).filter(id=>S.ptSelected[id]):null;
+    const pts=ids?PATIENTS.filter(p=>ids.includes(p.id)):PATIENTS;
+    exportPatientsCSV(pts);return;
+  }
+  if(act==='pt-export-pdf'||act==='pt-export-pdf-all'){
+    const ids=act==='pt-export-pdf'?Object.keys(S.ptSelected).filter(id=>S.ptSelected[id]):null;
+    const pts=ids?PATIENTS.filter(p=>ids.includes(p.id)):PATIENTS;
+    exportPatientsPDF(pts);return;
+  }
   if(act==='billing-open'){
     S.billingOpen=true;S.billingPhase='input';S.billingPrompt='';render();
     return;
