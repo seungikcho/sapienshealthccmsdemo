@@ -28,7 +28,7 @@ const S = {
   billingPhase: 'input', billingPrompt: '', billingInputs: [], billingInputMenu: false, billingReview: {}, billingViewingId: null,
   carePlanStep: 'select', selectedTemplate: null, carePlanLoaded: false,
   cpPhase: 'input', cpTemplate: null, cpInputs: [], cpInputMenu: false, cpPrompt: '', cpViewingId: null,
-  ptStatus: 'all', ptSort: 'name', ptProvider: 'all', ptSelected: {},
+  ptStatus: 'all', ptSort: 'name', ptProvider: 'all', ptSelected: {}, ptExportMenu: false,
   workItemView: null,
   ftDetailId: null,
   ftCreateOpen: false, ftCreateName: '', ftCreateDesc: '', ftCreateContent: '', ftCreatePrompt: '',
@@ -1862,33 +1862,49 @@ function renderPatients(){
         <div style="display:flex;align-items:center;gap:8px;padding:7px 13px;border:1px solid var(--border);border-radius:10px;background:var(--panel);">
           ${I.search}<input id="pq-input" value="${S.pq}" placeholder="Search patients…" style="border:none;background:transparent;color:var(--text);font-size:13px;font-family:inherit;outline:none;width:160px;"/>
         </div>
-        <button data-action="pt-export-csv-all" style="display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:10px;border:1px solid var(--border);background:var(--panel);color:var(--text-2);font-size:12.5px;font-weight:600;cursor:pointer;" class="edit-btn">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          CSV
-        </button>
-        <button data-action="pt-export-pdf-all" style="display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:10px;border:1px solid var(--border);background:var(--panel);color:var(--text-2);font-size:12.5px;font-weight:600;cursor:pointer;" class="edit-btn">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-          PDF
-        </button>
+        <div style="position:relative;">
+          <button data-action="pt-export-open" style="display:flex;align-items:center;gap:7px;padding:7px 14px;border-radius:10px;font-size:12.5px;font-weight:600;cursor:pointer;transition:background .15s,color .15s,border-color .15s;${someSelected?'background:var(--accent);color:#fff;border:1px solid transparent;':'background:var(--panel);color:var(--text-3);border:1px solid var(--border);'}" class="${someSelected?'approve-btn':'edit-btn'}">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Export
+            ${someSelected?`<span style="background:rgba(255,255,255,.22);border-radius:5px;padding:1px 6px;font-size:11px;font-weight:800;">${selIds.length}</span>`:''}
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          ${S.ptExportMenu?`
+          <div data-action="pt-export-close" style="position:fixed;inset:0;z-index:98;"></div>
+          <div style="position:absolute;top:calc(100% + 6px);right:0;z-index:99;background:var(--panel);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);min-width:196px;padding:5px;overflow:hidden;">
+            ${someSelected?`
+            <div style="padding:5px 10px 3px;font-size:10.5px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.07em;">Selected · ${selIds.length}</div>
+            <button data-action="pt-export-csv" style="width:100%;display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;background:transparent;color:var(--text);font-size:13px;font-weight:600;cursor:pointer;text-align:left;" class="cmd-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Export as CSV
+            </button>
+            <button data-action="pt-export-pdf" style="width:100%;display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;background:transparent;color:var(--text);font-size:13px;font-weight:600;cursor:pointer;text-align:left;" class="cmd-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              Export as PDF
+            </button>
+            <div style="height:1px;background:var(--border);margin:4px 0;"></div>`:''}
+            <div style="padding:5px 10px 3px;font-size:10.5px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.07em;">All Patients · ${PATIENTS.length}</div>
+            <button data-action="pt-export-csv-all" style="width:100%;display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;background:transparent;color:var(--text);font-size:13px;font-weight:600;cursor:pointer;text-align:left;" class="cmd-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Export as CSV
+            </button>
+            <button data-action="pt-export-pdf-all" style="width:100%;display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;background:transparent;color:var(--text);font-size:13px;font-weight:600;cursor:pointer;text-align:left;" class="cmd-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              Export as PDF
+            </button>
+          </div>`:''}
+        </div>
       </div>
     </div>
 
     <!-- Selection toolbar (shown when any patients selected) -->
     ${someSelected?`
-    <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:11px;background:var(--accent-soft);border:1px solid var(--accent-line);margin-bottom:12px;">
+    <div style="display:flex;align-items:center;gap:10px;padding:9px 14px;border-radius:11px;background:var(--accent-soft);border:1px solid var(--accent-line);margin-bottom:12px;">
       <div style="display:flex;align-items:center;gap:7px;flex:1;">
         <div style="width:20px;height:20px;border-radius:5px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;font-weight:800;">${selIds.length}</div>
-        <span style="font-size:13px;font-weight:600;color:var(--accent);">${selIds.length} patient${selIds.length>1?'s':''} selected</span>
+        <span style="font-size:13px;font-weight:600;color:var(--accent);">${selIds.length} patient${selIds.length>1?'s':''} selected — use the Export button above to download</span>
       </div>
-      <button data-action="pt-export-csv" style="display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:9px;background:var(--accent);color:#fff;font-size:12.5px;font-weight:700;border:none;cursor:pointer;" class="approve-btn">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Export CSV
-      </button>
-      <button data-action="pt-export-pdf" style="display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:9px;background:var(--accent);color:#fff;font-size:12.5px;font-weight:700;border:none;cursor:pointer;" class="approve-btn">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-        Export PDF
-      </button>
-      <button data-action="pt-deselect-all" style="padding:7px 12px;border-radius:9px;border:1px solid var(--accent-line);background:transparent;color:var(--accent);font-size:12.5px;font-weight:600;cursor:pointer;">Clear</button>
+      <button data-action="pt-deselect-all" style="padding:6px 12px;border-radius:9px;border:1px solid var(--accent-line);background:transparent;color:var(--accent);font-size:12.5px;font-weight:600;cursor:pointer;">Clear</button>
     </div>`:''}
 
 
@@ -3829,6 +3845,9 @@ document.getElementById('app').addEventListener('click',e=>{
   if(!el) return;
   const act=el.dataset.action;
   if(act==='stop'){e.stopPropagation();return;}
+  if(act!=='pt-export-open') S.ptExportMenu=false;
+  if(act==='pt-export-open'){S.ptExportMenu=!S.ptExportMenu;render();return;}
+  if(act==='pt-export-close'){render();return;}
   if(act==='close-cmd'){S.cmd=false;S.query='';render();return;}
   if(act==='cmd'){S.cmd=true;S.query='';render();return;}
   if(act==='toggle-new-task'){S.newTaskOpen=!S.newTaskOpen;render();return;}
@@ -3872,12 +3891,12 @@ document.getElementById('app').addEventListener('click',e=>{
   if(act==='pt-export-csv'||act==='pt-export-csv-all'){
     const ids=act==='pt-export-csv'?Object.keys(S.ptSelected).filter(id=>S.ptSelected[id]):null;
     const pts=ids?PATIENTS.filter(p=>ids.includes(p.id)):PATIENTS;
-    exportPatientsCSV(pts);return;
+    exportPatientsCSV(pts);render();return;
   }
   if(act==='pt-export-pdf'||act==='pt-export-pdf-all'){
     const ids=act==='pt-export-pdf'?Object.keys(S.ptSelected).filter(id=>S.ptSelected[id]):null;
     const pts=ids?PATIENTS.filter(p=>ids.includes(p.id)):PATIENTS;
-    exportPatientsPDF(pts);return;
+    exportPatientsPDF(pts);render();return;
   }
   if(act==='billing-open'){
     S.billingOpen=true;S.billingPhase='input';S.billingPrompt='';render();
