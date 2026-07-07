@@ -34,6 +34,8 @@ const S = {
   ftCreateOpen: false, ftCreateName: '', ftCreateDesc: '', ftCreateContent: '', ftCreatePrompt: '',
   ftCreateType: null, ftCreateStep: 'type', ftEditId: null,
   userFtTemplates: [],
+  patientSignoffs: {},
+  patientCarePlanStatus: {},
 };
 
 // ── Clinics ───────────────────────────────────────────────────────────────
@@ -53,7 +55,7 @@ const PATIENTS = [
     conditions:['Type 2 Diabetes Mellitus','Hypertension','Chronic Kidney Disease (Stage 3)'],
     medications:['Metformin 1000mg BID','Lisinopril 10mg daily','Amlodipine 5mg daily','Atorvastatin 40mg nightly'],
     vitals:{bp:'138/82',hr:78,temp:'98.4°F',weight:'167 lbs',a1c:'7.8%'},
-    minutesThisMonth:47, lastCall:'Jun 10, 2026', ccmStatus:'ready',
+    minutesThisMonth:47, lastCall:'Jun 10, 2026', ccmStatus:'ready', carePlanStatus:'complete',
     activities:[
       {date:'Jun 10',desc:'Monthly follow-up call — diabetes & hypertension review',staff:'Maria R., RN',clinical:true,minutes:22},
       {date:'Jun 3', desc:'Medication refill coordination with pharmacy',staff:'Maria R., RN',clinical:true,minutes:15},
@@ -64,7 +66,7 @@ const PATIENTS = [
     conditions:['Congestive Heart Failure (HFrEF)','Atrial Fibrillation','Hypertension'],
     medications:['Carvedilol 25mg BID','Furosemide 40mg daily','Apixaban 5mg BID','Lisinopril 5mg daily'],
     vitals:{bp:'128/76',hr:62,temp:'98.1°F',weight:'198 lbs',a1c:'N/A'},
-    minutesThisMonth:28, lastCall:'Jun 14, 2026', ccmStatus:'ready',
+    minutesThisMonth:28, lastCall:'Jun 14, 2026', ccmStatus:'ready', carePlanStatus:'complete',
     activities:[
       {date:'Jun 14',desc:'CHF monitoring — daily weight log review, edema assessment',staff:'Sandra K., LVN',clinical:true,minutes:28},
     ]},
@@ -73,7 +75,7 @@ const PATIENTS = [
     conditions:['COPD (GOLD Stage II)','Hyperlipidemia','Osteoarthritis'],
     medications:['Tiotropium inhaler daily','Albuterol PRN','Atorvastatin 20mg nightly','Acetaminophen 500mg TID'],
     vitals:{bp:'124/78',hr:74,temp:'97.9°F',weight:'142 lbs',a1c:'N/A'},
-    minutesThisMonth:12, lastCall:'Jun 2, 2026', ccmStatus:'needs-call',
+    minutesThisMonth:12, lastCall:'Jun 2, 2026', ccmStatus:'needs-call', carePlanStatus:'in-progress',
     activities:[
       {date:'Jun 2', desc:'Pharmacy coordination — inhaler refill and technique review',staff:'Sandra K., LVN',clinical:true,minutes:12},
     ]},
@@ -82,7 +84,7 @@ const PATIENTS = [
     conditions:['Coronary Artery Disease','Type 2 Diabetes Mellitus','Chronic Kidney Disease (Stage 3b)','Hypertension'],
     medications:['Aspirin 81mg daily','Atorvastatin 80mg nightly','Metoprolol 50mg BID','Metformin 500mg daily','Amlodipine 10mg daily'],
     vitals:{bp:'142/88',hr:68,temp:'98.2°F',weight:'189 lbs',a1c:'8.1%'},
-    minutesThisMonth:62, lastCall:'Jun 12, 2026', ccmStatus:'ready',
+    minutesThisMonth:62, lastCall:'Jun 12, 2026', ccmStatus:'ready', carePlanStatus:'complete',
     activities:[
       {date:'Jun 12',desc:'Monthly CCM call — CAD management, diabetes review, kidney monitoring',staff:'Maria R., RN',clinical:true,minutes:30},
       {date:'Jun 5', desc:'Cardiology follow-up coordination — appointment scheduling',staff:'Maria R., RN',clinical:true,minutes:20},
@@ -93,14 +95,14 @@ const PATIENTS = [
     conditions:['Hypertension','Hypothyroidism','Osteoporosis'],
     medications:['Amlodipine 10mg daily','Levothyroxine 75mcg daily','Alendronate 70mg weekly','Calcium+D3 daily'],
     vitals:{bp:'130/80',hr:72,temp:'98.0°F',weight:'155 lbs',a1c:'N/A'},
-    minutesThisMonth:0, lastCall:'May 20, 2026', ccmStatus:'needs-call',
+    minutesThisMonth:0, lastCall:'May 20, 2026', ccmStatus:'needs-call', carePlanStatus:'none',
     activities:[]},
   { id:'p6', name:'Antonio Reyes', dob:'02/14/1958', age:68, sex:'M', mrn:'CYP-6204',
     plan:'Medicare', risk:'High', provider:'Davis', last:'Jun 11',
     conditions:['Type 2 Diabetes Mellitus','Hypertension','Hyperlipidemia','Peripheral Artery Disease'],
     medications:['Glipizide 10mg daily','Lisinopril 20mg daily','Rosuvastatin 40mg nightly','Clopidogrel 75mg daily','Cilostazol 100mg BID'],
     vitals:{bp:'136/84',hr:80,temp:'98.3°F',weight:'201 lbs',a1c:'8.4%'},
-    minutesThisMonth:35, lastCall:'Jun 11, 2026', ccmStatus:'ready',
+    minutesThisMonth:35, lastCall:'Jun 11, 2026', ccmStatus:'ready', carePlanStatus:'complete',
     activities:[
       {date:'Jun 11',desc:'Monthly CCM call — diabetes management, PAD foot care education',staff:'Sandra K., LVN',clinical:true,minutes:25},
       {date:'Jun 6', desc:'Medication reconciliation — clopidogrel refill',staff:'Sandra K., LVN',clinical:true,minutes:10},
@@ -110,7 +112,7 @@ const PATIENTS = [
     conditions:['Atrial Fibrillation','Hypertension','Mild Cognitive Impairment'],
     medications:['Warfarin 5mg daily','Metoprolol 25mg BID','Ramipril 5mg daily'],
     vitals:{bp:'126/74',hr:64,temp:'97.8°F',weight:'138 lbs',a1c:'N/A'},
-    minutesThisMonth:18, lastCall:'Jun 8, 2026', ccmStatus:'in-progress',
+    minutesThisMonth:18, lastCall:'Jun 8, 2026', ccmStatus:'in-progress', carePlanStatus:'in-progress',
     activities:[
       {date:'Jun 8', desc:'INR check follow-up — result review, dose adjustment notification',staff:'Maria R., RN',clinical:true,minutes:18},
     ]},
@@ -119,7 +121,7 @@ const PATIENTS = [
     conditions:['COPD (GOLD Stage III)','Lung Cancer (Remission, 2023)','Depression','Hypertension'],
     medications:['Symbicort 160/4.5 BID','Albuterol PRN','Sertraline 100mg daily','Amlodipine 5mg daily'],
     vitals:{bp:'132/80',hr:82,temp:'98.5°F',weight:'174 lbs',a1c:'N/A'},
-    minutesThisMonth:54, lastCall:'Jun 13, 2026', ccmStatus:'ready',
+    minutesThisMonth:54, lastCall:'Jun 13, 2026', ccmStatus:'ready', carePlanStatus:'complete',
     activities:[
       {date:'Jun 13',desc:'Monthly CCM call — COPD symptom monitoring, depression screen (PHQ-2)',staff:'Maria R., RN',clinical:true,minutes:30},
       {date:'Jun 7', desc:'Oncology follow-up coordination — imaging results',staff:'Maria R., RN',clinical:true,minutes:15},
@@ -145,6 +147,31 @@ const initials = name => name.split(' ').map(w=>w[0]).slice(0,2).join('').toUppe
 const first = name => name.split(' ')[0];
 const byId = id => PATIENTS.find(p=>p.id===id) || S.extraPatients.find(p=>p.id===id);
 const typeLabel = t => ({lab:'Lab panel',note:'Visit note',referral:'Referral',doc:'Document',message:'Outreach'})[t];
+
+// Computes live patient CCM status (respects signoffs + actual minutes)
+function effectiveStatus(p){
+  if(S.patientSignoffs[p.id]) return 'signed-off';
+  const min=p.activities.reduce((s,a)=>s+a.minutes,0);
+  if(min>=20) return 'ready';
+  if(min>0) return 'in-progress';
+  return 'needs-call';
+}
+function effectiveCpStatus(p){
+  return S.patientCarePlanStatus[p.id]||p.carePlanStatus||'none';
+}
+// Returns CPT code recommendation and revenue for a given minutes total
+function billingTier(min){
+  if(min>=60){
+    const add=Math.floor((min-60)/30);
+    const codes=['99487',...Array(add).fill('99489')];
+    const rev=132.93+add*68.02;
+    return {codes,rev,label:'Complex CCM'};
+  }
+  const add=Math.min(2,Math.floor((min-20)/20));
+  const codes=['99490',...Array(add).fill('99439')];
+  const rev=62.71+add*47.34;
+  return {codes,rev,label:'Standard CCM'};
+}
 const riskMeta = r => !r?{c:'var(--text-3)',s:'var(--panel-2)'}:r==='High'?{c:'var(--danger)',s:'var(--danger-soft)'}:r==='Moderate'?{c:'var(--ready)',s:'var(--ready-soft)'}:{c:'var(--good)',s:'var(--good-soft)'};
 
 function showToast(msg){
@@ -1061,26 +1088,43 @@ function renderToday(ma){
       <div style="font-size:28px;font-weight:800;color:var(--text);letter-spacing:-.03em;line-height:1.1;">${val}</div>
     </div>`;
 
-  // Sign-off queue from current clinic's patients
-  const signoffRows=PATIENTS.filter(p=>p.ccmStatus==='ready'&&p.minutesThisMonth>=20).map(p=>{
-    const min=p.minutesThisMonth;
-    let codes='',rev=0;
-    if(min>=60){codes='99487';const add=Math.floor((min-60)/30);rev=132.93+(add*68.02);if(add)codes+=' + '+Array(add).fill('99489').join(' + ');}
-    else{codes='99490';const add=Math.min(2,Math.floor((min-20)/20));rev=62.71+(add*47.34);if(add)codes+=' + '+Array(add).fill('99439').join(' + ');}
-    return {p,min,codes,rev};
+  // Sign-off queue — pending (not yet signed off, eligible)
+  const signoffPending=PATIENTS.filter(p=>effectiveStatus(p)==='ready').map(p=>{
+    const min=p.activities.reduce((s,a)=>s+a.minutes,0);
+    const t=billingTier(min);
+    return {p,min,codes:t.codes.join(' + '),rev:t.rev};
   });
+  const signoffDoneList=PATIENTS.filter(p=>effectiveStatus(p)==='signed-off');
+  const dynamicSignoffReady=signoffPending.length;
+  const dynamicSignoffDone=signoffDoneList.length;
 
-  const signoffTable=signoffRows.length?signoffRows.map((r,i)=>`
-    <div style="display:grid;grid-template-columns:1fr 80px 160px 80px;align-items:center;padding:11px 16px;${i<signoffRows.length-1?'border-bottom:1px solid var(--border)':''};">
+  const signoffTable=(signoffPending.length||signoffDoneList.length)?`
+    ${signoffPending.map((r,i)=>`
+    <div style="display:grid;grid-template-columns:1fr 80px 160px 100px;align-items:center;padding:11px 16px;border-bottom:1px solid var(--border);">
       <div>
         <button data-action="pt-open:${r.p.id}" style="font-size:13px;font-weight:700;color:var(--text);cursor:pointer;background:none;border:none;padding:0;text-align:left;">${r.p.name}</button>
         <div style="font-size:11px;color:var(--text-3);margin-top:1px;">Dr. ${r.p.provider}</div>
       </div>
       <div style="font-size:13px;font-weight:700;color:var(--accent);text-align:center;">${r.min} min</div>
       <div style="font-size:11.5px;color:var(--text-2);font-family:monospace;">${r.codes}</div>
-      <div style="font-size:13px;font-weight:700;color:var(--good);text-align:right;">$${r.rev.toFixed(2)}</div>
-    </div>`).join('')
-  :`<div style="padding:28px;text-align:center;color:var(--text-3);font-size:13px;">No patients ready for sign-off this month.</div>`;
+      <div style="text-align:right;display:flex;align-items:center;justify-content:flex-end;gap:6px;">
+        <span style="font-size:13px;font-weight:700;color:var(--good);">$${r.rev.toFixed(2)}</span>
+        <button data-action="patient:${r.p.id}" style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:7px;background:var(--good);color:#fff;border:none;cursor:pointer;">Sign Off</button>
+      </div>
+    </div>`).join('')}
+    ${signoffDoneList.map(p=>`
+    <div style="display:grid;grid-template-columns:1fr 80px 160px 100px;align-items:center;padding:10px 16px;border-bottom:1px solid var(--border);opacity:.6;">
+      <div>
+        <span style="font-size:13px;font-weight:700;color:var(--text);">${p.name}</span>
+        <div style="font-size:11px;color:var(--text-3);margin-top:1px;">Dr. ${p.provider}</div>
+      </div>
+      <div style="font-size:13px;font-weight:700;color:var(--good);text-align:center;">${p.activities.reduce((s,a)=>s+a.minutes,0)} min</div>
+      <div style="font-size:11px;color:var(--text-3);font-style:italic;">Signed off</div>
+      <div style="text-align:right;">
+        <span style="font-size:11px;font-weight:700;padding:3px 9px;border-radius:7px;background:var(--good-soft);color:var(--good);">✓ Done</span>
+      </div>
+    </div>`).join('')}
+  `:`<div style="padding:28px;text-align:center;color:var(--text-3);font-size:13px;">No patients ready for sign-off this month.</div>`;
 
   // Activity review queue (missing or low minutes)
   const ACTIVITY_QUEUE=[
@@ -1161,30 +1205,36 @@ function renderToday(ma){
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px;">
 
       <div style="border:1px solid var(--border);border-radius:14px;background:var(--panel);box-shadow:var(--shadow);padding:16px 18px;grid-column:span 2;">
-        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--text-3);margin-bottom:10px;">Patients</div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--text-3);margin-bottom:10px;">Patients · Care Plan Status</div>
         <div style="display:flex;align-items:center;gap:0;">
           <div style="display:flex;flex-direction:column;gap:2px;padding-right:18px;border-right:1px solid var(--border);margin-right:18px;flex:none;">
             <div style="font-size:34px;font-weight:800;color:var(--accent);letter-spacing:-.03em;line-height:1;">${cl.patients}</div>
             <div style="font-size:11.5px;font-weight:600;color:var(--text-2);">Active Patients</div>
           </div>
           <div style="display:flex;gap:20px;">
-            ${[
-              {v:6,   label:'No Active<br>Care Plan',   color:'var(--text-2)'},
-              {v:1,   label:'In Progress<br>Care Plan', color:'var(--ready)'},
-              {v:cl.patients-7, label:'Completed<br>Care Plan', color:'var(--good)'},
-            ].map(s=>`
-            <div>
-              <div style="font-size:22px;font-weight:800;color:${s.color};letter-spacing:-.02em;line-height:1;">${s.v}</div>
-              <div style="font-size:11px;color:var(--text-3);margin-top:3px;line-height:1.3;">${s.label}</div>
-            </div>`).join('')}
+            ${(()=>{
+              const cpNone=PATIENTS.filter(p=>effectiveCpStatus(p)==='none').length;
+              const cpInProg=PATIENTS.filter(p=>effectiveCpStatus(p)==='in-progress').length;
+              const cpDone=PATIENTS.filter(p=>effectiveCpStatus(p)==='complete').length;
+              return [
+                {v:cpNone,   label:'No Active<br>Care Plan',   color:'var(--text-2)'},
+                {v:cpInProg, label:'In Progress<br>Care Plan', color:'var(--ready)'},
+                {v:cpDone,   label:'Completed<br>Care Plan',   color:'var(--good)'},
+              ].map(s=>`
+              <div>
+                <div style="font-size:22px;font-weight:800;color:${s.color};letter-spacing:-.02em;line-height:1;">${s.v}</div>
+                <div style="font-size:11px;color:var(--text-3);margin-top:3px;line-height:1.3;">${s.label}</div>
+              </div>`).join('');
+            })()}
           </div>
         </div>
       </div>
 
       <div style="border:1px solid var(--border);border-radius:14px;background:var(--panel);box-shadow:var(--shadow);padding:16px 18px;">
-        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--text-3);margin-bottom:10px;">Sign-Off to EHR/Bill</div>
-        <div style="font-size:34px;font-weight:800;color:var(--good);letter-spacing:-.03em;line-height:1;">${cl.signoffReady}</div>
-        <div style="font-size:11.5px;font-weight:600;color:var(--text-2);margin-top:3px;">Potential Sign-Offs</div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--text-3);margin-bottom:6px;">Sign-Off to EHR/Bill</div>
+        <div style="font-size:34px;font-weight:800;color:var(--ready);letter-spacing:-.03em;line-height:1;">${dynamicSignoffReady}</div>
+        <div style="font-size:11.5px;font-weight:600;color:var(--text-2);margin-top:2px;">Pending Sign-Offs</div>
+        ${dynamicSignoffDone>0?`<div style="margin-top:8px;display:flex;align-items:center;gap:5px;"><span style="font-size:13px;font-weight:700;color:var(--good);">${dynamicSignoffDone}</span><span style="font-size:11.5px;color:var(--text-3);">completed this month</span></div>`:''}
       </div>
 
       <div style="border:1px solid var(--border);border-radius:14px;background:var(--panel);box-shadow:var(--shadow);padding:16px 18px;grid-column:span 2;">
@@ -1653,15 +1703,16 @@ function renderMem(){
 function renderPatients(){
   const q=S.pq.toLowerCase();
   const statusMeta={
-    'ready':    {label:'Ready to Bill', color:'var(--good)',   bg:'var(--good-soft)'},
-    'in-progress':{label:'In Progress', color:'var(--ready)',  bg:'var(--ready-soft)'},
-    'needs-call':{label:'Needs Call',   color:'var(--text-3)', bg:'var(--panel-2)'},
+    'signed-off': {label:'Signed Off',   color:'var(--good)',   bg:'var(--good-soft)'},
+    'ready':      {label:'Ready to Bill',color:'var(--ready)',  bg:'var(--ready-soft)'},
+    'in-progress':{label:'In Progress',  color:'var(--info)',   bg:'var(--info-soft)'},
+    'needs-call': {label:'Needs Call',   color:'var(--text-3)', bg:'var(--panel-2)'},
   };
 
-  // filter
+  // filter using live effectiveStatus
   let list=PATIENTS.filter(p=>{
     if(q && !p.name.toLowerCase().includes(q)) return false;
-    if(S.ptStatus!=='all' && p.ccmStatus!==S.ptStatus) return false;
+    if(S.ptStatus!=='all' && effectiveStatus(p)!==S.ptStatus) return false;
     if(S.ptProvider!=='all' && p.provider!==S.ptProvider) return false;
     return true;
   });
@@ -1675,10 +1726,11 @@ function renderPatients(){
   const pill=(label,act,active)=>`<button data-action="${act}" style="padding:5px 12px;border-radius:99px;font-size:12px;font-weight:600;border:1px solid ${active?'var(--accent)':'var(--border)'};background:${active?'var(--accent-soft)':'transparent'};color:${active?'var(--accent)':'var(--text-3)'};cursor:pointer;transition:all .15s;">${label}</button>`;
 
   const statusPills=[
-    pill('All',         'pt-status:all',         S.ptStatus==='all'),
-    pill('Ready to Bill','pt-status:ready',       S.ptStatus==='ready'),
-    pill('In Progress', 'pt-status:in-progress',  S.ptStatus==='in-progress'),
-    pill('Needs Call',  'pt-status:needs-call',   S.ptStatus==='needs-call'),
+    pill('All',         'pt-status:all',          S.ptStatus==='all'),
+    pill('Signed Off',  'pt-status:signed-off',   S.ptStatus==='signed-off'),
+    pill('Ready to Bill','pt-status:ready',        S.ptStatus==='ready'),
+    pill('In Progress', 'pt-status:in-progress',   S.ptStatus==='in-progress'),
+    pill('Needs Call',  'pt-status:needs-call',    S.ptStatus==='needs-call'),
   ].join('');
 
   const providerPills=[
@@ -1696,23 +1748,36 @@ function renderPatients(){
   ].join('');
 
   const rows=list.map(p=>{
-    const sm=statusMeta[p.ccmStatus]||statusMeta['needs-call'];
-    const minColor=p.minutesThisMonth>=20?'var(--good)':p.minutesThisMonth>=10?'var(--ready)':'var(--danger)';
+    const es=effectiveStatus(p);
+    const sm=statusMeta[es]||statusMeta['needs-call'];
+    const totalMin=p.activities.reduce((s,a)=>s+a.minutes,0);
+    const minColor=totalMin>=20?'var(--good)':totalMin>=10?'var(--ready)':'var(--danger)';
+    const cpSt=effectiveCpStatus(p);
+    const cpDot=cpSt==='complete'?'var(--good)':cpSt==='in-progress'?'var(--ready)':'var(--text-3)';
     return `
     <div class="table-row" data-action="patient:${p.id}" style="display:flex;align-items:center;padding:13px 20px;border-bottom:1px solid var(--border);transition:background .14s;gap:0;">
       <span style="flex:1;display:flex;align-items:center;gap:12px;min-width:0;">
-        <span style="width:34px;height:34px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex:none;">${initials(p.name)}</span>
+        <span style="position:relative;flex:none;">
+          <span style="width:34px;height:34px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;">${initials(p.name)}</span>
+          ${es==='signed-off'?`<span style="position:absolute;bottom:-1px;right:-1px;width:11px;height:11px;border-radius:50%;background:var(--good);border:2px solid var(--bg);display:flex;align-items:center;justify-content:center;font-size:6px;color:#fff;font-weight:800;">✓</span>`:''}
+        </span>
         <span style="font-size:13.5px;font-weight:600;">${p.name}</span>
       </span>
       <span style="width:110px;font-size:13px;font-weight:700;color:var(--text);">${p.provider}</span>
       <span style="width:100px;text-align:center;">
-        <span style="font-size:14px;font-weight:800;color:${minColor};">${p.minutesThisMonth}</span>
+        <span style="font-size:14px;font-weight:800;color:${minColor};">${totalMin}</span>
         <span style="font-size:11px;color:var(--text-3);"> min</span>
       </span>
-      <span style="width:130px;text-align:center;">
+      <span style="width:130px;text-align:center;display:inline-flex;align-items:center;justify-content:center;gap:6px;">
         <span style="font-size:11.5px;font-weight:700;color:${sm.color};background:${sm.bg};padding:4px 10px;border-radius:99px;">${sm.label}</span>
       </span>
-      <span style="width:100px;text-align:right;font-size:12px;color:var(--text-3);">${p.lastCall.replace(', 2026','')}</span>
+      <span style="width:80px;text-align:center;">
+        <span title="Care Plan: ${cpSt}" style="display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:${cpDot};">
+          <span style="width:7px;height:7px;border-radius:50%;background:${cpDot};flex:none;"></span>
+          ${cpSt==='complete'?'CP Done':cpSt==='in-progress'?'CP Active':'No CP'}
+        </span>
+      </span>
+      <span style="width:90px;text-align:right;font-size:12px;color:var(--text-3);">${p.lastCall.replace(', 2026','')}</span>
     </div>`}).join('');
 
   return `
@@ -1750,7 +1815,8 @@ function renderPatients(){
         <span style="width:110px;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);">Provider</span>
         <span style="width:100px;text-align:center;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);">Min / Mo</span>
         <span style="width:130px;text-align:center;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);">Status</span>
-        <span style="width:100px;text-align:right;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);">Last Call</span>
+        <span style="width:80px;text-align:center;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);">Care Plan</span>
+        <span style="width:90px;text-align:right;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);">Last Call</span>
       </div>
       ${rows||`<div style="padding:36px;text-align:center;font-size:13.5px;color:var(--text-3);">No patients match the current filter.</div>`}
     </div>
@@ -1760,13 +1826,48 @@ function renderPatients(){
 // ── Patient detail view ───────────────────────────────────────────────────
 function renderPatient(){
   const p=PATIENTS.find(pt=>pt.id===S.patientId); if(!p) return '';
-  const statusMeta={
-    'ready':    {label:'Ready to Bill', color:'var(--good)',   bg:'var(--good-soft)'},
-    'in-progress':{label:'In Progress', color:'var(--ready)',  bg:'var(--ready-soft)'},
-    'needs-call':{label:'Needs Call',   color:'var(--text-3)', bg:'var(--panel-2)'},
+  const detailStatusMeta={
+    'signed-off': {label:'Signed Off',   color:'var(--good)',   bg:'var(--good-soft)'},
+    'ready':      {label:'Ready to Bill',color:'var(--ready)',  bg:'var(--ready-soft)'},
+    'in-progress':{label:'In Progress',  color:'var(--info)',   bg:'var(--info-soft)'},
+    'needs-call': {label:'Needs Call',   color:'var(--text-3)', bg:'var(--panel-2)'},
   };
-  const sm=statusMeta[p.ccmStatus]||statusMeta['needs-call'];
+  const es=effectiveStatus(p);
+  const sm=detailStatusMeta[es]||detailStatusMeta['needs-call'];
   const totalMin=p.activities.reduce((s,a)=>s+a.minutes,0);
+  const cpSt=effectiveCpStatus(p);
+  const isSignedOff=!!S.patientSignoffs[p.id];
+  const isReady=totalMin>=20&&!isSignedOff;
+
+  // Minutes progress bar (markers at 20, 40, 60)
+  const MAX_DISP=80;
+  const barPct=Math.min(100,(totalMin/MAX_DISP)*100);
+  const tier=totalMin>=20?billingTier(totalMin):null;
+  const progressBar=(()=>{
+    const filled=`<div style="height:100%;width:${barPct}%;background:${isSignedOff?'var(--good)':totalMin>=20?'var(--ready)':'var(--text-3)'};border-radius:99px;transition:width .4s;"></div>`;
+    const marker=(pct,label)=>`
+      <div style="position:absolute;left:${pct}%;top:-20px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:2px;">
+        <span style="font-size:9px;font-weight:700;color:var(--text-3);">${label}</span>
+        <div style="width:1px;height:6px;background:var(--border-2);"></div>
+      </div>`;
+    return `
+    <div style="position:relative;margin-top:24px;margin-bottom:10px;">
+      ${marker((20/MAX_DISP)*100,'20')}
+      ${marker((40/MAX_DISP)*100,'40')}
+      ${marker((60/MAX_DISP)*100,'60')}
+      <div style="height:8px;background:var(--panel-2);border-radius:99px;overflow:hidden;border:1px solid var(--border);">
+        ${filled}
+      </div>
+    </div>`;
+  })();
+
+  // Care plan UI
+  const cpMeta={
+    'complete':    {label:'Complete',    color:'var(--good)',   bg:'var(--good-soft)',   icon:'✓'},
+    'in-progress': {label:'In Progress', color:'var(--ready)',  bg:'var(--ready-soft)',  icon:'○'},
+    'none':        {label:'Not Started', color:'var(--text-3)', bg:'var(--panel-2)',     icon:'—'},
+  };
+  const cpM=cpMeta[cpSt]||cpMeta['none'];
 
   const actRows=p.activities.length
     ? p.activities.map(a=>`
@@ -1790,12 +1891,23 @@ function renderPatient(){
     <!-- Header -->
     <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;gap:20px;">
       <div style="display:flex;align-items:center;gap:13px;">
-        <span style="width:44px;height:44px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;flex:none;">${initials(p.name)}</span>
+        <span style="position:relative;flex:none;">
+          <span style="width:44px;height:44px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;">${initials(p.name)}</span>
+          ${isSignedOff?`<span style="position:absolute;bottom:0;right:0;width:16px;height:16px;border-radius:50%;background:var(--good);border:2px solid var(--bg);display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff;font-weight:800;">✓</span>`:''}
+        </span>
         <div>
           <h1 style="font-size:21px;font-weight:800;letter-spacing:-.02em;margin:0;">${p.name}</h1>
+          <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
+            <span style="font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:99px;color:${sm.color};background:${sm.bg};">${sm.label}</span>
+            <span style="font-size:11px;color:var(--text-3);">${p.mrn} · Dr. ${p.provider} · ${p.plan}</span>
+          </div>
         </div>
       </div>
-      <div style="display:flex;gap:5px;flex:none;">
+      <div style="display:flex;gap:5px;flex:none;align-items:center;">
+        ${isReady?`<button data-action="billing-open" style="display:flex;align-items:center;gap:8px;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:700;background:var(--good);color:#fff;border:none;cursor:pointer;box-shadow:0 4px 12px rgba(38,122,85,.3);transition:opacity .15s;" class="approve-btn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          Sign Off
+        </button>`:''}
         <button data-action="billing-open" class="nav-btn" style="display:flex;align-items:center;gap:9px;padding:9px 14px;border-radius:10px;font-size:13px;font-weight:600;background:var(--panel-2);color:var(--text-2);border:1px solid var(--border);cursor:pointer;transition:background .15s;">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h3"/></svg>
           Billing Code
@@ -1804,18 +1916,6 @@ function renderPatient(){
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.63A2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"/></svg>
           Followup Call
         </button>
-      </div>
-    </div>
-
-    <!-- Status strip -->
-    <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;">
-      <div style="display:flex;align-items:center;gap:7px;padding:7px 14px;border-radius:9px;border:1px solid var(--border);background:var(--panel-2);">
-        <span style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);">Status</span>
-        <span style="font-size:12px;font-weight:700;color:${sm.color};background:${sm.bg};padding:2px 9px;border-radius:99px;">${sm.label}</span>
-      </div>
-      <div style="display:flex;align-items:center;gap:7px;padding:7px 14px;border-radius:9px;border:1px solid var(--border);background:var(--panel-2);">
-        <span style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);">CCM Min</span>
-        <span style="font-size:14px;font-weight:800;color:${totalMin>=20?'var(--good)':'var(--ready)'};">${totalMin}</span>
       </div>
     </div>
 
@@ -1844,8 +1944,69 @@ function renderPatient(){
         </div>
       </div>
 
-      <!-- Right: CCM activity log + Work Items Done -->
-      <div style="flex:none;width:360px;display:flex;flex-direction:column;gap:14px;">
+      <!-- Right: Monthly CCM Status + Activity Log + Work Items Done -->
+      <div style="flex:none;width:370px;display:flex;flex-direction:column;gap:14px;">
+
+        <!-- Monthly CCM Status Card -->
+        <div style="border:1px solid ${isSignedOff?'var(--good)':isReady?'var(--ready)':'var(--border)'};border-radius:14px;overflow:hidden;background:var(--panel);box-shadow:var(--shadow);">
+          <div style="padding:11px 16px;border-bottom:1px solid var(--border);background:${isSignedOff?'var(--good-soft)':isReady?'var(--ready-soft)':'var(--panel-2)'};display:flex;align-items:center;justify-content:space-between;">
+            <span style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);">Monthly CCM Status</span>
+            <span style="font-size:11px;font-weight:700;color:var(--text-3);">Jun 2026</span>
+          </div>
+          <div style="padding:14px 18px;">
+            <!-- Minutes progress bar -->
+            <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:2px;">
+              <span style="font-size:28px;font-weight:800;color:${isSignedOff?'var(--good)':totalMin>=20?'var(--ready)':'var(--text-2)'};letter-spacing:-.02em;line-height:1;">${totalMin}</span>
+              <span style="font-size:12px;color:var(--text-3);font-weight:600;">min this month</span>
+            </div>
+            ${progressBar}
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-3);margin-bottom:12px;">
+              <span>0</span><span style="margin-left:${(20/MAX_DISP)*100}%;">Billable</span><span style="margin-left:auto;">80+</span>
+            </div>
+
+            ${isSignedOff?`
+            <!-- Signed Off State -->
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;background:var(--good-soft);border:1px solid var(--good);">
+              <div style="width:28px;height:28px;border-radius:50%;background:var(--good);display:flex;align-items:center;justify-content:center;flex:none;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div>
+                <div style="font-size:13px;font-weight:700;color:var(--good);">Signed Off</div>
+                <div style="font-size:11px;color:var(--text-3);">Billing submitted for Jun 2026</div>
+              </div>
+            </div>`
+            :totalMin>=20?`
+            <!-- Ready to Bill State -->
+            <div style="margin-bottom:10px;">
+              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);margin-bottom:6px;">Recommended Billing</div>
+              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                ${tier.codes.map(c=>`<span style="padding:3px 10px;border-radius:7px;background:var(--good-soft);border:1px solid var(--good);font-size:12px;font-weight:800;font-family:monospace;color:var(--good);">${c}</span>`).join('')}
+                <span style="font-size:13px;font-weight:700;color:var(--good);">$${tier.rev.toFixed(2)}<span style="font-size:10px;font-weight:500;color:var(--text-3);">/mo</span></span>
+              </div>
+            </div>
+            <button data-action="billing-open" style="width:100%;padding:10px;border-radius:10px;background:var(--good);color:#fff;font-size:13px;font-weight:700;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:opacity .15s;" class="approve-btn">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              Sign Off &amp; Submit Billing
+            </button>`:`
+            <!-- Not Eligible State -->
+            <div style="display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;background:var(--panel-2);border:1px solid var(--border);">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--ready)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <span style="font-size:12.5px;color:var(--text-2);font-weight:600;">${20-totalMin} more min needed to bill</span>
+            </div>`}
+
+            <!-- Care Plan Status -->
+            <div style="margin-top:12px;display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-radius:10px;background:var(--panel-2);border:1px solid var(--border);">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="13" y2="15"/></svg>
+                <span style="font-size:12px;font-weight:600;color:var(--text-2);">Care Plan</span>
+                <span style="font-size:11px;font-weight:700;color:${cpM.color};background:${cpM.bg};padding:2px 8px;border-radius:99px;">${cpM.label}</span>
+              </div>
+              ${cpSt!=='complete'?`<button data-action="cp-mark-complete" class="edit-btn" style="font-size:11.5px;font-weight:700;padding:5px 12px;border-radius:8px;border:1px solid var(--border);background:var(--panel);color:var(--text-2);cursor:pointer;transition:all .15s;">Complete ↗</button>`:''}
+            </div>
+          </div>
+        </div>
+
+        <!-- CCM Activity Log -->
         <div style="border:1px solid var(--border);border-radius:14px;overflow:hidden;background:var(--panel);box-shadow:var(--shadow);">
           <div style="padding:11px 16px;border-bottom:1px solid var(--border);background:var(--panel-2);display:flex;align-items:center;justify-content:space-between;">
             <span style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);">CCM Activity Log</span>
@@ -3636,9 +3797,11 @@ document.getElementById('app').addEventListener('click',e=>{
         savedInputs:[...S.billingInputs],
         savedPrompt:S.billingPrompt,
       },...S.completedWork];
+      // Mark patient as signed off for this month
+      if(!S.billingViewingId) S.patientSignoffs={...S.patientSignoffs,[p.id]:true};
     }
     S.billingOpen=false;S.billingPhase='input';S.billingPrompt='';S.billingInputs=[];S.billingInputMenu=false;S.billingReview={};S.billingViewingId=null;
-    showToast('Billing codes assigned');render();return;
+    showToast('Billing codes assigned — patient signed off');render();return;
   }
   if(act==='care-plan-open'){
     S.carePlanOpen=true;S.cpPhase='input';S.cpTemplate=null;S.cpInputs=[];S.cpInputMenu=false;S.cpPrompt='';S.cpViewingId=null;
@@ -3671,6 +3834,11 @@ document.getElementById('app').addEventListener('click',e=>{
     const idx=parseInt(act.slice(16));
     S.cpInputs=S.cpInputs.filter((_,i)=>i!==idx);render();return;
   }
+  if(act==='cp-mark-complete'){
+    const p=PATIENTS.find(pt=>pt.id===S.patientId);
+    if(p){S.patientCarePlanStatus={...S.patientCarePlanStatus,[p.id]:'complete'};}
+    showToast('Care plan marked complete');render();return;
+  }
   if(act==='care-plan-sign'){
     const p=PATIENTS.find(pt=>pt.id===S.patientId);
     const tmpl=CALL_TEMPLATES.find(t=>t.id===S.cpTemplate)||CALL_TEMPLATES[0];
@@ -3685,6 +3853,8 @@ document.getElementById('app').addEventListener('click',e=>{
         savedCpInputs:[...S.cpInputs],
         savedCpPrompt:S.cpPrompt,
       },...S.completedWork];
+      // Followup call assigned = care plan is documented as complete
+      S.patientCarePlanStatus={...S.patientCarePlanStatus,[p.id]:'complete'};
     }
     S.carePlanOpen=false;S.cpPhase='input';S.cpTemplate=null;S.cpInputs=[];S.cpInputMenu=false;S.cpPrompt='';S.cpViewingId=null;
     showToast('Template assigned');render();return;
